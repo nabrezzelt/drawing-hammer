@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingHammerClientApi", "D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingHammerDataLib", "DrawingHammerDataLib\DrawingHammerDataLib.csproj", "{1E3ECEBA-BFEB-4245-9E66-956A9748F476}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperLibrary", "HelperLibrary\HelperLibrary.csproj", "{3922E085-3615-422B-B706-EF8ADDEAE830}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{1E3ECEBA-BFEB-4245-9E66-956A9748F476}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E3ECEBA-BFEB-4245-9E66-956A9748F476}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E3ECEBA-BFEB-4245-9E66-956A9748F476}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3922E085-3615-422B-B706-EF8ADDEAE830}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3922E085-3615-422B-B706-EF8ADDEAE830}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3922E085-3615-422B-B706-EF8ADDEAE830}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3922E085-3615-422B-B706-EF8ADDEAE830}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -39,8 +39,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\AuthenticationType.cs" />
     <Compile Include="Enums\PacketType.cs" />
-    <Compile Include="Packet.cs" />
+    <Compile Include="Log.cs" />
+    <Compile Include="Packets\AuthPacket.cs" />
+    <Compile Include="Packets\BasePacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
