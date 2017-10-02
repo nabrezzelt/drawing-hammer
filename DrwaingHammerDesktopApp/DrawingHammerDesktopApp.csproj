@@ -93,12 +93,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DrawingHammerDataLib\DrawingHammerDataLib.csproj">
-      <Project>{1e3eceba-bfeb-4245-9e66-956a9748f476}</Project>
-      <Name>DrawingHammerDataLib</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
