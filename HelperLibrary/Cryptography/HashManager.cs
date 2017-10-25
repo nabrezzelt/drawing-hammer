@@ -13,7 +13,7 @@ namespace HelperLibrary.Cryptography
                 throw new ArgumentException("Text can not be empty.", nameof(text));
             }
 
-            byte[] textBytes = TextToBytes(text);
+            byte[] textBytes = Encoding.UTF8.GetBytes(text);
             return HashSHA512(textBytes);
         }
 
@@ -33,7 +33,7 @@ namespace HelperLibrary.Cryptography
                 throw new ArgumentException("Text can not be empty.", nameof(text));
             }
 
-            byte[] textBytes = TextToBytes(text);
+            byte[] textBytes = Encoding.UTF8.GetBytes(text);
             return HashSHA384(textBytes);
         }
 
@@ -53,7 +53,7 @@ namespace HelperLibrary.Cryptography
                 throw new ArgumentException("Text can not be empty.", nameof(text));
             }
 
-            byte[] textBytes = TextToBytes(text);
+            byte[] textBytes = Encoding.UTF8.GetBytes(text);
             return HashSHA256(textBytes);
         }
 
@@ -73,7 +73,7 @@ namespace HelperLibrary.Cryptography
                 throw new ArgumentException("Text can not be empty.", nameof(text));
             }
 
-            byte[] textBytes = TextToBytes(text);
+            byte[] textBytes = Encoding.UTF8.GetBytes(text);
             return HashSHA1(textBytes);
         }
 
@@ -93,7 +93,7 @@ namespace HelperLibrary.Cryptography
                 throw new ArgumentException("Text can not be empty.", nameof(text));
             }
 
-            byte[] textBytes = TextToBytes(text);
+            byte[] textBytes = Encoding.UTF8.GetBytes(text);
             return HashMD5(textBytes);
         }
 

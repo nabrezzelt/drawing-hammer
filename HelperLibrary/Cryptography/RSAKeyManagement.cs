@@ -1,23 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace HelperLibrary.Cryptography
 {
     public class RSAKeyManagement
-    {
-        public int MaxStringLength { get; }
+    {    
+        private int _maxStringLength;
+        private KeySize keySize;
+        private string publicKey;
+        private string privateKey;
 
-        public KeySize KeySize { get; }
+        public int MaxStringLength { get => _maxStringLength; private set => _maxStringLength = value; }
+        public KeySize KeySize { get => keySize; set => keySize = value; }
+        public string PublicKey { get => publicKey; private set => publicKey = value; }
+        public string PrivateKey { get => privateKey; private set => privateKey = value; }
 
-        public string PublicKey { get; }
-
-        public string PrivateKey { get; }
-
-        public RSAKeyManagement(KeySize keySize = KeySize.Size2048)
+        public RSAKeyManagement(KeySize keySize = KeySize.SIZE_2048)
         {
-            KeySize = keySize;
-
             var keyPair = CreateKeyPair(keySize);
 
             PrivateKey = keyPair.Item1;
@@ -25,22 +28,22 @@ namespace HelperLibrary.Cryptography
 
             switch (keySize)
             {
-                case KeySize.Size512:
+                case KeySize.SIZE_512:
                     MaxStringLength = 53;
                     break;
-                case KeySize.Size1024:
+                case KeySize.SIZE_1024:
                     MaxStringLength = 117;
                     break;
-                case KeySize.Size2048:
+                case KeySize.SIZE_2048:
                     MaxStringLength = 245;
                     break;
-                case KeySize.Size4096:
+                case KeySize.SIZE_4096:
                     MaxStringLength = 501;
                     break;
-                case KeySize.Size8192:
+                case KeySize.SIZE_8192:
                     MaxStringLength = 1013;
                     break;
-                case KeySize.Size16384:
+                case KeySize.SIZE_16384:
                     MaxStringLength = 2037;
                     break;                
             }

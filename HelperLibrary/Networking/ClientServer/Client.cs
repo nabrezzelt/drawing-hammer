@@ -1,4 +1,5 @@
 ﻿using HelperLibrary.Logging;
+using HelperLibrary.Networking.ClientServer.Exceptions;
 using HelperLibrary.Networking.ClientServer.Packets;
 using System;
 using System.IO;
