@@ -1,17 +1,18 @@
 ﻿using HelperLibrary.Networking.ClientServer;
-using System;
+using System.IO;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 
 namespace DrawingHammerServer
 {
-    public class DrawingHammerServer : Server
+    public class DrawingHammerServer : SslServer
     {
-        public DrawingHammerServer(int port) : base(port)
-        { }
+        public DrawingHammerServer(X509Certificate2 certificate, int port) : base(certificate, port) { }
 
-        protected override BaseClientData HandleNewConnectedClient(TcpClient connectedClient)
+        public override BaseClientData HandleNewConnectedClient(TcpClient connectedClient, Stream stream)
         {
-            return new DrawingHammerClient(this, connectedClient);
+            //Um eigene Werte hinzuzufügen (Score) wir die Standard Methode überschrieben
+            return new DrawingHammerClientData(this, connectedClient, stream);
         }
     }
 }
