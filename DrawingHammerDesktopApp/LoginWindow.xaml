@@ -33,24 +33,24 @@
         <Image Grid.Row="1" Source="../Resources/DrawingHammerTestLogo.jpg" />
         <StackPanel Grid.Row="2">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,10,5,5">
-                <TextBlock Margin="0,0,10,0">Username:</TextBlock>
-                <TextBox Width="160" x:Name="tbUsername" TextChanged="CheckForEnablingLoginButton"></TextBox>
+                <materialDesign:PackIcon Kind="Account" Margin="0,10,8,0" Foreground="{Binding ElementName=tbUsername, Path=BorderBrush}" VerticalAlignment="Center" />
+                <TextBox x:Name="tbUsername" materialDesign:HintAssist.Hint="Username" Style="{StaticResource MaterialDesignFloatingHintTextBox}" TextChanged="CheckForEnablingLoginButton" Width="160" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,0,5,5">
-                <TextBlock Margin="0,0,13,0">Password:</TextBlock>
-                <PasswordBox Width="160" x:Name="tbPassword" PasswordChanged="CheckForEnablingLoginButton"></PasswordBox>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
+                <materialDesign:PackIcon Kind="Key" Margin="0,10,8,0" Foreground="{Binding ElementName=tbPassword, Path=BorderBrush}" VerticalAlignment="Center" />
+                <PasswordBox x:Name="tbPassword" materialDesign:HintAssist.Hint="Password" PasswordChanged="CheckForEnablingLoginButton" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Width="160" KeyDown="LoginWhenEnterPressed" />
             </StackPanel>
             <StackPanel Margin="15,10,15,0">
                 <Button Margin="0,0,0,5" x:Name="btnLogin" Click="Login" IsEnabled="False">
                     <StackPanel Orientation="Horizontal">
-                        <fa:ImageAwesome Icon="SignIn" Width="10" Margin="0,0,5,0" />
+                        <materialDesign:PackIcon Kind="Login" Margin="0,0,2,0" />
                         <TextBlock>Login</TextBlock>
                     </StackPanel>
                 </Button>
                 <TextBlock HorizontalAlignment="Center">or</TextBlock>
                 <Button Margin="0,5,0,0" x:Name="btnRegister" Click="ShowRegisterWindow">
                     <StackPanel Orientation="Horizontal">
-                        <fa:ImageAwesome Icon="User" Width="10" Margin="0,0,5,0"/>
+                        <materialDesign:PackIcon Kind="Account" Margin="0,0,2,0" />
                         <TextBlock>Create a new account</TextBlock>
                     </StackPanel>
                 </Button>
