@@ -60,6 +60,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DrawingHammerPacketLibrary\DrawingHammerPacketLibrary.csproj">
+      <Project>{10D12DC1-CB43-410C-96CF-0016297FEFB2}</Project>
+      <Name>DrawingHammerPacketLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HelperLibrary\HelperLibrary.csproj">
       <Project>{3922e085-3615-422b-b706-ef8addeae830}</Project>
       <Name>HelperLibrary</Name>

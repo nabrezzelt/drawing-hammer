@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -34,6 +35,12 @@ namespace DrawingHammerDesktopApp
             Properties.Settings.Default.Save();
 
             Close();
+        }
+
+        private void OnClosing(object sender, CancelEventArgs e)
+        {
+            if(!Properties.Settings.Default.IsConnectionConfigured)
+                Environment.Exit(0);
         }
     }
 }

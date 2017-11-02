@@ -71,15 +71,16 @@ namespace HelperLibrary.Networking.ClientServer
         {            
             Thread listenForNewClients = new Thread(ListenOnNewClients);
             listenForNewClients.Start();
+
+            Log.Info("Server started.");
+            Log.Info("Waiting for new client connections...");
         }
 
         protected void InitializeListener()
         {
-            Log.Info("Starting server on " + NetworkUtilities.GetThisIPv4Adress() + " on port " + Port);
+            Log.Info("Configured server for " + NetworkUtilities.GetThisIPv4Adress() + " on port " + Port);
 
-            Listener = new TcpListener(new IPEndPoint(IPAddress.Parse(NetworkUtilities.GetThisIPv4Adress()), Port));
-
-            Log.Info("Server started. Waiting for new Client connections...");
+            Listener = new TcpListener(new IPEndPoint(IPAddress.Parse(NetworkUtilities.GetThisIPv4Adress()), Port));            
         }
 
         protected virtual void ListenOnNewClients()

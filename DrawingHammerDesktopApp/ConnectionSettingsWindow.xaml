@@ -5,7 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DrawingHammerDesktopApp"
         mc:Ignorable="d"
-        Title="Connection Settings" Height="155" Width="255" WindowStartupLocation="CenterScreen"
+        Title="Connection Settings" 
+        Height="155" 
+        Width="255"
+        ResizeMode="NoResize"
+        Closing="OnClosing"
+        WindowStartupLocation="CenterScreen"
         
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"

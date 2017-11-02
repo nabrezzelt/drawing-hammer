@@ -63,6 +63,46 @@ namespace DrawingHammerDesktopApp.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap DrawingHammerIcon {
+            get {
+                object obj = ResourceManager.GetObject("DrawingHammerIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Icon ähnlich wie (Symbol).
+        /// </summary>
+        internal static System.Drawing.Icon DrawingHammerIcon1 {
+            get {
+                object obj = ResourceManager.GetObject("DrawingHammerIcon1", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DrawingHammerLogoCopyright {
+            get {
+                object obj = ResourceManager.GetObject("DrawingHammerLogoCopyright", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DrawingHammerLogoTradeamark {
+            get {
+                object obj = ResourceManager.GetObject("DrawingHammerLogoTradeamark", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap DrawingHammerTestLogo {
             get {
                 object obj = ResourceManager.GetObject("DrawingHammerTestLogo", resourceCulture);
