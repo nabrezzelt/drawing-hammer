@@ -6,8 +6,13 @@ namespace DrawingHammerPacketLibrary
     [Serializable]
     public class RegistrationPacket : BasePacket
     {
-        public RegistrationPacket(string senderUid, string destinationUid) : base(senderUid, destinationUid)
+        public readonly string Username;
+        public readonly string Password;
+
+        public RegistrationPacket(string username, string password, string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {
+            Username = username;
+            Password = password;
         }
     }
 }

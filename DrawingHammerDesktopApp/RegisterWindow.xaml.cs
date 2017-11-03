@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
+using DrawingHammerPacketLibrary;
+using DrawingHammerPacketLibrary.Enums;
 using HelperLibrary.Networking.ClientServer;
 
 namespace DrawingHammerDesktopApp
@@ -17,24 +21,71 @@ namespace DrawingHammerDesktopApp
 
             _client = client;
 
-            _client.ConnectionLost += OnConnectionLost;
-            _client.ConnectionSucceed += OnConnectionSucceed;
+            _client.ConnectionLost += OnConnectionLost;            
             _client.PacketReceived += OnPacketReceived;
         }
 
         private void OnPacketReceived(object sender, PacketReceivedEventArgs e)
         {
-            throw new NotImplementedException();
-        }
-
-        private void OnConnectionSucceed(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
+            switch (e.Packet)
+            {
+                case RegistrationResultPacket packet:
+                    HandleRegisterResult(packet);
+                    break;
+            }
         }
 
         private void OnConnectionLost(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            InvokeGui(() =>
+            {
+                StatusSnackbar.MessageQueue.Enqueue("Connection lost!");
+            });
+        }
+
+        private void HandleRegisterResult(RegistrationResultPacket packet)
+        {
+            InvokeGui(() =>
+            {
+                btnRegister.Visibility = Visibility.Visible;
+                pbRegistering.Visibility = Visibility.Collapsed;
+            });
+            
+            switch (packet.Result)
+            {
+                case RegistrationResult.Ok:
+                    InvokeGui(async () =>
+                    {
+                        StatusSnackbar.MessageQueue.Enqueue("Account successfully created - you can login now!");
+                        await TaskDelay();
+                        Close();
+                    });
+                    break;
+                case RegistrationResult.Failed:
+                    InvokeGui(() =>
+                    {
+                        StatusSnackbar.MessageQueue.Enqueue("Registration failed!");
+                    });
+                    break;
+                case RegistrationResult.UsernameTooLong:
+                    InvokeGui(() =>
+                    {
+                        StatusSnackbar.MessageQueue.Enqueue("Your username it so long");
+                    });
+                    break;
+                case RegistrationResult.UsernameTooShort:
+                    InvokeGui(() =>
+                    {
+                        StatusSnackbar.MessageQueue.Enqueue("Your username is to short!");
+                    });
+                    break;
+                case RegistrationResult.UsernameAlreadyExists:
+                    InvokeGui(() =>
+                    {
+                        StatusSnackbar.MessageQueue.Enqueue("A user with this name already exitsts. Please choose another one.");
+                    });
+                    break;                
+            }
         }
 
         private void CheckForEnableRegisterButton(object sender, RoutedEventArgs routedEventArgs)
@@ -51,7 +102,23 @@ namespace DrawingHammerDesktopApp
 
         private void Register(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Register...");
+            btnRegister.Visibility = Visibility.Collapsed;
+            pbRegistering.Visibility = Visibility.Visible;
+
+            SendRegisterMessage(tbUsername.Text, tbPassword.Password);
+        }
+
+        private async void SendRegisterMessage(string username, string password)
+        {            
+            await Task.Run(() =>
+            {
+                _client.SendPacketToServer(new RegistrationPacket(
+                    username,
+                    password,
+                    App.Uid,
+                    Router.ServerWildcard
+                    ));
+            });
         }
 
         private void RegisterWhenEnterPressed(object sender, KeyEventArgs e)
@@ -60,6 +127,16 @@ namespace DrawingHammerDesktopApp
             {
                 Register(sender, e);
             }
+        }
+
+        private void InvokeGui(Action action)
+        {
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
+        }
+
+        private async Task TaskDelay(int seconds = 3000)
+        {
+            await Task.Delay(seconds);
         }
     }
 }

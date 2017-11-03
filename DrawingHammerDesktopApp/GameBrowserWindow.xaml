@@ -1,0 +1,88 @@
+﻿<Window x:Class="DrawingHammerDesktopApp.GameBrowserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DrawingHammerDesktopApp"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="drawing-hammer | Gamebrowser"
+        Height="444.907"
+        Width="543.235"
+        
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" Source="Resources/DrawingHammerLogoTradeamark.png" Width="70" Margin="5" />
+            <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{DynamicResource MaterialDesignDisplay1TextBlock}" Text="Gamebrowser" />
+        </Grid>
+        <Grid Grid.Row="1">
+            <materialDesign:Card Margin="6">
+                <ListView>
+
+                    <ListBoxItem>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Foreground="{DynamicResource PrimaryHueMidBrush}">RUNNING</TextBlock>
+                            <TextBlock Grid.Column="1" Margin="12,0">Main Faggot Match 1</TextBlock>
+                            <TextBlock Style="{DynamicResource MaterialDesignCaptionTextBlock}" Grid.Column="2"> 10/12 Players</TextBlock>
+
+                        </Grid>
+                    </ListBoxItem>
+                    <ListBoxItem>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Foreground="{DynamicResource SecondaryAccentBrush}">WAITING</TextBlock>
+                            <TextBlock Grid.Column="1" Margin="12,0">Main Faggot Match 2</TextBlock>
+                            <TextBlock Style="{DynamicResource MaterialDesignCaptionTextBlock}" IsEnabled="False" Grid.Column="2"> 10/12 Players</TextBlock>
+                        </Grid>
+                    </ListBoxItem>
+                </ListView>
+            </materialDesign:Card>
+        </Grid>
+
+        <Grid Row="2" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Style="{DynamicResource MaterialDesignRaisedAccentButton}">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="Plus" Margin="0,0,2,0" />
+                    <TextBlock>Create new Game</TextBlock>
+                </StackPanel>
+            </Button>
+
+            <Button Grid.Column="2">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="Check" Margin="0,0,2,0" />
+                    <TextBlock>Join</TextBlock>
+                </StackPanel>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>

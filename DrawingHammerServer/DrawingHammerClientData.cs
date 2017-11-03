@@ -6,7 +6,8 @@ namespace DrawingHammerServer
 {
     public class DrawingHammerClientData : BaseClientData
     {
-        public int Score;
+        public int Score { get; set; }
+        public User User { get; set; }
 
         public DrawingHammerClientData(int score, Server serverInstance, TcpClient client, Stream stream) : base(serverInstance, client, stream)
         {

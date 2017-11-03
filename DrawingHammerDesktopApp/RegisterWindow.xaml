@@ -5,35 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:local="clr-namespace:DrawingHammerDesktopApp"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="drawing-hammer | Registration" 
-        Height="440" 
+        Title="drawing-hammer | Registration"
+        Height="440"
         Width="300"
         ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen"        
-        
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        WindowStartupLocation="CenterScreen"
+
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
-        TextOptions.TextFormattingMode="Ideal" 
-        TextOptions.TextRenderingMode="Auto"        
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="3*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="2*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Registration" Style="{StaticResource MaterialDesignHeadlineTextBlock}" />
+        <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Registration"
+                   Style="{DynamicResource MaterialDesignHeadlineTextBlock}" />
         <Image Grid.Row="1" Source="Resources/DrawingHammerLogoCopyright.png" Margin="5" />
         <StackPanel Grid.Row="2">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,10,5,5">
-                <materialDesign:PackIcon Kind="Account" Margin="0,10,8,0" Foreground="{Binding ElementName=tbUsername, Path=BorderBrush}" VerticalAlignment="Center" />
-                <TextBox x:Name="tbUsername" materialDesign:HintAssist.Hint="Username" Style="{StaticResource MaterialDesignFloatingHintTextBox}" TextChanged="CheckForEnableRegisterButton" Width="160" />
+                <materialDesign:PackIcon Kind="Account" Margin="0,10,8,0"
+                                         Foreground="{Binding ElementName=tbUsername, Path=BorderBrush}"
+                                         VerticalAlignment="Center" />
+                <TextBox x:Name="tbUsername" materialDesign:HintAssist.Hint="Username"
+                         Style="{DynamicResource MaterialDesignFloatingHintTextBox}"
+                         TextChanged="CheckForEnableRegisterButton" Width="160" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,0,5,5">
                 <materialDesign:PackIcon Kind="Key" Margin="0,10,8,0"
@@ -42,7 +48,7 @@
                 <PasswordBox x:Name="tbPassword"
                              materialDesign:HintAssist.Hint="Password"
                              PasswordChanged="CheckForEnableRegisterButton"
-                             Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
+                             Style="{DynamicResource MaterialDesignFloatingHintPasswordBox}"
                              Width="160" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,0,5,5">
@@ -52,17 +58,29 @@
                 <PasswordBox x:Name="tbPasswordRepeat"
                              materialDesign:HintAssist.Hint="Repeat Password"
                              PasswordChanged="CheckForEnableRegisterButton"
-                             Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
-                             Width="160" 
+                             Style="{DynamicResource MaterialDesignFloatingHintPasswordBox}"
+                             Width="160"
                              KeyDown="RegisterWhenEnterPressed" />
-                
+
             </StackPanel>
-            <Button Style="{StaticResource MaterialDesignRaisedAccentButton}" Margin="15,10,15,0" x:Name="btnRegister" IsEnabled="False" Click="Register">
+            <Button Style="{DynamicResource MaterialDesignRaisedAccentButton}" Margin="15,10,15,0" x:Name="btnRegister"
+                    IsEnabled="False" Click="Register">
                 <StackPanel Orientation="Horizontal">
-                    <fa:ImageAwesome Icon="UserPlus" Width="12" Margin="0,0,5,0" Foreground="White"/>
+                    <fa:ImageAwesome Icon="UserPlus" Width="12" Margin="0,0,5,0" Foreground="White" />
                     <TextBlock>Register</TextBlock>
                 </StackPanel>
             </Button>
+            <ProgressBar Style="{DynamicResource MaterialDesignCircularProgressBar}"
+                         Value="0"
+                         IsIndeterminate="True"
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Center"
+                         Margin="12 12 12 12"
+                         x:Name="pbRegistering" Visibility="Collapsed" />
         </StackPanel>
+        <materialDesign:Snackbar Grid.Row="5"
+                                 MessageQueue="{materialDesign:MessageQueue}"
+                                 x:Name="StatusSnackbar"
+                                 Margin="5,0" />
     </Grid>
 </Window>

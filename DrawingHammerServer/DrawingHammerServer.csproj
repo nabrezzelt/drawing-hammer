@@ -54,6 +54,7 @@
     <Compile Include="Exceptions\UserAlreadyExitsException.cs" />
     <Compile Include="UserManager.cs" />
     <Compile Include="Exceptions\UsernameTooLongException.cs" />
+    <Compile Include="Exceptions\UsernameTooShortException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -68,6 +69,9 @@
       <Project>{3922e085-3615-422b-b706-ef8addeae830}</Project>
       <Name>HelperLibrary</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="database-structure.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

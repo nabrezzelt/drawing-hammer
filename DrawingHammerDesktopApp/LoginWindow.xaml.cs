@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using DrawingHammerPacketLibrary.Enums;
 
 namespace DrawingHammerDesktopApp
 {
@@ -14,6 +15,8 @@ namespace DrawingHammerDesktopApp
     /// </summary>
     public partial class LoginWindow : Window
     {
+        private bool LoggedIn { get; set; }
+
         private readonly SslClient _client;
         public LoginWindow(SslClient client)
         {
@@ -47,10 +50,12 @@ namespace DrawingHammerDesktopApp
             switch (packet.Result)
             {
                 case AuthenticationResult.Ok:
-                    InvokeGui(() =>
-                    {
+                    LoggedIn = true;
+                    InvokeGui(async () =>
+                    {                        
                         StatusSnackbar.MessageQueue.Enqueue("Login was successfull.");
-                        //ToDo: Close(); and check why connection is killed when this windows closed
+                        await TaskDelay(2000);
+                        Close();
                     });
                     break;
                 case AuthenticationResult.Failed:
@@ -67,8 +72,7 @@ namespace DrawingHammerDesktopApp
             InvokeGui(() =>
             {
                 StatusSnackbar.MessageQueue.Enqueue("Connection lost!");
-            });
-            
+            });            
         }
 
         private void ShowRegisterWindow(object sender, RoutedEventArgs e)
@@ -78,20 +82,11 @@ namespace DrawingHammerDesktopApp
         }
 
         private void Login(object sender, RoutedEventArgs routedEventArgs)
-        {           
-            
-            InvokeGui(() =>
-            {
-                StatusSnackbar.MessageQueue.Enqueue("Logging in...");
-                btnLogin.IsEnabled = false;
-            });
-
+        {                                   
             SendLoginMessage(tbUsername.Text, tbPassword.Password);
 
             InvokeGui(() =>
-            {
-                btnLogin.IsEnabled = true;
-
+            {                
                 spButtons.Visibility = Visibility.Collapsed;
                 spLoggingIn.Visibility = Visibility.Visible;
             });            
@@ -135,12 +130,20 @@ namespace DrawingHammerDesktopApp
 
         private void OnClosing(object sender, CancelEventArgs e)
         {
-            Environment.Exit(0);   
-        }
+            if (!LoggedIn)
+            {
+                Environment.Exit(0);
+            }            
+        }        
 
         private void InvokeGui(Action action)
         {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
+        }
+
+        private async Task TaskDelay(int seconds = 3000)
+        {
+            await Task.Delay(seconds);
         }
     }
 }

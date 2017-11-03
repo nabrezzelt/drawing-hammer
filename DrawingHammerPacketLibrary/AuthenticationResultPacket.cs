@@ -1,4 +1,5 @@
 ﻿using System;
+using DrawingHammerPacketLibrary.Enums;
 using HelperLibrary.Networking.ClientServer.Packets;
 
 namespace DrawingHammerPacketLibrary
@@ -11,11 +12,5 @@ namespace DrawingHammerPacketLibrary
         {
             Result = result;
         }
-    }
-
-    public enum AuthenticationResult
-    {
-        Ok,
-        Failed
     }
 }
