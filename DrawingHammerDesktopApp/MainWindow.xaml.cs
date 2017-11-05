@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -22,6 +23,8 @@ namespace DrawingHammerDesktopApp
                 ConnectionSettingsWindow settingsWindow = new ConnectionSettingsWindow();
                 settingsWindow.ShowDialog();
             //}
+
+
 
             _client = new SslClient(Properties.Settings.Default.Host, true);
 
@@ -52,11 +55,14 @@ namespace DrawingHammerDesktopApp
             InvokeGui(() =>
             {
                 IsEnabled = true;
-
-                MessageBox.Show("Connected!");
-
+               
                 LoginWindow loginWindow = new LoginWindow(_client);
                 loginWindow.ShowDialog();
+
+                GameBrowserWindow gameBrowser = new GameBrowserWindow();
+                gameBrowser.ShowDialog();
+
+                pbLoading.Visibility = Visibility.Collapsed;
             });
         }
 
@@ -73,6 +79,11 @@ namespace DrawingHammerDesktopApp
         private void InvokeGui(Action action)
         {           
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);           
+        }
+
+        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+        {
+            Environment.Exit(0);
         }
     }
 }

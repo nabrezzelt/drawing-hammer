@@ -9,6 +9,8 @@
         Title="drawing-hammer | Gamebrowser"
         Height="444.907"
         Width="543.235"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
         
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -34,7 +36,6 @@
         <Grid Grid.Row="1">
             <materialDesign:Card Margin="6">
                 <ListView>
-
                     <ListBoxItem>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -44,8 +45,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Foreground="{DynamicResource PrimaryHueMidBrush}">RUNNING</TextBlock>
                             <TextBlock Grid.Column="1" Margin="12,0">Main Faggot Match 1</TextBlock>
-                            <TextBlock Style="{DynamicResource MaterialDesignCaptionTextBlock}" Grid.Column="2"> 10/12 Players</TextBlock>
-
+                            <TextBlock Grid.Column="2" Style="{DynamicResource MaterialDesignCaptionTextBlock}" Foreground="Gray">(12/12 Players)</TextBlock>
                         </Grid>
                     </ListBoxItem>
                     <ListBoxItem>
@@ -55,9 +55,9 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Foreground="{DynamicResource SecondaryAccentBrush}">WAITING</TextBlock>
+                            <TextBlock Grid.Column="0" Foreground="{DynamicResource SecondaryAccentBrush}">WAITING</TextBlock>
                             <TextBlock Grid.Column="1" Margin="12,0">Main Faggot Match 2</TextBlock>
-                            <TextBlock Style="{DynamicResource MaterialDesignCaptionTextBlock}" IsEnabled="False" Grid.Column="2"> 10/12 Players</TextBlock>
+                            <TextBlock Grid.Column="2" Style="{DynamicResource MaterialDesignCaptionTextBlock}" IsEnabled="False" Foreground="Gray">(9/12 Players)</TextBlock>
                         </Grid>
                     </ListBoxItem>
                 </ListView>
@@ -70,7 +70,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Style="{DynamicResource MaterialDesignRaisedAccentButton}">
+            <Button Grid.Column="0" Style="{DynamicResource MaterialDesignRaisedAccentButton}" Click="CreateNewGame">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Plus" Margin="0,0,2,0" />
                     <TextBlock>Create new Game</TextBlock>

@@ -5,6 +5,7 @@
         Height="419.412"
         Width="726.961"
         WindowStartupLocation="CenterScreen"
+        Closing="MainWindow_OnClosing"
         
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -20,7 +21,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ProgressBar IsIndeterminate="True"  Height="3"/>
+        <ProgressBar IsIndeterminate="True"  Height="3" x:Name="pbLoading"/>
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <Label Content="Verbleibende Zeit: " />
             <Label Content="17" FontWeight="Bold"/>

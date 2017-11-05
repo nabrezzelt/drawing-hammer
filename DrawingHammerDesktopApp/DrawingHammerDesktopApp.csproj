@@ -72,6 +72,9 @@
     <Compile Include="ConnectionSettingsWindow.xaml.cs">
       <DependentUpon>ConnectionSettingsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CreateNewGameWindow.xaml.cs">
+      <DependentUpon>CreateNewGameWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GameBrowserWindow.xaml.cs">
       <DependentUpon>GameBrowserWindow.xaml</DependentUpon>
     </Compile>
@@ -81,6 +84,10 @@
     <Compile Include="Settings.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Page Include="ConnectionSettingsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CreateNewGameWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

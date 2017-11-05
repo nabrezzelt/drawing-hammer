@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DrawingHammerDesktopApp"
         mc:Ignorable="d"
         Title="drawing-hammer | Login"
-        Height="450"
+        Height="522.361"
         Width="300"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
@@ -33,23 +33,28 @@
                    Style="{DynamicResource MaterialDesignHeadlineTextBlock}" />
         <Image Grid.Row="1" Source="Resources/DrawingHammerLogoCopyright.png" Margin="5" />
         <StackPanel Grid.Row="2">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,10,5,5">
-                <materialDesign:PackIcon Kind="Account" Margin="0,10,8,0"
-                                         Foreground="{Binding ElementName=tbUsername, Path=BorderBrush}"
-                                         VerticalAlignment="Center" />
-                <TextBox x:Name="tbUsername" materialDesign:HintAssist.Hint="Username"
-                         Style="{DynamicResource MaterialDesignFloatingHintTextBox}"
-                         TextChanged="CheckForEnablingLoginButton" Width="160" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
-                <materialDesign:PackIcon Kind="Key" Margin="0,10,8,0"
-                                         Foreground="{Binding ElementName=tbPassword, Path=BorderBrush}"
-                                         VerticalAlignment="Center" />
-                <PasswordBox x:Name="tbPassword" materialDesign:HintAssist.Hint="Password"
-                             PasswordChanged="CheckForEnablingLoginButton"
-                             Style="{DynamicResource MaterialDesignFloatingHintPasswordBox}" Width="160"
-                             KeyDown="LoginWhenEnterPressed" />
-            </StackPanel>
+            <materialDesign:Card Margin="16,10,16,15">
+                <StackPanel Margin="0,0,0,20">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,10,5,5">
+                        <materialDesign:PackIcon Kind="Account" Margin="0,10,8,0"
+                                                 Foreground="{Binding ElementName=tbUsername, Path=BorderBrush}"
+                                                 VerticalAlignment="Center" />
+                        <TextBox x:Name="tbUsername" materialDesign:HintAssist.Hint="Username"
+                                 Style="{DynamicResource MaterialDesignFloatingHintTextBox}"
+                                 TextChanged="CheckForEnablingLoginButton" Width="160" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
+                        <materialDesign:PackIcon Kind="Key" Margin="0,10,8,0"
+                                                 Foreground="{Binding ElementName=tbPassword, Path=BorderBrush}"
+                                                 VerticalAlignment="Center" />
+                        <PasswordBox x:Name="tbPassword" materialDesign:HintAssist.Hint="Password"
+                                     PasswordChanged="CheckForEnablingLoginButton"
+                                     Style="{DynamicResource MaterialDesignFloatingHintPasswordBox}" Width="160"
+                                     KeyDown="LoginWhenEnterPressed" />
+                    </StackPanel>
+                </StackPanel>
+            </materialDesign:Card>
+            
             <StackPanel Visibility="Collapsed" x:Name="spLoggingIn">
                 <ProgressBar Style="{DynamicResource MaterialDesignCircularProgressBar}"
                              Value="0"
