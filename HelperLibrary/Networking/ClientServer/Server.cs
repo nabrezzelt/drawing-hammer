@@ -14,6 +14,7 @@ namespace HelperLibrary.Networking.ClientServer
         protected readonly Router Router;
         protected TcpListener Listener;
         protected readonly int Port;
+        protected readonly string Ip;
 
         /// <summary>
         /// List containing all clients.
@@ -55,10 +56,12 @@ namespace HelperLibrary.Networking.ClientServer
         /// <summary>
         /// Initalize a new Server on a given port.
         /// </summary>
+        /// <param name="ip"></param>
         /// <param name="port"></param>
-        protected Server(int port)
+        protected Server(string ip, int port)
         {
             Port = port;
+            Ip = ip;
             Router = new Router(this);
 
             InitializeListener();
@@ -78,9 +81,9 @@ namespace HelperLibrary.Networking.ClientServer
 
         protected void InitializeListener()
         {
-            Log.Info("Configured server for " + NetworkUtilities.GetThisIPv4Adress() + " on port " + Port);
+            Log.Info("Configured server for " + Ip + " on port " + Port);
 
-            Listener = new TcpListener(new IPEndPoint(IPAddress.Parse(NetworkUtilities.GetThisIPv4Adress()), Port));            
+            Listener = new TcpListener(new IPEndPoint(IPAddress.Parse(Ip), Port));            
         }
 
         protected virtual void ListenOnNewClients()

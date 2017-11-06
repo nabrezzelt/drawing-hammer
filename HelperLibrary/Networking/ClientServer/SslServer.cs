@@ -9,14 +9,15 @@ namespace HelperLibrary.Networking.ClientServer
 {
     public abstract class SslServer : Server
     {
-        private readonly X509Certificate2 _certificate;
-
+        private readonly X509Certificate2 _certificate;        
+        
         /// <summary>
         /// Initialize a new <see cref="SslServer"/> with <see cref="X509Certificate2"/> and a given port.
         /// </summary>
         /// <param name="certificate"></param>
+        /// <param name="ip"></param>
         /// <param name="port"></param>
-        protected SslServer(X509Certificate2 certificate, int port) : base(port)
+        protected SslServer(X509Certificate2 certificate, string ip, int port) : base(ip, port)
         {
             _certificate = certificate;
         }

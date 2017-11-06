@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HelperLibrary.FileSystem;
+﻿using HelperLibrary.FileSystem;
 
 namespace DrawingHammerServer
 {
@@ -11,13 +6,15 @@ namespace DrawingHammerServer
     {
         private readonly IniFile _iniFile;
 
-        private const string DatabaseSettingsSection = "Database Settings";
+        private const string DatabaseSettingsSection = "Database Settings",
+            GeneralSettings = "General Settings";
 
         private const string
             DatabaseHostKey = "DatabaseHost",
             DatabaseUserKey = "DatabaseUser",
             DatabasePasswordKey = "DatabasePassword",
-            DatabasenameKey = "Databasename";
+            DatabasenameKey = "Databasename",
+            StartupIpKey = "StartupIp";
 
         public SettingsManager(string iniFilePath)
         {
@@ -30,6 +27,7 @@ namespace DrawingHammerServer
             _iniFile.WriteValue(DatabaseUserKey, "", DatabaseSettingsSection);
             _iniFile.WriteValue(DatabasePasswordKey, "", DatabaseSettingsSection);
             _iniFile.WriteValue(DatabasenameKey, "", DatabaseSettingsSection);
+            _iniFile.WriteValue(StartupIpKey, "", GeneralSettings);
         }
 
         public string GetDatabaseHost()
@@ -50,6 +48,11 @@ namespace DrawingHammerServer
         public string GetDatabasename()
         {
             return _iniFile.ReadValue(DatabasenameKey, DatabaseSettingsSection);
+        }
+
+        public string GetStartupIp()
+        {
+            return _iniFile.ReadValue(StartupIpKey, GeneralSettings);
         }
     }
 }

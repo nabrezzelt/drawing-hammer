@@ -59,7 +59,7 @@ namespace DrawingHammerDesktopApp
                 LoginWindow loginWindow = new LoginWindow(_client);
                 loginWindow.ShowDialog();
 
-                GameBrowserWindow gameBrowser = new GameBrowserWindow();
+                GameBrowserWindow gameBrowser = new GameBrowserWindow(_client);
                 gameBrowser.ShowDialog();
 
                 pbLoading.Visibility = Visibility.Collapsed;

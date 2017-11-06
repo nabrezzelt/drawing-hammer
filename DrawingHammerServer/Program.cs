@@ -5,9 +5,11 @@ using HelperLibrary.Database;
 using HelperLibrary.Logging;
 using HelperLibrary.Networking.ClientServer;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
+using HelperLibrary.Networking;
 
 namespace DrawingHammerServer
 {
@@ -21,16 +23,20 @@ namespace DrawingHammerServer
         private static SettingsManager _settingsManager;
         private static AuthenticationManager _authenticationManager;
 
+        private static List<Match> _matches;
+
         private static void Main(string[] args)
         {
-            InitializeSettingsFile();
-
             _settingsManager = new SettingsManager(SettingsPath);
+
+            InitializeSettingsFile();            
 
             InitializeDatabaseConnection();            
             Log.Info("");
-            
-            _server = new DrawingHammerServer(new X509Certificate2(CertificatePath, CertificatePassword), 9999);
+
+            string ip = _settingsManager.GetStartupIp() != "" ? _settingsManager.GetStartupIp() : NetworkUtilities.GetThisIPv4Adress();
+
+            _server = new DrawingHammerServer(new X509Certificate2(CertificatePath, CertificatePassword), ip, 9999);
             
             _server.ClientConnected += OnClientConnected;
             _server.ClientDisconnected += OnClientDisconnected;
@@ -38,6 +44,8 @@ namespace DrawingHammerServer
             _server.Start();
 
             _authenticationManager = new AuthenticationManager();
+
+            _matches = new List<Match>();
 
             StartCommandLineHandler();
         }
@@ -49,6 +57,7 @@ namespace DrawingHammerServer
 
             _settingsManager.InitializeSettingsFile();
             Log.Info(".ini-File initialized. Please setup your database login!");
+            Console.ReadLine();
             Environment.Exit(0);
         }
 
@@ -170,8 +179,18 @@ namespace DrawingHammerServer
 
                 case RegistrationPacket p:
                     HandleOnRegistrationRequest(p, e.SenderTcpClient);
-                    break;                
+                    break;
+
+                case RequestGamelistPacket p:
+                    HandleOnGamelistRequest(p);
+                    break;
             }
+        }
+
+        private static void HandleOnGamelistRequest(RequestGamelistPacket packet)
+        {
+            var client  = _server.GetClientByUid(packet.SenderUid);
+            client.SendDataPacketToClient(new GameListPacket(_matches, Router.ServerWildcard, client.Uid));
         }
 
         private static void HandleOnRegistrationRequest(RegistrationPacket packet, TcpClient senderTcpClient)
