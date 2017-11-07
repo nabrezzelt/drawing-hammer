@@ -1,17 +1,57 @@
 ﻿namespace DrawingHammerPacketLibrary
 {
-    public class Player
+    public class Player : ViewModelBase
     {
-        public int Id;
-        public string Username;
-        public string Uid;
-        public string Score;
+        private int _id;
+        private string _username;
+        private string _score;
+        private string _uid;
 
-        public Player(int id, string username, string uid, string score)
+        public int Id
         {
-            Id = id;                  
-            Username = username;
+            get => _id;
+            set
+            {
+                _id = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string Uid
+        {
+            get => _uid;
+            set
+            {
+                _uid = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string Username
+        {
+            get => _username;
+            set
+            {
+                _username = value;
+                OnPropertyChanged();
+            }
+        }        
+
+        public string Score
+        {
+            get => _score;
+            set
+            {
+                _score = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Player(int id, string uid, string username, string score)
+        {
+            _id = id;                              
             Uid = uid;
+            Username = username;
             Score = score;
         }
     }

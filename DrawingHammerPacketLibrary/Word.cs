@@ -1,13 +1,33 @@
 ﻿namespace DrawingHammerPacketLibrary
 {
-    public class Word
+    public class Word : ViewModelBase
     {
-        public int Id;
-        public string Value;
+        private int _id;
+        private string _value;
 
+        public int Id
+        {
+            get => _id;
+            set
+            {
+                _id = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string Value
+        {
+            get => _value;
+            set
+            {
+                _value = value;
+                OnPropertyChanged();
+            }
+        }
+        
         public Word(int id, string value)
         {
-            Id = id;
+            _id = id;
             Value = value;
         }
     }

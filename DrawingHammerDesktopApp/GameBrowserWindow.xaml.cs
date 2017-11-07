@@ -16,9 +16,9 @@ namespace DrawingHammerDesktopApp
 
         public GameBrowserWindow(SslClient client)
         {
-            InitializeComponent();
-
             DataContext = new GameBrowserViewModel();
+
+            InitializeComponent();            
 
             _client = client;
 

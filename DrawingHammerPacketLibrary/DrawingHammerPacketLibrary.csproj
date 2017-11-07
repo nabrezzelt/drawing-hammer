@@ -52,6 +52,7 @@
     <Compile Include="Enums\RegistrationResult.cs" />
     <Compile Include="RegistrationResultPacket.cs" />
     <Compile Include="RequestGamelistPacket.cs" />
+    <Compile Include="ViewModelBase.cs" />
     <Compile Include="Word.cs" />
   </ItemGroup>
   <ItemGroup>

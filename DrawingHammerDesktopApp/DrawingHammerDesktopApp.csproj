@@ -82,6 +82,7 @@
       <DependentUpon>RegisterWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
+    <Compile Include="ViewModel\GameBrowserViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Page Include="ConnectionSettingsWindow.xaml">
       <SubType>Designer</SubType>
