@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
+using HelperLibrary.Logging;
 using HelperLibrary.Networking.ClientServer.Packets;
 
 namespace HelperLibrary.Networking.ClientServer
@@ -36,7 +37,9 @@ namespace HelperLibrary.Networking.ClientServer
             var length = packetBytes.Length;
             var lengthBytes = BitConverter.GetBytes(length);
             ClientStream.Write(lengthBytes, 0, 4); //Senden der Länge/Größe des Textes
-            ClientStream.Write(packetBytes, 0, packetBytes.Length); //Senden der eingentlichen Daten/des Textes                                
+            ClientStream.Write(packetBytes, 0, packetBytes.Length); //Senden der eingentlichen Daten/des Textes    
+            
+            Log.Debug("Packet send to: " + Uid);
         }
     }
 }

@@ -122,6 +122,15 @@ namespace DrawingHammerServer
                         }
                         break;
                     #endregion
+                    #region match list
+                    case string command when command.StartsWith("match list"):
+                        Log.Info("Found " + _matches.Count + " matches:");
+                        foreach (var match in _matches)
+                        {
+                            Log.Info(match.Title);
+                        }
+                        break;
+                    #endregion
                     #region help                        
                     case string command when command == "help" || command == "h":
                         Log.Info("Available Commands:");
@@ -199,10 +208,15 @@ namespace DrawingHammerServer
             match.CreatorId = client.User.Id;
 
             _matches.Add(match);
+            Log.Debug("Match created with title: " + match.Title);
 
             _server.Router.DistributePacket(
                 new CreateMatchPacket(match, Router.ServerWildcard, Router.AllAuthenticatedWildCard),
                 new[] {client.Uid});
+            Log.Debug("All clients notified recording new match.");
+
+            client.SendDataPacketToClient(new MatchCreatedPacket(match, Router.ServerWildcard, client.Uid));
+            Log.Debug("User notified for own created match.");
         }
 
         private static void HandleOnGamelistRequest(RequestGamelistPacket packet)

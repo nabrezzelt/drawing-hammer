@@ -24,6 +24,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
@@ -73,7 +74,7 @@
             </materialDesign:Card>
         </Grid>
 
-        <Grid Row="2" Margin="5">
+        <Grid Grid.Row="2" Margin="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
@@ -85,5 +86,9 @@
                 </StackPanel>
             </Button>
         </Grid>
+        <materialDesign:Snackbar Grid.Row="3"
+                                 MessageQueue="{materialDesign:MessageQueue}"
+                                 x:Name="StatusSnackbar"
+                                 Margin="5,0" />
     </Grid>
 </Window>

@@ -47,6 +47,7 @@
     <Compile Include="AuthenticationResultPacket.cs" />
     <Compile Include="GameListPacket.cs" />
     <Compile Include="Match.cs" />
+    <Compile Include="MatchCreatedPacket.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistrationPacket.cs" />

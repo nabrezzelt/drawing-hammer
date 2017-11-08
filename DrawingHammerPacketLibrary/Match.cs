@@ -1,8 +1,10 @@
-﻿using HelperLibrary.Cryptography;
+﻿using System;
+using HelperLibrary.Cryptography;
 using System.Collections.ObjectModel;
 
 namespace DrawingHammerPacketLibrary
 {
+    [Serializable]
     public class Match : ViewModelBase
     {
         //public EventHandler<EventArgs> RoundFinished;

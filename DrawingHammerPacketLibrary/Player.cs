@@ -1,5 +1,8 @@
-﻿namespace DrawingHammerPacketLibrary
+﻿using System;
+
+namespace DrawingHammerPacketLibrary
 {
+    [Serializable]
     public class Player : ViewModelBase
     {
         private int _id;

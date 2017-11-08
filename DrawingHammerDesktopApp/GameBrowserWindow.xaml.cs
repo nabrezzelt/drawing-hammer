@@ -32,28 +32,20 @@ namespace DrawingHammerDesktopApp
             {
                 case GameListPacket p:
                     HandleOnGameListReceived(p);
-                    break;
-                case MatchCreatedPacket:
-                    NotifyForCreatedMatch();
-                    break;
-                case CreateMatchPacket p:
+                    break;                
+                case MatchCreatedPacket p:
                     AddMatchToList(p.Match);
                     break;
             }
         }
 
-        private void NotifyForCreatedMatch()
+        private void AddMatchToList(Match match)
         {
             InvokeGui(() =>
             {
-                StatusSnackbar.MessageQueue.Enqueue("Match successfully created.");
+                var vm = (GameBrowserViewModel) DataContext;
+                vm.Matches.Add(match);
             });
-        }
-
-        private void AddMatchToList(Match match)
-        {
-            var vm = (GameBrowserViewModel)DataContext;
-            vm.Matches.Add(match);
         }
 
         private void HandleOnGameListReceived(GameListPacket packet)

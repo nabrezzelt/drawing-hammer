@@ -25,12 +25,26 @@ namespace DrawingHammerDesktopApp
 
         private void OnPacketReceived(object sender, PacketReceivedEventArgs e)
         {
-            throw new NotImplementedException();
+            switch (e.Packet)
+            {
+                case MatchCreatedPacket p:
+                    NotifyForCreatedMatch();
+                    break;
+            }
+        }
+
+        private void NotifyForCreatedMatch()
+        {
+            InvokeGui(() =>
+            {
+                StatusSnackbar.MessageQueue.Enqueue("Match sucessfully created.");
+                Close();
+            });
         }
 
         private void OnConnectionLost(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            
         }
 
         private void CheckToEnableCreateButton(object sender, TextChangedEventArgs e)
@@ -42,7 +56,6 @@ namespace DrawingHammerDesktopApp
         {
             var match = new Match(tbGameName.Text, Convert.ToInt32(sRounds.Value), Convert.ToInt32(sPlayers.Value), Convert.ToInt32(sRoundlength.Value));
             SendCreateMassage(match);
-
         }
 
         private async void SendCreateMassage(Match match)
