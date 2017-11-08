@@ -1,20 +1,22 @@
-﻿using System.Collections.Generic;
-using HelperLibrary.Networking.ClientServer.Packets;
+﻿using HelperLibrary.Networking.ClientServer.Packets;
+using System;
+using System.Collections.ObjectModel;
 
 namespace DrawingHammerPacketLibrary
 {
+    [Serializable]
     public class GameListPacket : BasePacket
     {
-        public List<Match> Matches; 
+        public ObservableCollection<Match> Matches; 
 
-        public GameListPacket(List<Match> matches, string senderUid, string destinationUid) : base(senderUid, destinationUid)
+        public GameListPacket(ObservableCollection<Match> matches, string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {
             Matches = matches; 
         }
 
         public GameListPacket(string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {
-            Matches = new List<Match>();
+            Matches = new ObservableCollection<Match>();
         }
     }
 }

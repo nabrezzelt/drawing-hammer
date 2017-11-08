@@ -16,6 +16,7 @@ namespace DrawingHammerPacketLibrary
         private int _currentTime;
         private int _currentRound;
         private string _uid;
+        private int _creatorId;
 
         public string Uid
         {
@@ -23,6 +24,16 @@ namespace DrawingHammerPacketLibrary
             set
             {
                 _uid = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int CreatorId
+        {
+            get => _creatorId;
+            set
+            {
+                _creatorId = value;
                 OnPropertyChanged();
             }
         }

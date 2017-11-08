@@ -3,13 +3,13 @@ using DrawingHammerPacketLibrary.Enums;
 using DrawingHammerServer.Exceptions;
 using HelperLibrary.Database;
 using HelperLibrary.Logging;
+using HelperLibrary.Networking;
 using HelperLibrary.Networking.ClientServer;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
-using HelperLibrary.Networking;
 
 namespace DrawingHammerServer
 {
@@ -23,7 +23,7 @@ namespace DrawingHammerServer
         private static SettingsManager _settingsManager;
         private static AuthenticationManager _authenticationManager;
 
-        private static List<Match> _matches;
+        private static ObservableCollection<Match> _matches;
 
         private static void Main(string[] args)
         {
@@ -45,7 +45,7 @@ namespace DrawingHammerServer
 
             _authenticationManager = new AuthenticationManager();
 
-            _matches = new List<Match>();
+            _matches = new ObservableCollection<Match>();
 
             StartCommandLineHandler();
         }
@@ -184,7 +184,25 @@ namespace DrawingHammerServer
                 case RequestGamelistPacket p:
                     HandleOnGamelistRequest(p);
                     break;
+
+                case CreateMatchPacket p:
+                    HandleCreateMatchPacket(p);
+                    break;
             }
+        }
+
+        private static void HandleCreateMatchPacket(CreateMatchPacket packet)
+        {
+            var client = (DrawingHammerClientData) _server.GetClientByUid(packet.SenderUid);
+
+            Match match = packet.Match;
+            match.CreatorId = client.User.Id;
+
+            _matches.Add(match);
+
+            _server.Router.DistributePacket(
+                new CreateMatchPacket(match, Router.ServerWildcard, Router.AllAuthenticatedWildCard),
+                new[] {client.Uid});
         }
 
         private static void HandleOnGamelistRequest(RequestGamelistPacket packet)
@@ -224,13 +242,16 @@ namespace DrawingHammerServer
 
         private static void HandleOnAuthenticationRequest(AuthenticationPacket packet, TcpClient senderTcpClient)
         {
-            var client = _server.GetClientByTcpClient(senderTcpClient);
+            var client = (DrawingHammerClientData) _server.GetClientByTcpClient(senderTcpClient);
             client.Uid = packet.SenderUid;
 
-            if (_authenticationManager.IsValid(packet.Username, packet.Password))
+            var authResult = _authenticationManager.IsValid(packet.Username, packet.Password);
+
+            if (authResult.Result)
             {
                 Log.Info("Authenticationcredentials are valid!");
                 client.Authenticated = true;
+                client.User = authResult.User;
                 client.SendDataPacketToClient(new AuthenticationResultPacket(AuthenticationResult.Ok, Router.ServerWildcard, packet.SenderUid));
             }
             else

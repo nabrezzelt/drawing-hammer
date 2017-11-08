@@ -24,6 +24,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
@@ -35,7 +36,7 @@
         </Grid>
         <Grid Grid.Row="1">
             <materialDesign:Card Margin="6">
-                <ListView ItemsSource="{Binding Path=Matches}">
+                <ListView ItemsSource="{Binding Matches}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -106,5 +107,9 @@
                 </StackPanel>
             </Button>
         </Grid>
+        <materialDesign:Snackbar Grid.Row="3"
+                                 MessageQueue="{materialDesign:MessageQueue}"
+                                 x:Name="StatusSnackbar"
+                                 Margin="5,0" />
     </Grid>
 </Window>

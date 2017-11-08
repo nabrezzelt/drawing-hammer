@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticationPacket.cs" />
+    <Compile Include="CreateMatchPacket.cs" />
     <Compile Include="Enums\AuthenticationResult.cs" />
     <Compile Include="AuthenticationResultPacket.cs" />
     <Compile Include="GameListPacket.cs" />

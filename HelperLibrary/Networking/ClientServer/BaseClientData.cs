@@ -27,7 +27,7 @@ namespace HelperLibrary.Networking.ClientServer
             //Starte für jeden Client nach dem Verbinden einen seperaten Thread in dem auf neue eingehende Nachrichten gehört/gewartet wird.
             _clientThread = new Thread(_serverInstance.DataIn);
             _clientThread.Start(this);
-        }
+        }       
 
         public void SendDataPacketToClient(object packet)
         {

@@ -68,7 +68,7 @@ namespace DrawingHammerDesktopApp
 
         private void OnConnectionLost(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            
         }
 
         public void SetUsername(string username)

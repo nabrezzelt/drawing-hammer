@@ -33,7 +33,27 @@ namespace DrawingHammerDesktopApp
                 case GameListPacket p:
                     HandleOnGameListReceived(p);
                     break;
+                case MatchCreatedPacket:
+                    NotifyForCreatedMatch();
+                    break;
+                case CreateMatchPacket p:
+                    AddMatchToList(p.Match);
+                    break;
             }
+        }
+
+        private void NotifyForCreatedMatch()
+        {
+            InvokeGui(() =>
+            {
+                StatusSnackbar.MessageQueue.Enqueue("Match successfully created.");
+            });
+        }
+
+        private void AddMatchToList(Match match)
+        {
+            var vm = (GameBrowserViewModel)DataContext;
+            vm.Matches.Add(match);
         }
 
         private void HandleOnGameListReceived(GameListPacket packet)
@@ -43,17 +63,22 @@ namespace DrawingHammerDesktopApp
                 
             //});
 
-
+            var vm = (GameBrowserViewModel) DataContext;
+            vm.Matches = packet.Matches;
         }
 
+    
         private void OnConnectionLost(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            InvokeGui(() =>
+            {
+               StatusSnackbar.MessageQueue.Enqueue("Connection lost!");
+            });           
         }
 
         private void CreateNewGame(object sender, RoutedEventArgs e)
         {
-            CreateNewGameWindow createGameWindow = new CreateNewGameWindow();
+            CreateNewGameWindow createGameWindow = new CreateNewGameWindow(_client);
             createGameWindow.ShowDialog();
         }
 
