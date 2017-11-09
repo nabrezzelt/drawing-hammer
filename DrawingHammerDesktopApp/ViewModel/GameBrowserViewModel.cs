@@ -21,5 +21,18 @@ namespace DrawingHammerDesktopApp.ViewModel
         {
             _matches = new ObservableCollection<Match>(); 
         }
+
+        public Match GetMatch(string matchUid)
+        {
+            foreach (var match in Matches)
+            {
+                if (match.Uid == matchUid)
+                {
+                    return match;
+                }
+            }
+
+            return null;
+        }
     }
 }

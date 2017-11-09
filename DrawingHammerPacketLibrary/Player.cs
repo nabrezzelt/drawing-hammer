@@ -7,7 +7,7 @@ namespace DrawingHammerPacketLibrary
     {
         private int _id;
         private string _username;
-        private string _score;
+        private int _score;
         private string _uid;
 
         public int Id
@@ -40,7 +40,7 @@ namespace DrawingHammerPacketLibrary
             }
         }        
 
-        public string Score
+        public int Score
         {
             get => _score;
             set
@@ -50,7 +50,7 @@ namespace DrawingHammerPacketLibrary
             }
         }
 
-        public Player(int id, string uid, string username, string score)
+        public Player(int id, string uid, string username, int score)
         {
             _id = id;                              
             Uid = uid;

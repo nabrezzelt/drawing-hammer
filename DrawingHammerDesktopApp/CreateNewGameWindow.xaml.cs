@@ -27,7 +27,7 @@ namespace DrawingHammerDesktopApp
         {
             switch (e.Packet)
             {
-                case MatchCreatedPacket p:
+                case MatchCreatedPacket p:                    
                     NotifyForCreatedMatch();
                     break;
             }
@@ -36,7 +36,7 @@ namespace DrawingHammerDesktopApp
         private void NotifyForCreatedMatch()
         {
             InvokeGui(() =>
-            {
+            {               
                 StatusSnackbar.MessageQueue.Enqueue("Match sucessfully created.");
                 Close();
             });
@@ -44,7 +44,10 @@ namespace DrawingHammerDesktopApp
 
         private void OnConnectionLost(object sender, EventArgs e)
         {
-            
+            InvokeGui(() =>
+            {
+                StatusSnackbar.MessageQueue.Enqueue("Connection lost!");                
+            });
         }
 
         private void CheckToEnableCreateButton(object sender, TextChangedEventArgs e)

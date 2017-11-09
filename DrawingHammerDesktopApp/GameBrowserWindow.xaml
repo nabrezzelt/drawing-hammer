@@ -11,6 +11,7 @@
         Width="543.235"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
+        Closing="OnClosing"
         
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -36,7 +37,7 @@
         </Grid>
         <Grid Grid.Row="1">
             <materialDesign:Card Margin="6">
-                <ListView ItemsSource="{Binding Matches}">
+                <ListView x:Name="lvGamelist" ItemsSource="{Binding Matches}" SelectionChanged="lvGameList_OnSelectionChanged">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -100,7 +101,7 @@
                 </StackPanel>
             </Button>
 
-            <Button Grid.Column="2">
+            <Button x:Name="btnJoin" IsEnabled="False" Grid.Column="2" Click="JoinMatch">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Check" Margin="0,0,2,0" />
                     <TextBlock>Join</TextBlock>

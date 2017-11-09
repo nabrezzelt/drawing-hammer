@@ -8,12 +8,14 @@ namespace DrawingHammerDesktopApp
     /// </summary>
     public partial class App : Application
     {
-        public static string Uid;
-        public static string Username;
+        public static string Uid { get; set; }
+        public static string Username { get; set; }
 
         public App()
         {
-            Uid = HashManager.GenerateSecureRandomToken(64);
+            Uid = HashManager.GenerateSecureRandomToken(64);            
         }
+
+        
     }
 }

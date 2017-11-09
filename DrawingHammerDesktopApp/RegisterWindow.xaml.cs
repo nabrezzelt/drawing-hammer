@@ -57,7 +57,9 @@ namespace DrawingHammerDesktopApp
                     InvokeGui(async () =>
                     {
                         StatusSnackbar.MessageQueue.Enqueue("Account successfully created - you can login now!");
-                        await TaskDelay();
+                        btnRegister.IsEnabled = false;
+
+                        await TaskDelay(1500);
                         Close();
                     });
                     break;

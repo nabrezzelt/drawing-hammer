@@ -45,15 +45,19 @@
     <Compile Include="CreateMatchPacket.cs" />
     <Compile Include="Enums\AuthenticationResult.cs" />
     <Compile Include="AuthenticationResultPacket.cs" />
+    <Compile Include="Enums\MatchChangeType.cs" />
     <Compile Include="GameListPacket.cs" />
+    <Compile Include="JoinMatchPacket.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="MatchCreatedPacket.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PlayerChangedMatchPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistrationPacket.cs" />
     <Compile Include="Enums\RegistrationResult.cs" />
     <Compile Include="RegistrationResultPacket.cs" />
     <Compile Include="RequestGamelistPacket.cs" />
+    <Compile Include="RequestMatchDataPacket.cs" />
     <Compile Include="ViewModelBase.cs" />
     <Compile Include="Word.cs" />
   </ItemGroup>

@@ -6,9 +6,7 @@ namespace DrawingHammerPacketLibrary
 {
     [Serializable]
     public class Match : ViewModelBase
-    {
-        //public EventHandler<EventArgs> RoundFinished;
-        //public EventHandler<EventArgs> MatchFinished;
+    {        
         private string _title;
         private int _rounds;
         private int _maxPlayers;

@@ -197,7 +197,26 @@ namespace DrawingHammerServer
                 case CreateMatchPacket p:
                     HandleCreateMatchPacket(p);
                     break;
+                case JoinMatchPacket p:
+                    HandleOnMatchJoin(p);
+                    break;
             }
+        }
+
+        private static void HandleOnMatchJoin(JoinMatchPacket packet)
+        {
+            Match match = GetMatchByUid(packet.MatchUid);
+            DrawingHammerClientData client = (DrawingHammerClientData) _server.GetClientByUid(packet.SenderUid);
+            
+            Player player = new Player(client.User.Id, client.Uid, client.User.Username, 0);
+            match.Players.Add(player);
+
+            _server.Router.DistributePacket(new PlayerChangedMatchPacket(
+                MatchChangeType.Joined,
+                match.Uid,
+                player,
+                Router.ServerWildcard, 
+                Router.AllAuthenticatedWildCard));
         }
 
         private static void HandleCreateMatchPacket(CreateMatchPacket packet)
@@ -211,12 +230,10 @@ namespace DrawingHammerServer
             Log.Debug("Match created with title: " + match.Title);
 
             _server.Router.DistributePacket(
-                new CreateMatchPacket(match, Router.ServerWildcard, Router.AllAuthenticatedWildCard),
-                new[] {client.Uid});
-            Log.Debug("All clients notified recording new match.");
-
-            client.SendDataPacketToClient(new MatchCreatedPacket(match, Router.ServerWildcard, client.Uid));
-            Log.Debug("User notified for own created match.");
+                new CreateMatchPacket(match, Router.ServerWildcard, Router.AllAuthenticatedWildCard));
+            Log.Debug("All clients notified recording new match.");  
+            
+            client.SendDataPacketToClient(new MatchCreatedPacket(Router.ServerWildcard, client.Uid));
         }
 
         private static void HandleOnGamelistRequest(RequestGamelistPacket packet)
@@ -284,6 +301,17 @@ namespace DrawingHammerServer
         private static void OnClientConnected(object sender, ClientConnectedEventArgs e)
         {
             Console.WriteLine("Client connected from IP: {0}", e.Client.TcpClient.Client.RemoteEndPoint);
+        }
+
+        public static Match GetMatchByUid(string matchUid)
+        {
+            foreach (var match in _matches)
+            {
+                if (match.Uid == matchUid)
+                    return match;
+            }
+
+            return null;
         }
     }
 }

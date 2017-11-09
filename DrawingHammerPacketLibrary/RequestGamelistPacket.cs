@@ -6,7 +6,7 @@ namespace DrawingHammerPacketLibrary
     [Serializable]
     public class RequestGamelistPacket : BasePacket
     {
-        protected RequestGamelistPacket(string senderUid, string destinationUid) : base(senderUid, destinationUid)
+        public RequestGamelistPacket(string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {
 
         }

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using DrawingHammerPacketLibrary;
 using HelperLibrary.Networking.ClientServer;
 
 namespace DrawingHammerDesktopApp
@@ -24,8 +25,6 @@ namespace DrawingHammerDesktopApp
                 settingsWindow.ShowDialog();
             //}
 
-
-
             _client = new SslClient(Properties.Settings.Default.Host, true);
 
             _client.ConnectionLost += OnConnectionLost;
@@ -33,8 +32,6 @@ namespace DrawingHammerDesktopApp
             _client.PacketReceived += OnPacketReceived;
 
             Connect();
-
-            IsEnabled = false;
         }
 
         private async void Connect()
@@ -59,7 +56,7 @@ namespace DrawingHammerDesktopApp
                 LoginWindow loginWindow = new LoginWindow(_client);
                 loginWindow.ShowDialog();
 
-                GameBrowserWindow gameBrowser = new GameBrowserWindow(_client);
+                GameBrowserWindow gameBrowser = new GameBrowserWindow(_client, this);
                 gameBrowser.ShowDialog();
 
                 pbLoading.Visibility = Visibility.Collapsed;
@@ -71,11 +68,6 @@ namespace DrawingHammerDesktopApp
             
         }
 
-        public void SetUsername(string username)
-        {
-            throw new NotImplementedException();
-        }
-
         private void InvokeGui(Action action)
         {           
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);           
@@ -84,6 +76,11 @@ namespace DrawingHammerDesktopApp
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
             Environment.Exit(0);
+        }
+
+        public void MatchJoined(string matchUid)
+        {
+            _client.SendPacketToServer(new RequestMatchDataPacket(matchUid, App.Uid, Router.ServerWildcard));
         }
     }
 }
