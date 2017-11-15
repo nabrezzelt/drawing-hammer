@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
+using HelperLibrary.Database.Exceptions;
 
 namespace DrawingHammerServer
 {
@@ -65,28 +66,62 @@ namespace DrawingHammerServer
         {
             while (true)
             {
-                Console.WriteLine();
+                Log.Info("");
                 Console.Write("DrawingHammer>");
                 var input = Console.ReadLine();                
                 string[] args = input?.Split(' ');
+                string username, password;
+                User user;
 
                 switch (input)
                 {
                     #region lookup account
-                    case string command when command.StartsWith("lookup account "):
+                    case var command when command.StartsWith("lookup account "):
+                        if (args.Length != 3)
+                        {
+                            Log.Info("Paramenters are missing!");
+                            Log.Info("To search a account write: lookup account [filter]");
+                            continue;
+                        }
+                        var filteredUsers = UserManager.GetUsers(args[2]);
+                        Log.Info(filteredUsers.Count + " account(s) found.");
+                        Log.Info("");
 
+                        filteredUsers.ForEach(u => Log.Info(u.Id + " " + u.Username + ", IsBanned:" + (u.IsBanned ? "True" : "False")));
                         break;
                     #endregion
                     #region account list
-                    case string command when command.StartsWith("account list "):
+                    case var command when command == "account list":
+                        var users = UserManager.GetUsers();
+                        Log.Info(users.Count + " account(s) found.");
+                        Log.Info("");
+
+                        users.ForEach(u => Log.Info(u.Id + " " + u.Username + ", IsBanned:" + (u.IsBanned ? "True" : "False")));                        
                         break;
                     #endregion
                     #region account delete                    
-                    case string command when command.StartsWith("account delete "):
+                    case var command when command.StartsWith("account delete "):
+                        if (args.Length != 3)
+                        {
+                            Log.Info("Paramenter is missing!");
+                            Log.Info("To delete a account write: account delete [username]");
+                            continue;
+                        }
+
+                        user = UserManager.GetUser(args[2]);
+                        if (user == null)
+                        {
+                            Log.Info($"Account with username {args[2]} not found!");
+                        }
+                        else
+                        {
+                            UserManager.DeleteUser(user.Id);
+                            Log.Info($"Account {user.Username} successfully deleted!");
+                        }
                         break;
                     #endregion
                     #region account create
-                    case string command when command.StartsWith("account create "):                        
+                    case var command when command.StartsWith("account create "):                        
                         if (args.Length != 4)
                         {
                             Log.Info("Paramenters are missing!");
@@ -94,8 +129,8 @@ namespace DrawingHammerServer
                             continue;
                         }
 
-                        string username = args[2];
-                        string password = args[3];
+                        username = args[2];
+                        password = args[3];
 
                         try
                         {
@@ -110,20 +145,39 @@ namespace DrawingHammerServer
                         {
                             Log.Info("Username is too long. The maxium length is " + UserManager.MaxUsernameLength);
                         }
+                        catch (UsernameTooShortException)
+                        {
+                            Log.Info("Username is too short. The minimum length is " + UserManager.MinUsernameLength);
+                        }
                         break;
                     #endregion
                     #region account reset password
-                    case string command when command.StartsWith("account reset password "):
+                    case var command when command.StartsWith("account reset password "):
+                    
                         if (args.Length != 5)
                         {
                             Log.Info("Paramenters are missing!");
                             Log.Info("To create a new account write: account reset password [username] [new_password]");
                             continue;
                         }
-                        break;
+                        username = args[3];
+                        password = args[4];
+
+                        user = UserManager.GetUser(username);
+                        if (user == null)
+                        {
+                            Log.Info($"Account with username {username} not found!");
+                        }
+                        else
+                        {
+                            UserManager.ChangePassword(user.Id, password);
+                            Log.Info($"Password of account {user.Username} successfully changed!");
+                        }                        
+                        break;                    
+
                     #endregion
                     #region match list
-                    case string command when command.StartsWith("match list"):
+                    case var command when command.StartsWith("match list"):
                         Log.Info("Found " + _matches.Count + " matches:");
                         foreach (var match in _matches)
                         {
@@ -132,13 +186,13 @@ namespace DrawingHammerServer
                         break;
                     #endregion
                     #region help                        
-                    case string command when command == "help" || command == "h":
+                    case var command when command == "help" || command == "h":
                         Log.Info("Available Commands:");
                         Log.Info("");
                         Log.Info("Command                                          | Explanation");
                         Log.Info("--------------------------------------------------------------");
-                        Log.Info("lookup account [username]                        | Find a account.");
-                        Log.Info("account list [username]                          | List all existing accounts");
+                        Log.Info("lookup account [filter]                          | Find a account.");
+                        Log.Info("account list                                     | List all existing accounts");
                         Log.Info("account delete [username]                        | Delete a existing account");                        
                         Log.Info("account create [username] [password]             | Create a new account");
                         Log.Info("account reset password [username] [new_password] | Reset the password of a account");
@@ -148,7 +202,7 @@ namespace DrawingHammerServer
                     #endregion
 
                     #region exit
-                    case string command when command == "exit":
+                    case var command when command == "exit":
                         Log.Error("Shutting down the server...");
                         Environment.Exit(0);
                         break;
@@ -171,7 +225,18 @@ namespace DrawingHammerServer
                 _settingsManager.GetDatabaseUser(),
                 _settingsManager.GetDatabasePassword(),
                 _settingsManager.GetDatabasename());
-            dbManager.Connect();
+
+            try
+            {                
+                dbManager.Connect();
+            }
+            catch (CouldNotConnectException e)
+            {
+                Console.WriteLine(e.InnerException?.Message);
+                Console.ReadLine();
+                Environment.Exit(1);
+            }
+            
             Log.Info("Database connection successfully initialized!");
         }
 

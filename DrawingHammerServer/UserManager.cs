@@ -125,7 +125,8 @@ namespace DrawingHammerServer
             string salt = HashManager.GenerateSecureRandomToken();
             string passwordHash = HashManager.HashSha256(password + salt);
 
-            string query = "INSERT INTO users (username, password) VALUES (@username, @password)";
+            string query = "INSERT INTO users (username, password) VALUES " +
+                           "(@username, @password)";
             DBManager.PrepareQuery(query);
             DBManager.BindValue("@username", username.ToLower());
             DBManager.BindValue("@password", passwordHash);
@@ -133,7 +134,8 @@ namespace DrawingHammerServer
 
             int userID = DBManager.GetLastID();
 
-            query = "INSERT INTO user_salt (userID, salt) VALUES (" + userID + ", '" + salt + "')";
+            query = "INSERT INTO user_salt (userID, salt) VALUES " +
+                    "(" + userID + ", '" + salt + "')";
             DBManager.InsertUpdateDelete(query);
 
             return userID;
@@ -144,7 +146,9 @@ namespace DrawingHammerServer
             string salt = GetUserSalt(userID);
             string passwordHash = HashManager.HashSha256(password + salt);
 
-            string query = "UPDATE users SET password = '" + passwordHash + "' WHERE id = " + userID;
+            string query = "UPDATE users " +
+                           "SET password = '" + passwordHash + "' " +
+                           "WHERE id = " + userID;
             DBManager.InsertUpdateDelete(query);
         }
 
@@ -167,9 +171,7 @@ namespace DrawingHammerServer
                 var id = reader.GetInt32(0);
                 var username = reader.GetString(1);
                 var passwordHash = reader.GetString(2);
-                var isSuspended = reader.GetBoolean(3);
-
-                reader.Close();
+                var isSuspended = reader.GetBoolean(3);                
 
                 users.Add(new User(id, username, passwordHash, isSuspended));
             }
@@ -184,11 +186,11 @@ namespace DrawingHammerServer
             List<User> users = new List<User>();
 
             const string query = "SELECT * " +
-                                 "FROM users" +
+                                 "FROM users " +
                                  "WHERE username LIKE @filter";
             DBManager.PrepareQuery(query);
             DBManager.BindValue("@filter", "%" + usernameFilter + "%");
-            var reader = DBManager.Select(query);
+            var reader = DBManager.ExecutePreparedSelect();
 
             while (reader.Read())
             {
@@ -196,15 +198,27 @@ namespace DrawingHammerServer
                 var username = reader.GetString(1);
                 var passwordHash = reader.GetString(2);
                 var isSuspended = reader.GetBoolean(3);
-
-                reader.Close();
-
+                
                 users.Add(new User(id, username, passwordHash, isSuspended));
             }
 
             reader.Close();
 
             return users;
+        }
+
+        public static void ChangePassword(int userId, string newPassword)
+        {
+            string salt = GetUserSalt(userId);
+            string passwordHash = HashManager.HashSha256(newPassword + salt);
+
+            const string query = "UPDATE users " +
+                                 "SET password = @password " +
+                                 "WHERE id = @id";
+            DBManager.PrepareQuery(query);
+            DBManager.BindValue("@password", passwordHash);
+            DBManager.BindValue("@id", userId);
+            DBManager.ExecutePreparedInsertUpdateDelete();
         }
     }
 }
