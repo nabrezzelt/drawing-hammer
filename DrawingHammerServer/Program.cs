@@ -2,6 +2,7 @@
 using DrawingHammerPacketLibrary.Enums;
 using DrawingHammerServer.Exceptions;
 using HelperLibrary.Database;
+using HelperLibrary.Database.Exceptions;
 using HelperLibrary.Logging;
 using HelperLibrary.Networking;
 using HelperLibrary.Networking.ClientServer;
@@ -10,7 +11,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
-using HelperLibrary.Database.Exceptions;
 
 namespace DrawingHammerServer
 {
@@ -232,7 +232,8 @@ namespace DrawingHammerServer
             }
             catch (CouldNotConnectException e)
             {
-                Console.WriteLine(e.InnerException?.Message);
+                Log.Fatal(e.InnerException?.Message);
+                Log.Info("Press <enter> to exit...");
                 Console.ReadLine();
                 Environment.Exit(1);
             }
@@ -272,16 +273,23 @@ namespace DrawingHammerServer
         {
             Match match = GetMatchByUid(packet.MatchUid);
             DrawingHammerClientData client = (DrawingHammerClientData) _server.GetClientByUid(packet.SenderUid);
-            
-            Player player = new Player(client.User.Id, client.Uid, client.User.Username, 0);
-            match.Players.Add(player);
 
-            _server.Router.DistributePacket(new PlayerChangedMatchPacket(
-                MatchChangeType.Joined,
-                match.Uid,
-                player,
-                Router.ServerWildcard, 
-                Router.AllAuthenticatedWildCard));
+            if (match.Players.Count < match.MaxPlayers)
+            {
+                Player player = new Player(client.User.Id, client.Uid, client.User.Username, 0);
+                match.Players.Add(player);
+
+                _server.Router.DistributePacket(new PlayerChangedMatchPacket(
+                    MatchChangeType.Joined,
+                    match.Uid,
+                    player,
+                    Router.ServerWildcard,
+                    Router.AllAuthenticatedWildCard));
+            }
+            else
+            {
+                client.SendDataPacketToClient(new MatchJoinFailedPacket("Maximum player count reached!", packet.SenderUid, Router.ServerWildcard));
+            }            
         }
 
         private static void HandleCreateMatchPacket(CreateMatchPacket packet)

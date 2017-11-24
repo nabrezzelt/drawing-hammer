@@ -59,7 +59,18 @@ namespace DrawingHammerDesktopApp
                 case PlayerChangedMatchPacket p:
                     HandleOnPlayerChangedMatch(p);
                     break;
+                case MatchJoinFailedPacket p:
+                    HandleOnJoinMatchFailed(p);
+                    break;
             }
+        }
+
+        private void HandleOnJoinMatchFailed(MatchJoinFailedPacket packet)
+        {
+            InvokeGui(() =>
+            {
+                StatusSnackbar.MessageQueue.Enqueue($"Could not join this match (Reason: {packet.Reason})");
+            });
         }
 
         private void HandleOnPlayerChangedMatch(PlayerChangedMatchPacket packet)

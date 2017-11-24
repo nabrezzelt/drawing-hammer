@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="drawing-hammer"
-        Height="419.412"
+        Height="559.532"
         Width="726.961"
         WindowStartupLocation="CenterScreen"
         Closing="MainWindow_OnClosing"
@@ -16,6 +16,36 @@
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" HorizontalAlignment="Left" Orientation="Horizontal">
+            <Image Source="Resources/DrawingHammerLogoTradeamark.png" Width="70" Margin="5" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">Runden</TextBlock>
+                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" Margin="10,0,0,0">1</TextBlock>
+                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="2" Margin="5,0,0,0">von</TextBlock>
+                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="3" Margin="5,0,0,0">8</TextBlock>
+                
+                <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="0">Verbleibnde Zeit:</TextBlock>
+                <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center">17</TextBlock>
+                <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="3">Sekunden</TextBlock>
+            </Grid>
+        </StackPanel>
+    </Grid>
+    <!--<Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -57,5 +87,5 @@
                 <TextBox Grid.Row="1" Margin="5"></TextBox>
             </Grid>
         </Grid>
-    </Grid>
+    </Grid>-->
 </Window>

@@ -83,6 +83,7 @@
     </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="ViewModel\GameBrowserViewModel.cs" />
+    <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Page Include="ConnectionSettingsWindow.xaml">
       <SubType>Designer</SubType>

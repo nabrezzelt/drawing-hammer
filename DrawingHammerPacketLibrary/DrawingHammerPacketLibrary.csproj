@@ -50,6 +50,7 @@
     <Compile Include="JoinMatchPacket.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="MatchCreatedPacket.cs" />
+    <Compile Include="MatchJoinFailedPacket.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerChangedMatchPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
