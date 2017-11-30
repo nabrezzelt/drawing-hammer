@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 
 namespace DrawingHammerServer.Exceptions
 {
+    [Serializable]
     public class UsernameTooShortException : Exception
     {
         public UsernameTooShortException()

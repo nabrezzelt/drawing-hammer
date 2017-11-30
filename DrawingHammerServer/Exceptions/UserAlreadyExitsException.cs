@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 
 namespace DrawingHammerServer.Exceptions
 {
+    [Serializable]
     public class UserAlreadyExitsException : Exception
     {
         public UserAlreadyExitsException()
