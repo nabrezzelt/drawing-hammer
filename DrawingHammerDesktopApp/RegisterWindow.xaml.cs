@@ -59,7 +59,7 @@ namespace DrawingHammerDesktopApp
                         StatusSnackbar.MessageQueue.Enqueue("Account successfully created - you can login now!");
                         btnRegister.IsEnabled = false;
 
-                        await TaskDelay(1500);
+                        await TaskDelay(2000);
                         Close();
                     });
                     break;

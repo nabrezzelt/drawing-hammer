@@ -3,7 +3,9 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using DrawingHammerDesktopApp.ViewModel;
 using DrawingHammerPacketLibrary;
+using DrawingHammerPacketLibrary.Enums;
 using HelperLibrary.Networking.ClientServer;
 
 namespace DrawingHammerDesktopApp
@@ -16,9 +18,7 @@ namespace DrawingHammerDesktopApp
         private readonly SslClient _client;
 
         public MainWindow()
-        {
-            InitializeComponent();
-
+        {            
             //if (!Properties.Settings.Default.IsConnectionConfigured)
             //{
                 ConnectionSettingsWindow settingsWindow = new ConnectionSettingsWindow();
@@ -32,6 +32,10 @@ namespace DrawingHammerDesktopApp
             _client.PacketReceived += OnPacketReceived;
 
             Connect();
+
+            DataContext = new MainWindowViewModel();
+
+            InitializeComponent();
         }
 
         private async void Connect()
@@ -44,7 +48,41 @@ namespace DrawingHammerDesktopApp
 
         private void OnPacketReceived(object sender, PacketReceivedEventArgs e)
         {
-            
+            switch (e.Packet)
+            {
+                case AuthenticationResultPacket p:
+                    HandleAuthenticationPacket(p);
+                    break;
+                case MatchDataPacket p:
+                    HandleMatchDataPacket(p);
+                    break;
+            }
+        }
+
+        private void HandleAuthenticationPacket(AuthenticationResultPacket packet)
+        {
+            if (packet.Result == AuthenticationResult.Ok)
+            {
+                InvokeGui(() =>
+                {
+                    var vm = (MainWindowViewModel) DataContext;
+                    vm.MyUsername = App.Username;
+                });
+            }                
+        }
+
+        private void HandleMatchDataPacket(MatchDataPacket packet)
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel) DataContext;
+
+                vm.Rounds = packet.Match.Rounds;
+                vm.CurrentRound = packet.Match.CurrentRound;
+                vm.RemainingTime = packet.Match.RemainingTime;
+                vm.MatchTitle = packet.Match.Title;
+                vm.Players = packet.Match.Players;
+            });
         }
 
         private void OnConnectionSucceed(object sender, EventArgs e)

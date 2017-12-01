@@ -6,129 +6,38 @@ namespace DrawingHammerPacketLibrary
 {
     [Serializable]
     public class Match : ViewModelBase
-    {        
-        private string _title;
-        private int _rounds;
-        private int _maxPlayers;
-        private int _roundLengh;
-        private ObservableCollection<Player> _players;
-        private ObservableCollection<Word> _guessedWords;
-        private int _currentTime;
-        private int _currentRound;
-        private string _uid;
-        private int _creatorId;
+    {                
+        public string MatchUid { get; set; }
 
-        public string Uid
-        {
-            get => _uid;
-            set
-            {
-                _uid = value;
-                OnPropertyChanged();
-            }
-        }
+        public int CreatorId { get; set; }
 
-        public int CreatorId
-        {
-            get => _creatorId;
-            set
-            {
-                _creatorId = value;
-                OnPropertyChanged();
-            }
-        }
+        public string Title { get; set; }
 
-        public string Title
-        {
-            get => _title;
-            set
-            {
-                _title = value;
-                OnPropertyChanged();
-            }
-        }
+        public int Rounds { get; set; }
 
-        public int Rounds
-        {
-            get => _rounds;
-            set
-            {
-                _rounds = value;
-                OnPropertyChanged();
-            }
-        }
+        public int MaxPlayers { get; set; }
 
-        public int MaxPlayers
-        {
-            get => _maxPlayers;
-            set
-            {
-                _maxPlayers = value;
-                OnPropertyChanged();
-            }
-        }
+        public int RoundLength { get; set; }
 
-        public int RoundLengh
-        {
-            get => _roundLengh;
-            set
-            {
-                _roundLengh = value;
-                OnPropertyChanged();
-            }
-        }
+        public ObservableCollection<Player> Players { get; set; }
 
-        public ObservableCollection<Player> Players
-        {
-            get => _players;
-            set
-            {
-                _players = value;
-                OnPropertyChanged();
-            }
-        }
+        public ObservableCollection<Word> GuessedWords { get; set; }
 
-        public ObservableCollection<Word> GuessedWords
-        {
-            get => _guessedWords;
-            set
-            {
-                _guessedWords = value;
-                OnPropertyChanged();
-            }
-        }
+        public int RemainingTime { get; set; }
 
-        public int CurrentTime
-        {
-            get => _currentTime;
-            set
-            {
-                _currentTime = value;
-                OnPropertyChanged();
-            }
-        }
+        public int CurrentRound { get; set; }
 
-        public int CurrentRound
+        public Match(string title, int rounds, int maxPlayers, int roundLength)
         {
-            get => _currentRound;
-            set
-            {
-                _currentRound = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public Match(string title, int rounds, int maxPlayers, int roundLengh)
-        {
-            _uid = HashManager.GenerateSecureRandomToken();
+            MatchUid = HashManager.GenerateSecureRandomToken();
 
             Title = title;
             Rounds = rounds;
             MaxPlayers = maxPlayers;
-            RoundLengh = roundLengh;
+            RoundLength = roundLength;
 
             Players = new ObservableCollection<Player>();
-            CurrentTime = 0;
+            RemainingTime = RoundLength;
             CurrentRound = 1;
         }
     }

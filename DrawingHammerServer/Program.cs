@@ -266,7 +266,18 @@ namespace DrawingHammerServer
                 case JoinMatchPacket p:
                     HandleOnMatchJoin(p);
                     break;
+                case RequestMatchDataPacket p:
+                    HandleMatchDataRequest(p);
+                    break;
             }
+        }
+
+        private static void HandleMatchDataRequest(RequestMatchDataPacket packet)
+        {
+            var match = GetMatchByUid(packet.MatchUid);
+            DrawingHammerClientData client = (DrawingHammerClientData)_server.GetClientByUid(packet.SenderUid);
+
+            client.SendDataPacketToClient(new MatchDataPacket(match, Router.ServerWildcard, client.Uid));
         }
 
         private static void HandleOnMatchJoin(JoinMatchPacket packet)
@@ -281,7 +292,7 @@ namespace DrawingHammerServer
 
                 _server.Router.DistributePacket(new PlayerChangedMatchPacket(
                     MatchChangeType.Joined,
-                    match.Uid,
+                    match.MatchUid,
                     player,
                     Router.ServerWildcard,
                     Router.AllAuthenticatedWildCard));
@@ -380,7 +391,7 @@ namespace DrawingHammerServer
         {
             foreach (var match in _matches)
             {
-                if (match.Uid == matchUid)
+                if (match.MatchUid == matchUid)
                     return match;
             }
 

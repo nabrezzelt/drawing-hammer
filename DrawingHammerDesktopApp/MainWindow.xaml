@@ -8,6 +8,8 @@
         Closing="MainWindow_OnClosing"
         
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:viewModel="clr-namespace:DrawingHammerDesktopApp.ViewModel"
+        xmlns:drawingHammerPacketLibrary="clr-namespace:DrawingHammerPacketLibrary;assembly=DrawingHammerPacketLibrary"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
@@ -49,25 +51,25 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">Runde:</TextBlock>
-                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" Margin="16,0,0,0" Text="1" FontWeight="Bold" />
+                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" Margin="16,0,0,0" Text="{Binding CurrentRound}" FontWeight="Bold" />
                 <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="2" Margin="5,0,0,0">von</TextBlock>
-                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="3" Margin="5,0,0,0" Text="8" FontWeight="Bold" />
+                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="3" Margin="5,0,0,0" Text="{Binding Rounds}" FontWeight="Bold" />
 
                 <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="0">Verbleibnde Zeit:</TextBlock>
-                <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="-1,0,0,0" Text="17" FontWeight="Bold" />
+                <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="-1,0,0,0" Text="{Binding RemainingTime}" FontWeight="Bold" />
                 <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="3">Sekunden</TextBlock>
             </Grid>
         </StackPanel>
         <TextBlock Grid.Column="1" 
                    Grid.Row="1" 
                    Margin="5" 
-                   Text="Match for Faggot 1-3"
+                   Text="{Binding MatchTitle}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    Style="{DynamicResource MaterialDesignTitleTextBlock}"/>
         <materialDesign:Chip Grid.Column="2"
                              Grid.Row="1"                             
-                             Content="Nabrezzelt"
+                             Content="{Binding MyUsername}"
                              IsDeletable="True"
                              ToolTip="Profile"
                              DeleteToolTip="Leave current Match"
@@ -82,92 +84,28 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="175" />
             </Grid.ColumnDefinitions>
-            <ListView Grid.Column="0">
-                <ListViewItem>
-                    <Grid Width="184">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <materialDesign:Chip Grid.Column="0"
-                                             Content="Nabrezzelt"                                         
-                                             ToolTip="Profile"
-                                             DeleteToolTip="Leave current Match">
-                            <materialDesign:Chip.Icon>
-                                <materialDesign:PackIcon Kind="Account" />
-                            </materialDesign:Chip.Icon>
-                        </materialDesign:Chip>
-                        <TextBlock Grid.Column="2" 
-                                   Text="20"
-                                   VerticalAlignment="Center" 
-                                   HorizontalAlignment="Center" Margin="0,0,0,0" />
-                    </Grid>
-                </ListViewItem>
-                <ListViewItem>
-                    <Grid Width="184">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <materialDesign:Chip Grid.Column="0"
-                                             Content="Nabrezzelt"                                         
-                                             ToolTip="Profile"
-                                             DeleteToolTip="Leave current Match">
-                            <materialDesign:Chip.Icon>
-                                <materialDesign:PackIcon Kind="Account" />
-                            </materialDesign:Chip.Icon>
-                        </materialDesign:Chip>
-                        <TextBlock Grid.Column="2" 
-                                   Text="20"
-                                   VerticalAlignment="Center" 
-                                   HorizontalAlignment="Center" Margin="0,0,0,0" />
-                    </Grid>
-                </ListViewItem>
-                <ListViewItem>
-                    <Grid Width="184">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <materialDesign:Chip Grid.Column="0"
-                                             Content="Nabrezzelt"                                         
-                                             ToolTip="Profile"
-                                             DeleteToolTip="Leave current Match">
-                            <materialDesign:Chip.Icon>
-                                <materialDesign:PackIcon Kind="Account" />
-                            </materialDesign:Chip.Icon>
-                        </materialDesign:Chip>
-                        <TextBlock Grid.Column="2" 
-                                   Text="20"
-                                   VerticalAlignment="Center" 
-                                   HorizontalAlignment="Center" Margin="0,0,0,0" />
-                    </Grid>
-                </ListViewItem>
-                <ListViewItem>
-                    <Grid Width="184">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <materialDesign:Chip Grid.Column="0"
-                                             Content="Nabrezzelt"                                         
-                                             ToolTip="Profile"
-                                             DeleteToolTip="Leave current Match">
-                            <materialDesign:Chip.Icon>
-                                <materialDesign:PackIcon Kind="Account" />
-                            </materialDesign:Chip.Icon>
-                        </materialDesign:Chip>
-                        <TextBlock Grid.Column="2" 
-                                   Text="20"
-                                   VerticalAlignment="Center" 
-                                   HorizontalAlignment="Center" Margin="0,0,0,0" />
-                    </Grid>
-                </ListViewItem>
-                
+            <ListView Grid.Column="0" ItemsSource="{Binding Players}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Width="184">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <materialDesign:Chip Grid.Column="0"
+                                                 Content="{Binding Username}">
+                                <materialDesign:Chip.Icon>
+                                    <materialDesign:PackIcon Kind="Account" />
+                                </materialDesign:Chip.Icon>
+                            </materialDesign:Chip>
+                            <TextBlock Grid.Column="2" 
+                                       Text="{Binding Score}"
+                                       VerticalAlignment="Center" 
+                                       HorizontalAlignment="Center" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
             </ListView>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
@@ -181,7 +119,9 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <ListView></ListView>
+                <ListView>
+                    
+                </ListView>
                 <TextBox Grid.Row="1"
                          Margin="5"
                          materialDesign:HintAssist.Hint="Your Guess"/>

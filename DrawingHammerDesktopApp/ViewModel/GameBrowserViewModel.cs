@@ -5,28 +5,18 @@ namespace DrawingHammerDesktopApp.ViewModel
 {
     public class GameBrowserViewModel : ViewModelBase
     {
-        private ObservableCollection<Match> _matches;
-
-        public ObservableCollection<Match> Matches
-        {
-            get => _matches;
-            set
-            {
-                _matches = value;
-                OnPropertyChanged();
-            }
-        }
+        public ObservableCollection<Match> Matches { get; set; }
 
         public GameBrowserViewModel()
         {
-            _matches = new ObservableCollection<Match>(); 
+            Matches = new ObservableCollection<Match>(); 
         }
 
         public Match GetMatch(string matchUid)
         {
             foreach (var match in Matches)
             {
-                if (match.Uid == matchUid)
+                if (match.MatchUid == matchUid)
                 {
                     return match;
                 }

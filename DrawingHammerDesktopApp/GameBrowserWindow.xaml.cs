@@ -86,7 +86,7 @@ namespace DrawingHammerDesktopApp
                         Close();
                     }
 
-                    var match = ((GameBrowserViewModel)DataContext).GetMatch(packet.MatchUid);
+                    var match = ((GameBrowserViewModel) DataContext).GetMatch(packet.MatchUid);
                     match.Players.Add(packet.Player);                   
                 }
             });            
@@ -150,7 +150,7 @@ namespace DrawingHammerDesktopApp
                 Match selectedMatch = (Match) lvGamelist.SelectedItem;
                 await Task.Run(() =>
                 {
-                    _client.SendPacketToServer(new JoinMatchPacket(selectedMatch.Uid, App.Uid, Router.ServerWildcard));
+                    _client.SendPacketToServer(new JoinMatchPacket(selectedMatch.MatchUid, App.Uid, Router.ServerWildcard));
                 });
             });
 
