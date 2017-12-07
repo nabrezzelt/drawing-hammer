@@ -37,7 +37,7 @@
         </Grid>
         <Grid Grid.Row="1">
             <materialDesign:Card Margin="6">
-                <ListView x:Name="lvGamelist" MouseDoubleClick="lvGamelist_OnDoubleClick" ItemsSource="{Binding Matches}" SelectionChanged="lvGameList_OnSelectionChanged">
+                <ListView x:Name="ListViewGamelist" MouseDoubleClick="lvGamelist_OnDoubleClick" ItemsSource="{Binding Matches}" SelectionChanged="lvGameList_OnSelectionChanged">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -101,7 +101,7 @@
                 </StackPanel>
             </Button>
 
-            <Button x:Name="btnJoin" IsEnabled="False" Grid.Column="2" Click="JoinMatch">
+            <Button x:Name="ButtonJoin" IsEnabled="False" Grid.Column="2" Click="JoinMatch">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Check" Margin="0,0,2,0" />
                     <TextBlock>Join</TextBlock>

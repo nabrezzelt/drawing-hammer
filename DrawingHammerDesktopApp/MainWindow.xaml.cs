@@ -56,7 +56,20 @@ namespace DrawingHammerDesktopApp
                 case MatchDataPacket p:
                     HandleMatchDataPacket(p);
                     break;
+                case PlayerJoinedMatchPacket p:
+                    HandleOnPlayerJoinedMatch(p);
+                    break;
             }
+        }
+
+        private void HandleOnPlayerJoinedMatch(PlayerJoinedMatchPacket packet)
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel) DataContext;
+
+                vm.Players.Add(packet.Player);
+            });
         }
 
         private void HandleAuthenticationPacket(AuthenticationResultPacket packet)

@@ -52,12 +52,12 @@ namespace DrawingHammerDesktopApp
 
         private void CheckToEnableCreateButton(object sender, TextChangedEventArgs e)
         {
-            btnCreate.IsEnabled = tbGameName.Text != "";
+            ButtonCreate.IsEnabled = TextBoxGameName.Text != "";
         }
 
         private void Create(object sender, RoutedEventArgs e)
         {
-            var match = new Match(tbGameName.Text, Convert.ToInt32(sRounds.Value), Convert.ToInt32(sPlayers.Value), Convert.ToInt32(sRoundlength.Value));
+            var match = new Match(TextBoxGameName.Text, Convert.ToInt32(SliderRounds.Value), Convert.ToInt32(SliderPlayers.Value), Convert.ToInt32(Slider.Value));
             SendCreateMassage(match);
         }
 

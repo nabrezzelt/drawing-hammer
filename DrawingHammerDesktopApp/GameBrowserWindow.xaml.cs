@@ -56,7 +56,7 @@ namespace DrawingHammerDesktopApp
                 case CreateMatchPacket p:
                     AddMatchToList(p.Match);
                     break;
-                case PlayerChangedMatchPacket p:
+                case PlayerJoinedMatchPacket p:
                     HandleOnPlayerChangedMatch(p);
                     break;
                 case MatchJoinFailedPacket p:
@@ -73,22 +73,19 @@ namespace DrawingHammerDesktopApp
             });
         }
 
-        private void HandleOnPlayerChangedMatch(PlayerChangedMatchPacket packet)
+        private void HandleOnPlayerChangedMatch(PlayerJoinedMatchPacket packet)
         {
             InvokeGui(() =>
-            {
-                if (packet.ChangeType == MatchChangeType.Joined)
+            {                
+                if (packet.Player.Uid == App.Uid)
                 {
-                    if (packet.Player.Uid == App.Uid)
-                    {
-                        _mainWindow.MatchJoined(packet.MatchUid);
-                        _matchJoined = true;
-                        Close();
-                    }
-
-                    var match = ((GameBrowserViewModel) DataContext).GetMatch(packet.MatchUid);
-                    match.Players.Add(packet.Player);                   
+                    _mainWindow.MatchJoined(packet.MatchUid);
+                    _matchJoined = true;
+                    Close();
                 }
+
+                var match = ((GameBrowserViewModel) DataContext).GetMatch(packet.MatchUid);
+                match.Players.Add(packet.Player);                                
             });            
         }
 
@@ -132,12 +129,12 @@ namespace DrawingHammerDesktopApp
 
         private void lvGameList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            btnJoin.IsEnabled = lvGamelist.SelectedItem != null;
+            ButtonJoin.IsEnabled = ListViewGamelist.SelectedItem != null;
         }
 
         private void lvGamelist_OnDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (lvGamelist.SelectedItem != null)
+            if (ListViewGamelist.SelectedItem != null)
             {
                 JoinMatch(sender, e);
             }
@@ -147,7 +144,7 @@ namespace DrawingHammerDesktopApp
         {            
             InvokeGui(async () =>
             {
-                Match selectedMatch = (Match) lvGamelist.SelectedItem;
+                Match selectedMatch = (Match) ListViewGamelist.SelectedItem;
                 await Task.Run(() =>
                 {
                     _client.SendPacketToServer(new JoinMatchPacket(selectedMatch.MatchUid, App.Uid, Router.ServerWildcard));

@@ -47,8 +47,8 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                btnRegister.Visibility = Visibility.Visible;
-                pbRegistering.Visibility = Visibility.Collapsed;
+                ButtonRegister.Visibility = Visibility.Visible;
+                ProgressBarRegistering.Visibility = Visibility.Collapsed;
             });
             
             switch (packet.Result)
@@ -57,7 +57,7 @@ namespace DrawingHammerDesktopApp
                     InvokeGui(async () =>
                     {
                         StatusSnackbar.MessageQueue.Enqueue("Account successfully created - you can login now!");
-                        btnRegister.IsEnabled = false;
+                        ButtonRegister.IsEnabled = false;
 
                         await TaskDelay(2000);
                         Close();
@@ -92,22 +92,22 @@ namespace DrawingHammerDesktopApp
 
         private void CheckForEnableRegisterButton(object sender, RoutedEventArgs routedEventArgs)
         {
-            if (tbPassword.Password != "" && tbPassword.Password == tbPasswordRepeat.Password && tbUsername.Text != "")
+            if (TextBoxPassword.Password != "" && TextBoxPassword.Password == TextBoxPasswordRepeat.Password && TextBoxUsername.Text != "")
             {
-                btnRegister.IsEnabled = true;
+                ButtonRegister.IsEnabled = true;
             }
             else
             {
-                btnRegister.IsEnabled = false;
+                ButtonRegister.IsEnabled = false;
             }
         }
 
         private void Register(object sender, RoutedEventArgs e)
         {
-            btnRegister.Visibility = Visibility.Collapsed;
-            pbRegistering.Visibility = Visibility.Visible;
+            ButtonRegister.Visibility = Visibility.Collapsed;
+            ProgressBarRegistering.Visibility = Visibility.Visible;
 
-            SendRegisterMessage(tbUsername.Text, tbPassword.Password);
+            SendRegisterMessage(TextBoxUsername.Text, TextBoxPassword.Password);
         }
 
         private async void SendRegisterMessage(string username, string password)
@@ -125,7 +125,7 @@ namespace DrawingHammerDesktopApp
 
         private void RegisterWhenEnterPressed(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter && btnRegister.IsEnabled)
+            if (e.Key == Key.Enter && ButtonRegister.IsEnabled)
             {
                 Register(sender, e);
             }

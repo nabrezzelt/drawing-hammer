@@ -39,7 +39,7 @@ namespace HelperLibrary.Networking.ClientServer
             ClientStream.Write(lengthBytes, 0, 4); //Senden der Länge/Größe des Textes
             ClientStream.Write(packetBytes, 0, packetBytes.Length); //Senden der eingentlichen Daten/des Textes    
             
-            Log.Debug("Packet send to: " + Uid);
+            Log.Debug($"Packet of type {packet.GetType().Name} send to: {Uid}");
         }
     }
 }

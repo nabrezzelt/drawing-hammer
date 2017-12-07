@@ -244,7 +244,7 @@ namespace DrawingHammerServer
         private static void OnPacketReceived(object sender, PacketReceivedEventArgs e)
         {
             var packet = e.Packet;
-            Log.Debug("Packet recived of type: " + nameof(e.Packet));
+            Log.Debug("Packet recived of type: " + e.Packet.GetType().Name);
 
             switch (packet)
             {
@@ -286,16 +286,15 @@ namespace DrawingHammerServer
             DrawingHammerClientData client = (DrawingHammerClientData) _server.GetClientByUid(packet.SenderUid);
 
             if (match.Players.Count < match.MaxPlayers)
-            {
+            {               
                 Player player = new Player(client.User.Id, client.Uid, client.User.Username, 0);
                 match.Players.Add(player);
 
-                _server.Router.DistributePacket(new PlayerChangedMatchPacket(
-                    MatchChangeType.Joined,
+                _server.Router.DistributePacket(new PlayerJoinedMatchPacket(                    
                     match.MatchUid,
                     player,
                     Router.ServerWildcard,
-                    Router.AllAuthenticatedWildCard));
+                    Router.AllAuthenticatedWildCard));              
             }
             else
             {

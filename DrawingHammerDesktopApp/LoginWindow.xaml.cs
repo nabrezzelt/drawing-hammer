@@ -42,8 +42,8 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                spButtons.Visibility = Visibility.Visible;
-                spLoggingIn.Visibility = Visibility.Collapsed;
+                StackPanelButtons.Visibility = Visibility.Visible;
+                StackPanelLoggingIn.Visibility = Visibility.Collapsed;
             });
 
             
@@ -54,8 +54,8 @@ namespace DrawingHammerDesktopApp
                     InvokeGui(async () =>
                     {                        
                         StatusSnackbar.MessageQueue.Enqueue("Login was successfull.");
-                        btnLogin.IsEnabled = false;
-                        btnRegister.IsEnabled = false;
+                        ButtonLogin.IsEnabled = false;
+                        ButtonRegister.IsEnabled = false;
 
                         await TaskDelay(1500);
                         Close();
@@ -86,12 +86,12 @@ namespace DrawingHammerDesktopApp
 
         private void Login(object sender, RoutedEventArgs routedEventArgs)
         {                                   
-            SendLoginMessage(tbUsername.Text, tbPassword.Password);
+            SendLoginMessage(TextBoxUsername.Text, TextBoxPassword.Password);
 
             InvokeGui(() =>
             {                
-                spButtons.Visibility = Visibility.Collapsed;
-                spLoggingIn.Visibility = Visibility.Visible;
+                StackPanelButtons.Visibility = Visibility.Collapsed;
+                StackPanelLoggingIn.Visibility = Visibility.Visible;
             });            
         }
 
@@ -113,19 +113,19 @@ namespace DrawingHammerDesktopApp
 
         private void CheckForEnablingLoginButton(object sender, RoutedEventArgs routedEventArgs)
         {
-            if (tbPassword.Password != "" && tbUsername.Text != "")
+            if (TextBoxPassword.Password != "" && TextBoxUsername.Text != "")
             {
-                btnLogin.IsEnabled = true;
+                ButtonLogin.IsEnabled = true;
             }
             else
             {
-                btnLogin.IsEnabled = false;
+                ButtonLogin.IsEnabled = false;
             }
         }
 
         private void LoginWhenEnterPressed(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter && btnLogin.IsEnabled)
+            if (e.Key == Key.Enter && ButtonLogin.IsEnabled)
             {
                 Login(sender, e);
             }
