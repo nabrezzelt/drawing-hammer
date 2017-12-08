@@ -1,15 +1,14 @@
-﻿using System;
+﻿using DrawingHammerDesktopApp.ViewModel;
+using DrawingHammerPacketLibrary;
+using HelperLibrary.Logging;
+using HelperLibrary.Networking.ClientServer;
+using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using DrawingHammerDesktopApp.ViewModel;
-using DrawingHammerPacketLibrary;
-using DrawingHammerPacketLibrary.Enums;
-using HelperLibrary.Logging;
-using HelperLibrary.Networking.ClientServer;
 
 namespace DrawingHammerDesktopApp
 {
@@ -20,7 +19,7 @@ namespace DrawingHammerDesktopApp
     {
         private readonly MainWindow _mainWindow;
         private readonly SslClient _client;
-        private bool _matchJoined = false;
+        private bool _matchJoined;
 
         public GameBrowserWindow(SslClient client, MainWindow mainWindow)
         {

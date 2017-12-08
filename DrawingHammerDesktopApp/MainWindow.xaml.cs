@@ -65,10 +65,11 @@ namespace DrawingHammerDesktopApp
         private void HandleOnPlayerJoinedMatch(PlayerJoinedMatchPacket packet)
         {
             InvokeGui(() =>
-            {
+            {                
                 var vm = (MainWindowViewModel) DataContext;
 
-                vm.Players.Add(packet.Player);
+                if (packet.MatchUid == vm.MatchUid)
+                    vm.Players.Add(packet.Player);
             });
         }
 
@@ -90,6 +91,7 @@ namespace DrawingHammerDesktopApp
             {
                 var vm = (MainWindowViewModel) DataContext;
 
+                vm.MatchUid = packet.Match.MatchUid;
                 vm.Rounds = packet.Match.Rounds;
                 vm.CurrentRound = packet.Match.CurrentRound;
                 vm.RemainingTime = packet.Match.RemainingTime;
@@ -130,7 +132,7 @@ namespace DrawingHammerDesktopApp
         }
 
         public void MatchJoined(string matchUid)
-        {
+        {           
             _client.SendPacketToServer(new RequestMatchDataPacket(matchUid, App.Uid, Router.ServerWildcard));
         }
     }
