@@ -64,6 +64,7 @@
     <Compile Include="UserManager.cs" />
     <Compile Include="Exceptions\UsernameTooLongException.cs" />
     <Compile Include="Exceptions\UsernameTooShortException.cs" />
+    <Compile Include="Word-Manager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
