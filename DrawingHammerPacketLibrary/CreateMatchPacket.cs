@@ -6,11 +6,11 @@ namespace DrawingHammerPacketLibrary
     [Serializable]
     public class CreateMatchPacket : BasePacket
     {
-        public Match Match;
+        public MatchData MatchData { get; }
 
-        public CreateMatchPacket(Match match, string senderUid, string destinationUid) : base(senderUid, destinationUid)
+        public CreateMatchPacket(MatchData matchData, string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {
-            Match = match;
+            MatchData = matchData;
         }
     }
 }

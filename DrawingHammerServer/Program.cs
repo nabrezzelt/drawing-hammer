@@ -30,7 +30,9 @@ namespace DrawingHammerServer
         {
             _settingsManager = new SettingsManager(SettingsPath);
 
-            InitializeSettingsFile();            
+            InitializeSettingsFile(); 
+            
+            Log.DisplaySelfCertDetails(new X509Certificate2(CertificatePath, CertificatePassword));
 
             InitializeDatabaseConnection();            
             Log.Info("");
@@ -277,7 +279,7 @@ namespace DrawingHammerServer
             var match = GetMatchByUid(packet.MatchUid);
             DrawingHammerClientData client = (DrawingHammerClientData)_server.GetClientByUid(packet.SenderUid);
 
-            client.SendDataPacketToClient(new MatchDataPacket(match, Router.ServerWildcard, client.Uid));
+            client.SendDataPacketToClient(new MatchDataPacket(new MatchData(match), Router.ServerWildcard, client.Uid));
         }
 
         private static void HandleOnMatchJoin(JoinMatchPacket packet)
@@ -294,35 +296,86 @@ namespace DrawingHammerServer
                     match.MatchUid,
                     player,
                     Router.ServerWildcard,
-                    Router.AllAuthenticatedWildCard));              
+                    Router.AllAuthenticatedWildCard));
+
+                if (match.Players.Count > 1)
+                {
+                    StartMatch(match);
+                }
             }
             else
             {
                 client.SendDataPacketToClient(new MatchJoinFailedPacket("Maximum player count reached!", packet.SenderUid, Router.ServerWildcard));
             }            
-        }
+        }        
 
         private static void HandleCreateMatchPacket(CreateMatchPacket packet)
         {
             var client = (DrawingHammerClientData) _server.GetClientByUid(packet.SenderUid);
 
-            Match match = packet.Match;
-            match.CreatorId = client.User.Id;
+            Match match =
+                new Match(packet.MatchData.Title, packet.MatchData.Rounds, packet.MatchData.MaxPlayers, packet.MatchData.RoundLength)
+                {
+                    CreatorId = client.User.Id
+                };
+
+            match.RoundFinished += Match_RoundFinished;
+            match.PreparationTimeFinished += Match_PreparationTimeFinished;
+            match.MatchFinished += Match_MatchFinished;
+
 
             _matches.Add(match);
             Log.Debug("Match created with title: " + match.Title);
 
             _server.Router.DistributePacket(
-                new CreateMatchPacket(match, Router.ServerWildcard, Router.AllAuthenticatedWildCard));
+                new CreateMatchPacket(new MatchData(match), Router.ServerWildcard, Router.AllAuthenticatedWildCard));
             Log.Debug("All clients notified recording new match.");  
             
             client.SendDataPacketToClient(new MatchCreatedPacket(Router.ServerWildcard, client.Uid));
         }
 
+        private static void Match_RoundFinished(object sender, EventArgs e)
+        {
+            var match = (Match) sender;
+
+            foreach (Player player in match.Players)
+            {
+                _server.Router.DistributePacket(new RoundFinishedPacket(Router.ServerWildcard, player.Uid));                            
+            }
+        }
+
+        private static void Match_PreparationTimeFinished(object sender, EventArgs e)
+        {
+            var match = (Match) sender;
+
+            foreach (Player player in match.Players)
+            {
+                _server.Router.DistributePacket(new MatchFinishedPacket(Router.ServerWildcard, player.Uid));                
+            }
+        }
+
+        private static void Match_MatchFinished(object sender, EventArgs e)
+        {
+            var match = (Match) sender;
+
+            foreach (Player player in match.Players)
+            {
+                _server.Router.DistributePacket(new PreparationTimeFinishedPacket(Router.ServerWildcard, player.Uid));
+                //ToDo: Notifiy players and show score overview
+                Log.Debug("Notifiy players and show score overview");
+            }
+        }
+
         private static void HandleOnGamelistRequest(RequestGamelistPacket packet)
         {
+            var matchDataList = new ObservableCollection<MatchData>();
+            foreach (var match in _matches)
+            {
+                matchDataList.Add(new MatchData(match));
+            }
+
             var client  = _server.GetClientByUid(packet.SenderUid);
-            client.SendDataPacketToClient(new GameListPacket(_matches, Router.ServerWildcard, client.Uid));
+            client.SendDataPacketToClient(new GameListPacket(matchDataList, Router.ServerWildcard, client.Uid));
         }
 
         private static void HandleOnRegistrationRequest(RegistrationPacket packet, TcpClient senderTcpClient)
@@ -386,7 +439,7 @@ namespace DrawingHammerServer
             Console.WriteLine("Client connected from IP: {0}", e.Client.TcpClient.Client.RemoteEndPoint);
         }
 
-        public static Match GetMatchByUid(string matchUid)
+        private static Match GetMatchByUid(string matchUid)
         {
             foreach (var match in _matches)
             {
@@ -395,6 +448,12 @@ namespace DrawingHammerServer
             }
 
             return null;
+        }
+
+        private static void StartMatch(Match match)
+        {
+            match.StartPreparationTimer();
+            //ToDo: Send words to first player
         }
     }
 }

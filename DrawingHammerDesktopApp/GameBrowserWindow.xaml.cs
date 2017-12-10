@@ -54,7 +54,7 @@ namespace DrawingHammerDesktopApp
                     HandleOnGameListReceived(p);
                     break;                
                 case CreateMatchPacket p:
-                    AddMatchToList(p.Match);
+                    AddMatchToList(p.MatchData);
                     break;
                 case PlayerJoinedMatchPacket p:
                     HandleOnPlayerChangedMatch(p);
@@ -89,12 +89,12 @@ namespace DrawingHammerDesktopApp
             });            
         }
 
-        private void AddMatchToList(Match match)
+        private void AddMatchToList(MatchData matchData)
         {
             InvokeGui(() =>
             {
                 var vm = (GameBrowserViewModel) DataContext;
-                vm.Matches.Add(match);
+                vm.Matches.Add(matchData);
             });
         }
 
@@ -144,7 +144,7 @@ namespace DrawingHammerDesktopApp
         {            
             InvokeGui(async () =>
             {
-                Match selectedMatch = (Match) ListViewGamelist.SelectedItem;
+                MatchData selectedMatch = (MatchData) ListViewGamelist.SelectedItem;
                 await Task.Run(() =>
                 {
                     _client.SendPacketToServer(new JoinMatchPacket(selectedMatch.MatchUid, App.Uid, Router.ServerWildcard));

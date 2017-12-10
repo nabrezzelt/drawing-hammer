@@ -55,16 +55,20 @@
     <Compile Include="JoinMatchPacket.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="MatchCreatedPacket.cs" />
+    <Compile Include="MatchData.cs" />
     <Compile Include="MatchDataPacket.cs" />
+    <Compile Include="MatchFinishedPacket.cs" />
     <Compile Include="MatchJoinFailedPacket.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerJoinedMatchPacket.cs" />
+    <Compile Include="PreparationTimeFinishedPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistrationPacket.cs" />
     <Compile Include="Enums\RegistrationResult.cs" />
     <Compile Include="RegistrationResultPacket.cs" />
     <Compile Include="RequestGamelistPacket.cs" />
     <Compile Include="RequestMatchDataPacket.cs" />
+    <Compile Include="RoundFinishedPacket.cs" />
     <Compile Include="ViewModelBase.cs" />
     <Compile Include="Word.cs" />
   </ItemGroup>

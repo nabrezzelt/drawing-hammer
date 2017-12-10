@@ -59,6 +59,15 @@ namespace DrawingHammerDesktopApp
                 case PlayerJoinedMatchPacket p:
                     HandleOnPlayerJoinedMatch(p);
                     break;
+                case MatchFinishedPacket p:
+                    MessageBox.Show(p.GetType().Name);
+                    break;
+                case RoundFinishedPacket p:
+                    MessageBox.Show(p.GetType().Name);
+                    break;
+                case PreparationTimeFinishedPacket p:
+                    MessageBox.Show(p.GetType().Name);
+                    break;
             }
         }
 
@@ -90,11 +99,11 @@ namespace DrawingHammerDesktopApp
             {
                 var vm = (MainWindowViewModel) DataContext;
 
-                vm.Rounds = packet.Match.Rounds;
-                vm.CurrentRound = packet.Match.CurrentRound;
-                vm.RemainingTime = packet.Match.RemainingTime;
-                vm.MatchTitle = packet.Match.Title;
-                vm.Players = packet.Match.Players;
+                vm.Rounds = packet.MatchData.Rounds;
+                vm.CurrentRound = packet.MatchData.CurrentRound;
+                vm.RemainingTime = packet.MatchData.RemainingTime;
+                vm.MatchTitle = packet.MatchData.Title;
+                vm.Players = packet.MatchData.Players;
             });
         }
 
