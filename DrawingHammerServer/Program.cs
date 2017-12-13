@@ -350,7 +350,7 @@ namespace DrawingHammerServer
 
             foreach (Player player in match.Players)
             {
-                _server.Router.DistributePacket(new MatchFinishedPacket(Router.ServerWildcard, player.Uid));                
+                _server.Router.DistributePacket(new PreparationTimeFinishedPacket(Router.ServerWildcard, player.Uid));                
             }
         }
 
@@ -360,9 +360,9 @@ namespace DrawingHammerServer
 
             foreach (Player player in match.Players)
             {
-                _server.Router.DistributePacket(new PreparationTimeFinishedPacket(Router.ServerWildcard, player.Uid));
+                _server.Router.DistributePacket(new MatchFinishedPacket(Router.ServerWildcard, player.Uid));
                 //ToDo: Notifiy players and show score overview
-                Log.Debug("Notifiy players and show score overview");
+                Log.Debug("Notifiy players and show score overview");                
             }
         }
 

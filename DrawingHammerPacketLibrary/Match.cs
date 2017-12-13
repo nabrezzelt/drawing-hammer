@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using HelperLibrary.Cryptography;
 using System.Collections.ObjectModel;
 using System.Timers;
@@ -12,11 +13,21 @@ namespace DrawingHammerPacketLibrary
         /// <summary>
         /// Time to prepare and select a word in seconds
         /// </summary>
-        public const int PreparationTime = 10;
+        public const int MaxPreparationTime = 10;
+
+        public event EventHandler PreparationTimeStarted;
+
+        public event EventHandler RoundStarted;
+
+        public event EventHandler MatchStarted;
+
+        public event EventHandler SubRoundStarted;
 
         public event EventHandler PreparationTimeFinished;
 
         public event EventHandler RoundFinished;
+
+        public event EventHandler SubRoundFinished;
 
         public event EventHandler MatchFinished;
 
@@ -34,11 +45,17 @@ namespace DrawingHammerPacketLibrary
 
         public ObservableCollection<Player> Players { get; set; }
 
+        public List<Player> PlayedPlayers { get; set; }
+
         public ObservableCollection<Word> GuessedWords { get; set; }
 
         public int RemainingTime { get; set; }
 
         public int CurrentRound { get; set; }
+
+        private readonly Timer _preparationTimer;
+
+        private readonly Timer _subRoundTimer;
 
         private int _currentPreparationTime;
 
@@ -52,96 +69,148 @@ namespace DrawingHammerPacketLibrary
             RoundLength = roundLength;
 
             Players = new ObservableCollection<Player>();
+            PlayedPlayers = new List<Player>();
+            GuessedWords = new ObservableCollection<Word>();
             RemainingTime = RoundLength;
             CurrentRound = 1;
-            _currentPreparationTime = 0;
+            _currentPreparationTime = MaxPreparationTime;
 
             _preparationTimer = new Timer(1000);
             _preparationTimer.Elapsed += PreparationTimerTicked;
 
-            _roundTimer = new Timer(1000);
-            _roundTimer.Elapsed += RoundTimer_Ticked;
+            _subRoundTimer = new Timer(1000);
+            _subRoundTimer.Elapsed += SubRoundTimerTicked;
+
+            PreparationTimeFinished += Match_PreparationTimeFinished;
+            SubRoundFinished += Match_SubRoundFinished;
         }
 
-        public Match(string uid, string title, int rounds, int maxPlayers, int roundLength)
+        //public Match(string uid, string title, int rounds, int maxPlayers, int roundLength)
+        //{
+        //    MatchUid = uid;
+
+        //    Title = title;
+        //    Rounds = rounds;
+        //    MaxPlayers = maxPlayers;
+        //    RoundLength = roundLength;
+
+        //    Players = new ObservableCollection<Player>();
+        //    PlayedPlayers = new List<Player>();
+        //    GuessedWords = new ObservableCollection<Word>();
+        //    RemainingTime = RoundLength;
+        //    CurrentRound = 1;
+        //    _currentPreparationTime = MaxPreparationTime;
+
+        //    _preparationTimer = new Timer(1000);
+        //    _preparationTimer.Elapsed += PreparationTimerTicked;
+
+        //    PreparationTimeFinished += Match_PreparationTimeFinished;
+
+
+        //    _subRoundTimer = new Timer(1000);
+        //    _subRoundTimer.Elapsed += SubRoundTimerTicked;            
+        //}
+
+        private void Match_PreparationTimeFinished(object sender, EventArgs e)
         {
-            MatchUid = uid;
-
-            Title = title;
-            Rounds = rounds;
-            MaxPlayers = maxPlayers;
-            RoundLength = roundLength;
-
-            Players = new ObservableCollection<Player>();
-            RemainingTime = RoundLength;
-            CurrentRound = 1;
-            _currentPreparationTime = 0;
-
-            _preparationTimer = new Timer(1000);
-            _preparationTimer.Elapsed += PreparationTimerTicked;
-
-            _roundTimer = new Timer(1000);
-            _roundTimer.Elapsed += RoundTimer_Ticked;            
+            StartSubRound();
         }
 
-        //ToDo: Needs to be checked, because is firing random events :x
-        private void RoundTimer_Ticked(object sender, ElapsedEventArgs e)
+        private void Match_SubRoundFinished(object sender, EventArgs e)
         {
-            RemainingTime--;
-
-            if (RemainingTime == 0)
-            {
-                _roundTimer.Stop();
-                RoundFinished?.Invoke(this, EventArgs.Empty);
-
-                if (CurrentRound < Rounds)
-                {
-                    Log.Warn($"Round {CurrentRound} finished!");
-                    CurrentRound++;
-                    
-                    StartPreparationTimer();
-                }
-                else
-                {
-                    MatchFinished?.Invoke(this, EventArgs.Empty);
-                    Log.Warn("Match finished!");
-                }
-            }            
+            StartRound();
         }
 
-        //ToDo: Needs to be checked, because is not working properly :x
-        private void PreparationTimerTicked(object sender, ElapsedEventArgs e)
+        private void NextP()
         {
-
-
-            if (_currentPreparationTime <= PreparationTime)
-            {
-                _currentPreparationTime++;
-            }
-            else            
-            {
-                _preparationTimer.Stop();
-                Log.Warn("PreparationTime finished!");
-                PreparationTimeFinished?.Invoke(this, EventArgs.Empty);                
-                StartRound();
-            }
-
+            
         }
 
-        private readonly Timer _preparationTimer;
-
-        private readonly Timer _roundTimer;
-
-        public void StartPreparationTimer()
+        public void StartMatch()
         {
-            _preparationTimer.Start();
-            Log.Warn("PreparationTimer started!");
+            MatchStarted?.Invoke(this, EventArgs.Empty);
+
+            StartRound();
         }
 
         public void StartRound()
         {
-            _roundTimer.Start();
-            Log.Warn("RoundTimer started!");
+            if (CurrentRound < Rounds)
+            {
+                if (PlayedPlayers.Count < Players.Count)
+                {                    
+                    StartPreparationTimer();
+                    var playerToPlay =  GetPlayerWhoHasNotPlayed();
+                    //ToDo: Notifiy "playerToPlay" to draw a word.
+                    PlayedPlayers.Add(playerToPlay);
+                }
+                else
+                {
+                    RoundFinished?.Invoke(this, EventArgs.Empty);
+                    Log.Warn("Round finished");
+                    PlayedPlayers.Clear();
+                    CurrentRound++;
+                    StartRound();
+                }
+            }
+            else
+            {
+                MatchFinished?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private Player GetPlayerWhoHasNotPlayed()
+        {
+            foreach (var player in Players)
+            {
+                if (!PlayedPlayers.Contains(player))
+                {
+                    return player;
+                }
+            }
+
+            return null;
+        }
+
+
+        public void StartPreparationTimer()
+        {           
+            _preparationTimer.Start();
+            PreparationTimeStarted?.Invoke(this, EventArgs.Empty);
+            Log.Warn("PreparationTimer started!");
+        }
+        
+        private void SubRoundTimerTicked(object sender, ElapsedEventArgs e)
+        {
+            RemainingTime--;
+
+            if (RemainingTime <= 0)
+            {
+                RemainingTime = RoundLength;
+                _subRoundTimer.Stop();
+                Log.Warn("SubRound finished!");
+                SubRoundFinished?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void PreparationTimerTicked(object sender, ElapsedEventArgs e)
+        {
+            _currentPreparationTime--;
+
+            if (_currentPreparationTime <= 0)
+            {
+                _currentPreparationTime = MaxPreparationTime;
+                _preparationTimer.Stop();
+                Log.Warn("PreparationTimer finished!");
+                PreparationTimeFinished?.Invoke(this, EventArgs.Empty);                
+            }
+        }
+
+        public void StartSubRound()
+        {
+            _subRoundTimer.Start();
+            SubRoundStarted?.Invoke(this, EventArgs.Empty);
+            Log.Warn("SubRoundTimer started!");
         }
     }
 }
