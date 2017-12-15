@@ -121,11 +121,6 @@ namespace DrawingHammerPacketLibrary
             StartRound();
         }
 
-        private void NextP()
-        {
-            
-        }
-
         public void StartMatch()
         {
             MatchStarted?.Invoke(this, EventArgs.Empty);
@@ -147,7 +142,7 @@ namespace DrawingHammerPacketLibrary
                 else
                 {
                     RoundFinished?.Invoke(this, EventArgs.Empty);
-                    Log.Warn("Round finished");
+                    Log.Warn(DateTime.Now + " Round finished");
                     PlayedPlayers.Clear();
                     CurrentRound++;
                     StartRound();
@@ -177,7 +172,7 @@ namespace DrawingHammerPacketLibrary
         {           
             _preparationTimer.Start();
             PreparationTimeStarted?.Invoke(this, EventArgs.Empty);
-            Log.Warn("PreparationTimer started!");
+            Log.Warn(DateTime.Now + " PreparationTimer started!");
         }
         
         private void SubRoundTimerTicked(object sender, ElapsedEventArgs e)
@@ -188,7 +183,7 @@ namespace DrawingHammerPacketLibrary
             {
                 RemainingTime = RoundLength;
                 _subRoundTimer.Stop();
-                Log.Warn("SubRound finished!");
+                Log.Warn(DateTime.Now + " SubRound finished!");
                 SubRoundFinished?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -201,7 +196,7 @@ namespace DrawingHammerPacketLibrary
             {
                 _currentPreparationTime = MaxPreparationTime;
                 _preparationTimer.Stop();
-                Log.Warn("PreparationTimer finished!");
+                Log.Warn(DateTime.Now + " PreparationTimer finished!");
                 PreparationTimeFinished?.Invoke(this, EventArgs.Empty);                
             }
         }
@@ -210,7 +205,7 @@ namespace DrawingHammerPacketLibrary
         {
             _subRoundTimer.Start();
             SubRoundStarted?.Invoke(this, EventArgs.Empty);
-            Log.Warn("SubRoundTimer started!");
+            Log.Warn(DateTime.Now + " SubRoundTimer started!");
         }
     }
 }

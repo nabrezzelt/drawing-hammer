@@ -69,6 +69,7 @@
     <Compile Include="RequestGamelistPacket.cs" />
     <Compile Include="RequestMatchDataPacket.cs" />
     <Compile Include="RoundFinishedPacket.cs" />
+    <Compile Include="SubRoundFinishedPacket.cs" />
     <Compile Include="ViewModelBase.cs" />
     <Compile Include="Word.cs" />
   </ItemGroup>

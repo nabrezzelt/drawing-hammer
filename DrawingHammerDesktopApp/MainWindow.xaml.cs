@@ -62,6 +62,9 @@ namespace DrawingHammerDesktopApp
                 case MatchFinishedPacket p:
                     MessageBox.Show(p.GetType().Name);
                     break;
+                case SubRoundFinishedPacket p:
+                    MessageBox.Show(p.GetType().Name);
+                    break;
                 case RoundFinishedPacket p:
                     MessageBox.Show(p.GetType().Name);
                     break;

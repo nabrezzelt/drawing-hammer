@@ -319,6 +319,7 @@ namespace DrawingHammerServer
                     CreatorId = client.User.Id
                 };
 
+            match.SubRoundFinished += Match_SubRoundFinished;
             match.RoundFinished += Match_RoundFinished;
             match.PreparationTimeFinished += Match_PreparationTimeFinished;
             match.MatchFinished += Match_MatchFinished;
@@ -332,6 +333,16 @@ namespace DrawingHammerServer
             Log.Debug("All clients notified recording new match.");  
             
             client.SendDataPacketToClient(new MatchCreatedPacket(Router.ServerWildcard, client.Uid));
+        }
+
+        private static void Match_SubRoundFinished(object sender, EventArgs e)
+        {
+            var match = (Match)sender;
+
+            foreach (Player player in match.Players)
+            {
+                _server.Router.DistributePacket(new SubRoundFinishedPacket(Router.ServerWildcard, player.Uid));
+            }
         }
 
         private static void Match_RoundFinished(object sender, EventArgs e)
