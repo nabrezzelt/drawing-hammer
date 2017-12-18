@@ -66,7 +66,7 @@ namespace DrawingHammerPacketLibrary
             Title = title;
             Rounds = rounds;
             MaxPlayers = maxPlayers;
-            RoundLength = roundLength;
+            RoundLength = 10;
 
             Players = new ObservableCollection<Player>();
             PlayedPlayers = new List<Player>();
@@ -84,6 +84,7 @@ namespace DrawingHammerPacketLibrary
             PreparationTimeFinished += Match_PreparationTimeFinished;
             SubRoundFinished += Match_SubRoundFinished;
         }
+
 
         //public Match(string uid, string title, int rounds, int maxPlayers, int roundLength)
         //{
@@ -129,19 +130,20 @@ namespace DrawingHammerPacketLibrary
         }
 
         public void StartRound()
-        {
-            if (CurrentRound < Rounds)
+        {   
+            if (CurrentRound < Rounds + 1)
             {
                 if (PlayedPlayers.Count < Players.Count)
                 {                    
                     StartPreparationTimer();
-                    var playerToPlay =  GetPlayerWhoHasNotPlayed();
+                    var playerToPlay = GetPlayerWhoHasNotPlayed();
+                    Log.Warn($"Player has played or should be play now: {playerToPlay.Username}");
                     //ToDo: Notifiy "playerToPlay" to draw a word.
                     PlayedPlayers.Add(playerToPlay);
                 }
                 else
                 {
-                    RoundFinished?.Invoke(this, EventArgs.Empty);
+                    RoundFinished?.Invoke(this, EventArgs.Empty); //Roundennummer mit an client/Event senden.
                     Log.Warn(DateTime.Now + " Round finished");
                     PlayedPlayers.Clear();
                     CurrentRound++;
@@ -151,6 +153,7 @@ namespace DrawingHammerPacketLibrary
             else
             {
                 MatchFinished?.Invoke(this, EventArgs.Empty);
+                Log.Warn(DateTime.Now + " Match finished");
             }
         }
 
