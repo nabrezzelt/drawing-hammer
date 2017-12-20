@@ -17,7 +17,7 @@ namespace DrawingHammerPacketLibrary
 
         public event EventHandler PreparationTimeStarted;
 
-        public event EventHandler RoundStarted;
+        public event EventHandler<RoundStartedEventArgs> RoundStarted;
 
         public event EventHandler MatchStarted;
 
@@ -58,6 +58,7 @@ namespace DrawingHammerPacketLibrary
         private readonly Timer _subRoundTimer;
 
         private int _currentPreparationTime;
+        private bool _firstRound;
 
         public Match(string title, int rounds, int maxPlayers, int roundLength)
         {
@@ -126,20 +127,28 @@ namespace DrawingHammerPacketLibrary
         {
             MatchStarted?.Invoke(this, EventArgs.Empty);
 
+            _firstRound = true;
             StartRound();
         }
 
         public void StartRound()
-        {   
+        {
+            if (_firstRound)
+            {
+                RoundStarted?.Invoke(this, new RoundStartedEventArgs(CurrentRound));
+                Log.Warn(DateTime.Now + " Round started");
+                _firstRound = false;
+            }
+
             if (CurrentRound < Rounds + 1)
             {
                 if (PlayedPlayers.Count < Players.Count)
-                {                    
-                    StartPreparationTimer();
+                {
                     var playerToPlay = GetPlayerWhoHasNotPlayed();
-                    Log.Warn($"Player has played or should be play now: {playerToPlay.Username}");
                     //ToDo: Notifiy "playerToPlay" to draw a word.
+                    Log.Warn($"Player should be play now: {playerToPlay.Username}");
                     PlayedPlayers.Add(playerToPlay);
+                    StartPreparationTimer();                                                                                
                 }
                 else
                 {
@@ -147,13 +156,19 @@ namespace DrawingHammerPacketLibrary
                     Log.Warn(DateTime.Now + " Round finished");
                     PlayedPlayers.Clear();
                     CurrentRound++;
-                    StartRound();
+
+                    if (CurrentRound <= Rounds)
+                    {
+                        RoundStarted?.Invoke(this, new RoundStartedEventArgs(CurrentRound));
+                        Log.Warn(DateTime.Now + " Round started");
+                        StartRound();
+                    }
+                    else
+                    {
+                        MatchFinished?.Invoke(this, EventArgs.Empty);
+                        Log.Warn(DateTime.Now + " Match finished");
+                    }
                 }
-            }
-            else
-            {
-                MatchFinished?.Invoke(this, EventArgs.Empty);
-                Log.Warn(DateTime.Now + " Match finished");
             }
         }
 
@@ -169,7 +184,6 @@ namespace DrawingHammerPacketLibrary
 
             return null;
         }
-
 
         public void StartPreparationTimer()
         {           
@@ -187,7 +201,7 @@ namespace DrawingHammerPacketLibrary
                 RemainingTime = RoundLength;
                 _subRoundTimer.Stop();
                 Log.Warn(DateTime.Now + " SubRound finished!");
-                SubRoundFinished?.Invoke(this, EventArgs.Empty);
+                SubRoundFinished?.Invoke(this, EventArgs.Empty);                
             }
         }
 

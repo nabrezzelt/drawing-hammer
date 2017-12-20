@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="drawing-hammer"
-        Height="502.929"
-        Width="791.333"
+        Height="500"
+        Width="790"
         WindowStartupLocation="CenterScreen"
         Closing="MainWindow_OnClosing"
         

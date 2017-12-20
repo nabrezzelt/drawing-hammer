@@ -59,11 +59,20 @@ namespace DrawingHammerDesktopApp
                 case PlayerJoinedMatchPacket p:
                     HandleOnPlayerJoinedMatch(p);
                     break;
+
+                #region TimerEvents
                 case MatchFinishedPacket p:
                     MessageBox.Show(p.GetType().Name);
                     break;
+                case SubRoundStartedPacket p:
+                    StartTimer();
+                    break;
                 case SubRoundFinishedPacket p:
-                    MessageBox.Show(p.GetType().Name);
+                    StopTimer();
+                    break;
+                case RoundStartedPacket p:
+                    ChangeRoundNumber(p.RoundNumber);
+                    MessageBox.Show(p.GetType().Name + "started" + p.RoundNumber);
                     break;
                 case RoundFinishedPacket p:
                     MessageBox.Show(p.GetType().Name);
@@ -71,7 +80,41 @@ namespace DrawingHammerDesktopApp
                 case PreparationTimeFinishedPacket p:
                     MessageBox.Show(p.GetType().Name);
                     break;
+                case PreparationTimeStartedPacket p:
+                    MessageBox.Show(p.GetType().Name);
+                    break;
+                    #endregion
             }
+        }
+
+        private void StartTimer()
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel)DataContext;
+
+                vm.StartTimer();
+            });
+        }
+
+        private void StopTimer()
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel)DataContext;
+
+                vm.ResetTimer();
+            });
+        }
+
+        private void ChangeRoundNumber(int roundNumber)
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel)DataContext;
+
+                vm.CurrentRound = roundNumber;
+            });
         }
 
         private void HandleOnPlayerJoinedMatch(PlayerJoinedMatchPacket packet)

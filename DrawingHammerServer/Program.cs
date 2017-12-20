@@ -319,9 +319,12 @@ namespace DrawingHammerServer
                     CreatorId = client.User.Id
                 };
 
-            match.SubRoundFinished += Match_SubRoundFinished;
-            match.RoundFinished += Match_RoundFinished;
+            match.PreparationTimeStarted += Match_PreparationTimeStarted;
             match.PreparationTimeFinished += Match_PreparationTimeFinished;
+            match.SubRoundStarted += Match_SubRoundStarted;
+            match.SubRoundFinished += Match_SubRoundFinished;
+            match.RoundStarted += Match_RoundStarted;
+            match.RoundFinished += Match_RoundFinished;            
             match.MatchFinished += Match_MatchFinished;
 
 
@@ -333,6 +336,36 @@ namespace DrawingHammerServer
             Log.Debug("All clients notified recording new match.");  
             
             client.SendDataPacketToClient(new MatchCreatedPacket(Router.ServerWildcard, client.Uid));
+        }
+
+        private static void Match_RoundStarted(object sender, RoundStartedEventArgs e)
+        {
+            var match = (Match)sender;
+
+            foreach (Player player in match.Players)
+            {
+                _server.Router.DistributePacket(new RoundStartedPacket(e.RoundNumber, Router.ServerWildcard, player.Uid));
+            }
+        }
+
+        private static void Match_PreparationTimeStarted(object sender, EventArgs e)
+        {
+            var match = (Match)sender;
+
+            foreach (Player player in match.Players)
+            {
+                _server.Router.DistributePacket(new PreparationTimeStartedPacket(Router.ServerWildcard, player.Uid));
+            }
+        }
+
+        private static void Match_SubRoundStarted(object sender, EventArgs e)
+        {
+            var match = (Match)sender;
+
+            foreach (Player player in match.Players)
+            {
+                _server.Router.DistributePacket(new SubRoundStartedPacket(Router.ServerWildcard, player.Uid));
+            }
         }
 
         private static void Match_SubRoundFinished(object sender, EventArgs e)
@@ -463,7 +496,7 @@ namespace DrawingHammerServer
 
         private static void StartMatch(Match match)
         {
-            match.StartPreparationTimer();
+            match.StartMatch();
             //ToDo: Send words to first player
         }
     }
