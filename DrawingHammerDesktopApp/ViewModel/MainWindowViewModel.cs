@@ -23,7 +23,6 @@ namespace DrawingHammerDesktopApp.ViewModel
 
             _roundTimer = new Timer(1000);
             _roundTimer.Elapsed += _roundTimer_Elapsed;
-
         }
 
         private void _roundTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -38,15 +37,14 @@ namespace DrawingHammerDesktopApp.ViewModel
         }
 
         public void ResetTimer()
-        {
-            RemainingTime = RoundLength;
+        {            
             _roundTimer.Stop();
+            RemainingTime = RoundLength;
         }
 
         public void StartTimer()
         {
             _roundTimer.Start();
-        }
-           
+        }           
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using DrawingHammerPacketLibrary.Enums;
 
 namespace DrawingHammerPacketLibrary
 {
@@ -13,12 +14,15 @@ namespace DrawingHammerPacketLibrary
 
         public int Score { get; set; }
 
+        public PlayerStatus Status { get; set; }
+
         public Player(int id, string uid, string username, int score)
         {
             Id = id;                              
             Uid = uid;
             Username = username;
             Score = score;
+            Status = PlayerStatus.Guessing;
         }
     }
 }

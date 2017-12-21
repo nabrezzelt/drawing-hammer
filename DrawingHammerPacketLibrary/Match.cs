@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HelperLibrary.Cryptography;
 using System.Collections.ObjectModel;
 using System.Timers;
+using DrawingHammerPacketLibrary.Enums;
 using HelperLibrary.Logging;
 
 namespace DrawingHammerPacketLibrary
@@ -15,7 +16,7 @@ namespace DrawingHammerPacketLibrary
         /// </summary>
         public const int MaxPreparationTime = 10;
 
-        public event EventHandler PreparationTimeStarted;
+        public event EventHandler<PreparationTimerStartedEventArgs> PreparationTimeStarted;
 
         public event EventHandler<RoundStartedEventArgs> RoundStarted;
 
@@ -115,12 +116,27 @@ namespace DrawingHammerPacketLibrary
 
         private void Match_PreparationTimeFinished(object sender, EventArgs e)
         {
+            foreach (var player in Players)
+            {
+                if (player.Status == PlayerStatus.Preparing)
+                {
+                    player.Status = PlayerStatus.Drawing;
+                }
+            }
             StartSubRound();
         }
 
         private void Match_SubRoundFinished(object sender, EventArgs e)
         {
-            StartRound();
+            foreach (var player in Players)
+            {
+                if (player.Status == PlayerStatus.Drawing)
+                {
+                    player.Status = PlayerStatus.Guessing;
+                }
+            }
+
+            StartRound();            
         }
 
         public void StartMatch()
@@ -147,8 +163,8 @@ namespace DrawingHammerPacketLibrary
                     var playerToPlay = GetPlayerWhoHasNotPlayed();
                     //ToDo: Notifiy "playerToPlay" to draw a word.
                     Log.Warn($"Player should be play now: {playerToPlay.Username}");
-                    PlayedPlayers.Add(playerToPlay);
-                    StartPreparationTimer();                                                                                
+                    PlayedPlayers.Add(playerToPlay);                    
+                    StartPreparationTimer(playerToPlay);                                                                                
                 }
                 else
                 {
@@ -185,10 +201,11 @@ namespace DrawingHammerPacketLibrary
             return null;
         }
 
-        public void StartPreparationTimer()
-        {           
+        public void StartPreparationTimer(Player player)
+        {
+            player.Status = PlayerStatus.Preparing;
             _preparationTimer.Start();
-            PreparationTimeStarted?.Invoke(this, EventArgs.Empty);
+            PreparationTimeStarted?.Invoke(this, new PreparationTimerStartedEventArgs(player));
             Log.Warn(DateTime.Now + " PreparationTimer started!");
         }
         

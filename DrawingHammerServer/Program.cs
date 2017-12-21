@@ -348,13 +348,13 @@ namespace DrawingHammerServer
             }
         }
 
-        private static void Match_PreparationTimeStarted(object sender, EventArgs e)
+        private static void Match_PreparationTimeStarted(object sender, PreparationTimerStartedEventArgs e)
         {
             var match = (Match)sender;
 
             foreach (Player player in match.Players)
             {
-                _server.Router.DistributePacket(new PreparationTimeStartedPacket(Router.ServerWildcard, player.Uid));
+                _server.Router.DistributePacket(new PreparationTimeStartedPacket(e.Player, Router.ServerWildcard, player.Uid));
             }
         }
 
@@ -496,8 +496,7 @@ namespace DrawingHammerServer
 
         private static void StartMatch(Match match)
         {
-            match.StartMatch();
-            //ToDo: Send words to first player
+            match.StartMatch();            
         }
     }
 }

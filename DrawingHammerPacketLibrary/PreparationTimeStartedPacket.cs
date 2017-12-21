@@ -6,9 +6,11 @@ namespace DrawingHammerPacketLibrary
     [Serializable]
     public class PreparationTimeStartedPacket : BasePacket
     {
-        public PreparationTimeStartedPacket(string senderUid, string destinationUid) : base(senderUid, destinationUid)
-        {
+        public Player PreparingPlayer { get; }
 
+        public PreparationTimeStartedPacket(Player preparingPlayer, string senderUid, string destinationUid) : base(senderUid, destinationUid)
+        {
+            PreparingPlayer = preparingPlayer;
         }
     }
 }

@@ -69,22 +69,71 @@ namespace DrawingHammerDesktopApp
                     break;
                 case SubRoundFinishedPacket p:
                     StopTimer();
+                    SetPreparingPlayerToGuessing();
                     break;
                 case RoundStartedPacket p:
                     ChangeRoundNumber(p.RoundNumber);
-                    MessageBox.Show(p.GetType().Name + "started" + p.RoundNumber);
+                    //    MessageBox.Show(p.GetType().Name + "started" + p.RoundNumber);
                     break;
-                case RoundFinishedPacket p:
-                    MessageBox.Show(p.GetType().Name);
-                    break;
+                ////case RoundFinishedPacket p:
+                ////    MessageBox.Show(p.GetType().Name);
+                ////    break;
                 case PreparationTimeFinishedPacket p:
-                    MessageBox.Show(p.GetType().Name);
+                    SetPreparingPlayerToDrawing();
                     break;
                 case PreparationTimeStartedPacket p:
-                    MessageBox.Show(p.GetType().Name);
+                    SetPreparingPlayerToPreparing(p.PreparingPlayer);
                     break;
                     #endregion
             }
+        }
+
+        private void SetPreparingPlayerToDrawing()
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel)DataContext;
+
+                foreach (var player in vm.Players)
+                {
+                    if (player.Status == PlayerStatus.Preparing)
+                    {
+                        player.Status = PlayerStatus.Drawing;
+                    }
+                }
+            });
+        }
+
+        private void SetPreparingPlayerToGuessing()
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel)DataContext;
+
+                foreach (var player in vm.Players)
+                {
+                    if (player.Status == PlayerStatus.Drawing)
+                    {
+                        player.Status = PlayerStatus.Guessing;
+                    }
+                }
+            });
+        }
+
+        private void SetPreparingPlayerToPreparing(Player preparingPlayer)
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel)DataContext;
+
+                foreach (var player in vm.Players)
+                {
+                    if (player.Uid == preparingPlayer.Uid)
+                    {
+                        player.Status = PlayerStatus.Preparing;
+                    }
+                }
+            });
         }
 
         private void StartTimer()
@@ -148,6 +197,7 @@ namespace DrawingHammerDesktopApp
                 vm.Rounds = packet.MatchData.Rounds;
                 vm.CurrentRound = packet.MatchData.CurrentRound;
                 vm.RemainingTime = packet.MatchData.RemainingTime;
+                vm.RoundLength = packet.MatchData.RoundLength;
                 vm.MatchTitle = packet.MatchData.Title;
                 vm.Players = packet.MatchData.Players;
             });
