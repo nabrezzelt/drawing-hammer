@@ -44,7 +44,10 @@ namespace DrawingHammerPacketLibrary
 
         public int RoundLength { get; set; }
 
-        public ObservableCollection<Player> Players { get; set; }
+        public ObservableCollection<Player> Players {
+            get;
+            set;            
+        }
 
         public List<Player> PlayedPlayers { get; set; }
 
@@ -86,34 +89,7 @@ namespace DrawingHammerPacketLibrary
             PreparationTimeFinished += Match_PreparationTimeFinished;
             SubRoundFinished += Match_SubRoundFinished;
         }
-
-
-        //public Match(string uid, string title, int rounds, int maxPlayers, int roundLength)
-        //{
-        //    MatchUid = uid;
-
-        //    Title = title;
-        //    Rounds = rounds;
-        //    MaxPlayers = maxPlayers;
-        //    RoundLength = roundLength;
-
-        //    Players = new ObservableCollection<Player>();
-        //    PlayedPlayers = new List<Player>();
-        //    GuessedWords = new ObservableCollection<Word>();
-        //    RemainingTime = RoundLength;
-        //    CurrentRound = 1;
-        //    _currentPreparationTime = MaxPreparationTime;
-
-        //    _preparationTimer = new Timer(1000);
-        //    _preparationTimer.Elapsed += PreparationTimerTicked;
-
-        //    PreparationTimeFinished += Match_PreparationTimeFinished;
-
-
-        //    _subRoundTimer = new Timer(1000);
-        //    _subRoundTimer.Elapsed += SubRoundTimerTicked;            
-        //}
-
+      
         private void Match_PreparationTimeFinished(object sender, EventArgs e)
         {
             foreach (var player in Players)
@@ -153,6 +129,7 @@ namespace DrawingHammerPacketLibrary
             {
                 RoundStarted?.Invoke(this, new RoundStartedEventArgs(CurrentRound));
                 Log.Warn(DateTime.Now + " Round started");
+                Log.Warn(this.ShowPlayerStatus());
                 _firstRound = false;
             }
 
@@ -164,25 +141,26 @@ namespace DrawingHammerPacketLibrary
                     //ToDo: Notifiy "playerToPlay" to draw a word.
                     Log.Warn($"Player should be play now: {playerToPlay.Username}");
                     PlayedPlayers.Add(playerToPlay);                    
-                    StartPreparationTimer(playerToPlay);                                                                                
+                    StartPreparationTimer(playerToPlay);
+                    Log.Warn(this.ShowPlayerStatus());
                 }
                 else
                 {
                     RoundFinished?.Invoke(this, EventArgs.Empty); //Roundennummer mit an client/Event senden.
-                    Log.Warn(DateTime.Now + " Round finished");
+                    Log.Warn(DateTime.Now + " Round finished");                    
                     PlayedPlayers.Clear();
                     CurrentRound++;
 
                     if (CurrentRound <= Rounds)
                     {
                         RoundStarted?.Invoke(this, new RoundStartedEventArgs(CurrentRound));
-                        Log.Warn(DateTime.Now + " Round started");
+                        Log.Warn(DateTime.Now + " Round started");                        
                         StartRound();
                     }
                     else
                     {
                         MatchFinished?.Invoke(this, EventArgs.Empty);
-                        Log.Warn(DateTime.Now + " Match finished");
+                        Log.Warn(DateTime.Now + " Match finished");                        
                     }
                 }
             }
@@ -206,7 +184,7 @@ namespace DrawingHammerPacketLibrary
             player.Status = PlayerStatus.Preparing;
             _preparationTimer.Start();
             PreparationTimeStarted?.Invoke(this, new PreparationTimerStartedEventArgs(player));
-            Log.Warn(DateTime.Now + " PreparationTimer started!");
+            Log.Warn(DateTime.Now + " PreparationTimer started!");            
         }
         
         private void SubRoundTimerTicked(object sender, ElapsedEventArgs e)
@@ -217,7 +195,7 @@ namespace DrawingHammerPacketLibrary
             {
                 RemainingTime = RoundLength;
                 _subRoundTimer.Stop();
-                Log.Warn(DateTime.Now + " SubRound finished!");
+                Log.Warn(DateTime.Now + " SubRound finished!");                
                 SubRoundFinished?.Invoke(this, EventArgs.Empty);                
             }
         }
@@ -230,7 +208,7 @@ namespace DrawingHammerPacketLibrary
             {
                 _currentPreparationTime = MaxPreparationTime;
                 _preparationTimer.Stop();
-                Log.Warn(DateTime.Now + " PreparationTimer finished!");
+                Log.Warn(DateTime.Now + " PreparationTimer finished!");                
                 PreparationTimeFinished?.Invoke(this, EventArgs.Empty);                
             }
         }
@@ -239,7 +217,19 @@ namespace DrawingHammerPacketLibrary
         {
             _subRoundTimer.Start();
             SubRoundStarted?.Invoke(this, EventArgs.Empty);
-            Log.Warn(DateTime.Now + " SubRoundTimer started!");
+            Log.Warn(DateTime.Now + " SubRoundTimer started!");            
+        }
+
+        public string ShowPlayerStatus()
+        {
+            var statusResult = string.Empty;
+
+            foreach (var player in Players)
+            {
+                statusResult += $"[{player.Username}] {player.Status} \n";                
+            }
+
+            return statusResult;
         }
     }
 }

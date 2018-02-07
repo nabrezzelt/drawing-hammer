@@ -10,6 +10,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:viewModel="clr-namespace:DrawingHammerDesktopApp.ViewModel"
         xmlns:drawingHammerPacketLibrary="clr-namespace:DrawingHammerPacketLibrary;assembly=DrawingHammerPacketLibrary"
+        xmlns:converters="clr-namespace:DrawingHammerDesktopApp.Converters"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
@@ -17,6 +18,9 @@
         TextOptions.TextRenderingMode="Auto"        
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}">
+    <Window.Resources>
+        <converters:StatusToIconConverter x:Key="StatusToIconConverter" />
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -99,10 +103,13 @@
                                     <materialDesign:PackIcon Kind="Account" />
                                 </materialDesign:Chip.Icon>
                             </materialDesign:Chip>
-                            <TextBlock Grid.Column="2" 
+                            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                <TextBlock Text="{Binding StatusName}" VerticalAlignment="Center" />
+                                <TextBlock 
                                        Text="{Binding Score}"
                                        VerticalAlignment="Center" 
-                                       HorizontalAlignment="Center" />
+                                       HorizontalAlignment="Center" Margin="6,0,0,0" />
+                            </StackPanel>
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>

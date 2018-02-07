@@ -72,12 +72,9 @@ namespace DrawingHammerDesktopApp
                     SetPreparingPlayerToGuessing();
                     break;
                 case RoundStartedPacket p:
-                    ChangeRoundNumber(p.RoundNumber);
-                    //    MessageBox.Show(p.GetType().Name + "started" + p.RoundNumber);
-                    break;
-                ////case RoundFinishedPacket p:
-                ////    MessageBox.Show(p.GetType().Name);
-                ////    break;
+                    ChangeRoundNumber(p.RoundNumber);                    
+                    break; 
+                    
                 case PreparationTimeFinishedPacket p:
                     SetPreparingPlayerToDrawing();
                     break;

@@ -187,6 +187,15 @@ namespace DrawingHammerServer
                         }
                         break;
                     #endregion
+                    #region match player status
+                    case var command when command.StartsWith("match player status"):                        
+                        foreach (var match in _matches)
+                        {
+                            Log.Info(match.ShowPlayerStatus());
+                        }
+                        break;
+                    #endregion
+
                     #region help                        
                     case var command when command == "help" || command == "h":
                         Log.Info("Available Commands:");
@@ -265,9 +274,11 @@ namespace DrawingHammerServer
                 case CreateMatchPacket p:
                     HandleCreateMatchPacket(p);
                     break;
+
                 case JoinMatchPacket p:
-                    HandleOnMatchJoin(p);
+                    HandleOnMatchJoin(p);                    
                     break;
+
                 case RequestMatchDataPacket p:
                     HandleMatchDataRequest(p);
                     break;
@@ -301,7 +312,7 @@ namespace DrawingHammerServer
                 if (match.Players.Count > 1)
                 {
                     StartMatch(match);
-                }
+                }                
             }
             else
             {
