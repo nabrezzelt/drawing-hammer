@@ -64,7 +64,7 @@ namespace DrawingHammerPacketLibrary
         private int _currentPreparationTime;
         private bool _firstRound;
 
-        public Match(string title, int rounds, int maxPlayers, int roundLength)
+        public Match(string title, int rounds, int maxPlayers, int roundLength) //ToDo: Add roundLength
         {
             MatchUid = HashManager.GenerateSecureRandomToken();
 

@@ -16,15 +16,15 @@ namespace DrawingHammerPacketLibrary
 
         public int Score { get; set; }
 
-        public PlayerStatus Status
-        {
-            get => _status;
-            set
-            {
-                _status = value;
-                Log.Info($"[{Username}] {Status.ToString()}");
-            }
-        }
+        public PlayerStatus Status { get; set; }
+        //{
+        //    get => _status;
+        //    set
+        //    {
+        //        _status = value;
+        //        Log.Info($"[{Username}] {Status.ToString()}");
+        //    }
+        //}
 
         public string StatusName => Status.ToString();
 

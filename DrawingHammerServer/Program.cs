@@ -302,6 +302,7 @@ namespace DrawingHammerServer
             {               
                 Player player = new Player(client.User.Id, client.Uid, client.User.Username, 0);
                 match.Players.Add(player);
+                match.ShowPlayerStatus();
 
                 _server.Router.DistributePacket(new PlayerJoinedMatchPacket(                    
                     match.MatchUid,

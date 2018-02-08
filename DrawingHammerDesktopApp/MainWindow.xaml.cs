@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using DrawingHammerDesktopApp.ViewModel;
 using DrawingHammerPacketLibrary;
 using DrawingHammerPacketLibrary.Enums;
+using HelperLibrary.Logging;
 using HelperLibrary.Networking.ClientServer;
 
 namespace DrawingHammerDesktopApp
@@ -170,6 +171,7 @@ namespace DrawingHammerDesktopApp
                 var vm = (MainWindowViewModel) DataContext;
 
                 vm.Players.Add(packet.Player);
+                Log.Warn($"Player {packet.Player.Username} joind with status: {packet.Player.Status}");
             });
         }
 

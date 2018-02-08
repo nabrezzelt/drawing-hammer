@@ -54,14 +54,14 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">Runde:</TextBlock>
+                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">Round:</TextBlock>
                 <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" Margin="16,0,0,0" Text="{Binding CurrentRound}" FontWeight="Bold" />
-                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="2" Margin="5,0,0,0">von</TextBlock>
+                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="2" Margin="5,0,0,0">of</TextBlock>
                 <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="3" Margin="5,0,0,0" Text="{Binding Rounds}" FontWeight="Bold" />
 
-                <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="0">Verbleibnde Zeit:</TextBlock>
+                <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="0">Remainig Time:</TextBlock>
                 <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="-1,0,0,0" Text="{Binding RemainingTime}" FontWeight="Bold" />
-                <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="3">Sekunden</TextBlock>
+                <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="3">Seconds</TextBlock>
             </Grid>
         </StackPanel>
         <TextBlock Grid.Column="1" 
@@ -104,7 +104,7 @@
                                 </materialDesign:Chip.Icon>
                             </materialDesign:Chip>
                             <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                <TextBlock Text="{Binding StatusName}" VerticalAlignment="Center" />
+                                <materialDesign:PackIcon Kind="{Binding Status, Converter={StaticResource StatusToIconConverter}}" VerticalAlignment="Center" />
                                 <TextBlock 
                                        Text="{Binding Score}"
                                        VerticalAlignment="Center" 
