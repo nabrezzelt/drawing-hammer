@@ -17,7 +17,7 @@ namespace HelperLibrary.Logging
             ClearCurrentConsoleLine();
             var defaultColor = Console.ForegroundColor;
             Console.ForegroundColor = ColorDebug;
-            Console.WriteLine(message);
+            //Console.WriteLine(message);
             Console.ForegroundColor = defaultColor;
         }
 

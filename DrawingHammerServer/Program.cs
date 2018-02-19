@@ -331,8 +331,8 @@ namespace DrawingHammerServer
                     CreatorId = client.User.Id
                 };
 
-            match.PreparationTimeStarted += Match_PreparationTimeStarted;
-            match.PreparationTimeFinished += Match_PreparationTimeFinished;
+            match.PreparationTimeStarted += MatchPreparationTimeStarted;
+            match.PreparationTimeFinished += MatchPreparationTimeFinished;
             match.SubRoundStarted += Match_SubRoundStarted;
             match.SubRoundFinished += Match_SubRoundFinished;
             match.RoundStarted += Match_RoundStarted;
@@ -360,7 +360,7 @@ namespace DrawingHammerServer
             }
         }
 
-        private static void Match_PreparationTimeStarted(object sender, PreparationTimerStartedEventArgs e)
+        private static void MatchPreparationTimeStarted(object sender, PreparationTimerStartedEventArgs e)
         {
             var match = (Match)sender;
 
@@ -400,7 +400,7 @@ namespace DrawingHammerServer
             }
         }
 
-        private static void Match_PreparationTimeFinished(object sender, EventArgs e)
+        private static void MatchPreparationTimeFinished(object sender, EventArgs e)
         {
             var match = (Match) sender;
 
