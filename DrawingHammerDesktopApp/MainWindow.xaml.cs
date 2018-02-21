@@ -69,18 +69,17 @@ namespace DrawingHammerDesktopApp
                     StartTimer();
                     break;
                 case SubRoundFinishedPacket p:
-                    StopTimer();
-                    SetPreparingPlayerToGuessing();
+                    StopTimer();                    
                     break;
                 case RoundStartedPacket p:
                     ChangeRoundNumber(p.RoundNumber);                    
-                    break; 
-                    
+                    break;                     
                 case PreparationTimeFinishedPacket p:
                     SetPreparingPlayerToDrawing();
                     break;
                 case PreparationTimeStartedPacket p:
-                    SetPreparingPlayerToPreparing(p.PreparingPlayer);
+                    SetDrawingPlayerToGuessing();
+                    SetPlayerToPreparing(p.PreparingPlayer);
                     break;
                     #endregion
             }
@@ -102,7 +101,7 @@ namespace DrawingHammerDesktopApp
             });
         }
 
-        private void SetPreparingPlayerToGuessing()
+        private void SetDrawingPlayerToGuessing()
         {
             InvokeGui(() =>
             {
@@ -118,7 +117,7 @@ namespace DrawingHammerDesktopApp
             });
         }
 
-        private void SetPreparingPlayerToPreparing(Player preparingPlayer)
+        private void SetPlayerToPreparing(Player preparingPlayer)
         {
             InvokeGui(() =>
             {

@@ -84,7 +84,15 @@ namespace DrawingHammerPacketLibrary
             
             PreparationTimeFinished += MatchPreparationTimeFinished;
             SubRoundFinished += Match_SubRoundFinished;
+
+            SubRoundStarted += OnSubRoundStarted;
         }
+
+        private void OnSubRoundStarted(object sender, EventArgs eventArgs)
+        {
+            ShowPlayerStatus();
+        }
+
 
         private void Match_SubRoundFinished(object sender, EventArgs e)
         {
@@ -101,13 +109,16 @@ namespace DrawingHammerPacketLibrary
                 PlayedPlayers.Clear();
                 RoundFinished?.Invoke(this, EventArgs.Empty);
 
-                CurrentRound++;
-
+                
                 if (CurrentRound == Rounds)
                 {
                     MatchFinished?.Invoke(this, EventArgs.Empty);
                     return;                    
                 }
+
+                CurrentRound++;
+
+                RoundStarted?.Invoke(this, new RoundStartedEventArgs(CurrentRound));
             }
             
             player = GetPlayerWhoHasNotPlayed();
@@ -184,6 +195,9 @@ namespace DrawingHammerPacketLibrary
         public void StartMatch()
         {
             var player = GetPlayerWhoHasNotPlayed();
+
+            MatchStarted?.Invoke(this, EventArgs.Empty);
+            RoundStarted?.Invoke(this, new RoundStartedEventArgs(CurrentRound));
 
             StartPreparationTimer(player);
         }
