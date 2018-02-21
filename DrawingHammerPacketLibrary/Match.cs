@@ -47,7 +47,9 @@ namespace DrawingHammerPacketLibrary
 
         public List<Player> PlayedPlayers { get; set; }
 
-        public ObservableCollection<Word> GuessedWords { get; set; }
+        public ObservableCollection<Word> PickedWords { get; set; }
+
+        public Word WordToDraw { get; set; }
 
         public int RemainingTime { get; set; }
 
@@ -58,7 +60,6 @@ namespace DrawingHammerPacketLibrary
         private readonly Timer _subRoundTimer;
 
         private int _currentPreparationTime;
-        private bool _firstRound;
 
         public Match(string title, int rounds, int maxPlayers, int roundLength) //ToDo: Add roundLength
         {
@@ -71,7 +72,7 @@ namespace DrawingHammerPacketLibrary
 
             Players = new ObservableCollection<Player>();
             PlayedPlayers = new List<Player>();
-            GuessedWords = new ObservableCollection<Word>();
+            PickedWords = new ObservableCollection<Word>();
             RemainingTime = RoundLength;
             CurrentRound = 1;
             _currentPreparationTime = PreparationTime;
@@ -122,10 +123,7 @@ namespace DrawingHammerPacketLibrary
             }
             
             player = GetPlayerWhoHasNotPlayed();
-            StartPreparationTimer(player);            
-            //ToDo: set player to guessing!
-            throw new NotImplementedException();
-            //ToDo: Check here if other polayer have to play or complete round finished            
+            StartPreparationTimer(player);                     
         }
 
         private void MatchPreparationTimeFinished(object sender, EventArgs e)

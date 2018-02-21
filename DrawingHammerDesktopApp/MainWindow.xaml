@@ -11,6 +11,7 @@
         xmlns:viewModel="clr-namespace:DrawingHammerDesktopApp.ViewModel"
         xmlns:drawingHammerPacketLibrary="clr-namespace:DrawingHammerPacketLibrary;assembly=DrawingHammerPacketLibrary"
         xmlns:converters="clr-namespace:DrawingHammerDesktopApp.Converters"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
@@ -67,7 +68,7 @@
         <TextBlock Grid.Column="1" 
                    Grid.Row="1" 
                    Margin="5" 
-                   Text="{Binding MatchTitle}"
+                   Text="{Binding WordToDraw.Word}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    Style="{DynamicResource MaterialDesignTitleTextBlock}"/>
@@ -119,7 +120,20 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <InkCanvas Margin="10"/>
+                <materialDesign:DialogHost>
+                    <materialDesign:DialogHost.DialogContent>
+                        <Grid>
+                            <ListView ItemsSource="{Binding Words}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Content="{Binding Word}" Command="materialDesign:DialogHost.CloseDialogCommand" CommandParameter="{Binding .}" />
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
+                    </materialDesign:DialogHost.DialogContent>
+                    <InkCanvas Margin="10"/>
+                </materialDesign:DialogHost>
             </Grid>
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>

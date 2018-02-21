@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,13 +18,13 @@ namespace DrawingHammerDesktopApp
     public partial class MainWindow : Window
     {
         private readonly SslClient _client;
-
+        private MainWindowViewModel _viewModel;
         public MainWindow()
-        {            
+        {
             //if (!Properties.Settings.Default.IsConnectionConfigured)
             //{
-                ConnectionSettingsWindow settingsWindow = new ConnectionSettingsWindow();
-                settingsWindow.ShowDialog();
+            ConnectionSettingsWindow settingsWindow = new ConnectionSettingsWindow();
+            settingsWindow.ShowDialog();
             //}
 
             _client = new SslClient(Properties.Settings.Default.Host, true);
@@ -35,6 +36,7 @@ namespace DrawingHammerDesktopApp
             Connect();
 
             DataContext = new MainWindowViewModel();
+            _viewModel = (MainWindowViewModel)DataContext;
 
             InitializeComponent();
         }
@@ -69,11 +71,11 @@ namespace DrawingHammerDesktopApp
                     StartTimer();
                     break;
                 case SubRoundFinishedPacket p:
-                    StopTimer();                    
+                    StopTimer();
                     break;
                 case RoundStartedPacket p:
-                    ChangeRoundNumber(p.RoundNumber);                    
-                    break;                     
+                    ChangeRoundNumber(p.RoundNumber);
+                    break;
                 case PreparationTimeFinishedPacket p:
                     SetPreparingPlayerToDrawing();
                     break;
@@ -81,17 +83,29 @@ namespace DrawingHammerDesktopApp
                     SetDrawingPlayerToGuessing();
                     SetPlayerToPreparing(p.PreparingPlayer);
                     break;
+                #endregion
+
+                #region Wordhandling
+                case PickWordsPacket p:
+                    HandlePickingWords(p);
+                    break;
                     #endregion
             }
+        }
+
+        private void HandlePickingWords(PickWordsPacket packet)
+        {
+            InvokeGui(() =>
+            {
+                _viewModel.Words = new ObservableCollection<Word>(packet.WordsToSelect);
+            });
         }
 
         private void SetPreparingPlayerToDrawing()
         {
             InvokeGui(() =>
             {
-                var vm = (MainWindowViewModel)DataContext;
-
-                foreach (var player in vm.Players)
+                foreach (var player in _viewModel.Players)
                 {
                     if (player.Status == PlayerStatus.Preparing)
                     {
@@ -105,9 +119,7 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                var vm = (MainWindowViewModel)DataContext;
-
-                foreach (var player in vm.Players)
+                foreach (var player in _viewModel.Players)
                 {
                     if (player.Status == PlayerStatus.Drawing)
                     {
@@ -121,9 +133,7 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                var vm = (MainWindowViewModel)DataContext;
-
-                foreach (var player in vm.Players)
+                foreach (var player in _viewModel.Players)
                 {
                     if (player.Uid == preparingPlayer.Uid)
                     {
@@ -136,10 +146,8 @@ namespace DrawingHammerDesktopApp
         private void StartTimer()
         {
             InvokeGui(() =>
-            {
-                var vm = (MainWindowViewModel)DataContext;
-
-                vm.StartTimer();
+            {                
+                _viewModel.StartTimer();
             });
         }
 
@@ -147,9 +155,7 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                var vm = (MainWindowViewModel)DataContext;
-
-                vm.ResetTimer();
+                _viewModel.ResetTimer();
             });
         }
 
@@ -157,9 +163,7 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                var vm = (MainWindowViewModel)DataContext;
-
-                vm.CurrentRound = roundNumber;
+                _viewModel.CurrentRound = roundNumber;
             });
         }
 
@@ -167,9 +171,7 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                var vm = (MainWindowViewModel) DataContext;
-
-                vm.Players.Add(packet.Player);
+                _viewModel.Players.Add(packet.Player);
                 Log.Warn($"Player {packet.Player.Username} joind with status: {packet.Player.Status}");
             });
         }
@@ -180,24 +182,20 @@ namespace DrawingHammerDesktopApp
             {
                 InvokeGui(() =>
                 {
-                    var vm = (MainWindowViewModel) DataContext;
-                    vm.MyUsername = App.Username;
+                    _viewModel.MyUsername = App.Username;
                 });
-            }                
+            }
         }
 
         private void HandleMatchDataPacket(MatchDataPacket packet)
         {
             InvokeGui(() =>
             {
-                var vm = (MainWindowViewModel) DataContext;
-
-                vm.Rounds = packet.MatchData.Rounds;
-                vm.CurrentRound = packet.MatchData.CurrentRound;
-                vm.RemainingTime = packet.MatchData.RemainingTime;
-                vm.RoundLength = packet.MatchData.RoundLength;
-                vm.MatchTitle = packet.MatchData.Title;
-                vm.Players = packet.MatchData.Players;
+                _viewModel.Rounds = packet.MatchData.Rounds;
+                _viewModel.CurrentRound = packet.MatchData.CurrentRound;
+                _viewModel.RemainingTime = packet.MatchData.RemainingTime;
+                _viewModel.RoundLength = packet.MatchData.RoundLength;
+                _viewModel.Players = packet.MatchData.Players;
             });
         }
 
@@ -206,7 +204,7 @@ namespace DrawingHammerDesktopApp
             InvokeGui(() =>
             {
                 IsEnabled = true;
-               
+
                 LoginWindow loginWindow = new LoginWindow(_client);
                 loginWindow.ShowDialog();
 
@@ -219,12 +217,12 @@ namespace DrawingHammerDesktopApp
 
         private void OnConnectionLost(object sender, EventArgs e)
         {
-            
+
         }
 
         private void InvokeGui(Action action)
-        {           
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);           
+        {
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
         }
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)

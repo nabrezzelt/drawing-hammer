@@ -9,7 +9,7 @@ namespace DrawingHammerServer
     {
         public const int MaxUsernameLength = 64;
         public const int MinUsernameLength = 6;
-        private static readonly MySQLDatabaseManager DBManager = MySQLDatabaseManager.GetInstance();
+        private static readonly MySQLDatabaseManager DbManager = MySQLDatabaseManager.GetInstance();
         
         public static User GetUser(int id)
         {
@@ -17,7 +17,7 @@ namespace DrawingHammerServer
                            "FROM users " +
                            "WHERE id = " + id;
 
-            var reader = DBManager.Select(query);
+            var reader = DbManager.Select(query);
 
             reader.Read();
 
@@ -41,9 +41,9 @@ namespace DrawingHammerServer
             string query = "SELECT id, password, isBanned " +
                            "FROM users " +
                            "WHERE username = @username";
-            DBManager.PrepareQuery(query);
-            DBManager.BindValue("@username", username.ToLower());
-            var reader = DBManager.ExecutePreparedSelect();
+            DbManager.PrepareQuery(query);
+            DbManager.BindValue("@username", username.ToLower());
+            var reader = DbManager.ExecutePreparedSelect();
 
             reader.Read();
 
@@ -69,9 +69,9 @@ namespace DrawingHammerServer
                                  "JOIN users " +
                                  "ON users.id = user_salt.userID " +
                                  "WHERE users.username = @username";
-            DBManager.PrepareQuery(query);
-            DBManager.BindValue("@username", username.ToLower());
-            var reader = DBManager.ExecutePreparedSelect();
+            DbManager.PrepareQuery(query);
+            DbManager.BindValue("@username", username.ToLower());
+            var reader = DbManager.ExecutePreparedSelect();
 
             reader.Read();
 
@@ -94,7 +94,7 @@ namespace DrawingHammerServer
             string query = "SELECT salt " +
                            "FROM user_salt " +
                            "WHERE userID = " + id;
-            var reader = DBManager.Select(query);
+            var reader = DbManager.Select(query);
 
             reader.Read();
 
@@ -127,16 +127,16 @@ namespace DrawingHammerServer
 
             string query = "INSERT INTO users (username, password) VALUES " +
                            "(@username, @password)";
-            DBManager.PrepareQuery(query);
-            DBManager.BindValue("@username", username.ToLower());
-            DBManager.BindValue("@password", passwordHash);
-            DBManager.ExecutePreparedInsertUpdateDelete();
+            DbManager.PrepareQuery(query);
+            DbManager.BindValue("@username", username.ToLower());
+            DbManager.BindValue("@password", passwordHash);
+            DbManager.ExecutePreparedInsertUpdateDelete();
 
-            int userID = DBManager.GetLastID();
+            int userID = DbManager.GetLastID();
 
             query = "INSERT INTO user_salt (userID, salt) VALUES " +
                     "(" + userID + ", '" + salt + "')";
-            DBManager.InsertUpdateDelete(query);
+            DbManager.InsertUpdateDelete(query);
 
             return userID;
         }
@@ -149,13 +149,13 @@ namespace DrawingHammerServer
             string query = "UPDATE users " +
                            "SET password = '" + passwordHash + "' " +
                            "WHERE id = " + userID;
-            DBManager.InsertUpdateDelete(query);
+            DbManager.InsertUpdateDelete(query);
         }
 
         public static void DeleteUser(int userID)
         {
             string query = "DELETE FROM users WHERE id = " + userID;
-            DBManager.InsertUpdateDelete(query);
+            DbManager.InsertUpdateDelete(query);
         }
 
         public static List<User> GetUsers()
@@ -164,7 +164,7 @@ namespace DrawingHammerServer
 
             const string query = "SELECT * " +
                                  "FROM users";
-            var reader = DBManager.Select(query);
+            var reader = DbManager.Select(query);
 
             while (reader.Read())
             {
@@ -188,9 +188,9 @@ namespace DrawingHammerServer
             const string query = "SELECT * " +
                                  "FROM users " +
                                  "WHERE username LIKE @filter";
-            DBManager.PrepareQuery(query);
-            DBManager.BindValue("@filter", "%" + usernameFilter + "%");
-            var reader = DBManager.ExecutePreparedSelect();
+            DbManager.PrepareQuery(query);
+            DbManager.BindValue("@filter", "%" + usernameFilter + "%");
+            var reader = DbManager.ExecutePreparedSelect();
 
             while (reader.Read())
             {
@@ -215,10 +215,10 @@ namespace DrawingHammerServer
             const string query = "UPDATE users " +
                                  "SET password = @password " +
                                  "WHERE id = @id";
-            DBManager.PrepareQuery(query);
-            DBManager.BindValue("@password", passwordHash);
-            DBManager.BindValue("@id", userId);
-            DBManager.ExecutePreparedInsertUpdateDelete();
+            DbManager.PrepareQuery(query);
+            DbManager.BindValue("@password", passwordHash);
+            DbManager.BindValue("@id", userId);
+            DbManager.ExecutePreparedInsertUpdateDelete();
         }
     }
 }
