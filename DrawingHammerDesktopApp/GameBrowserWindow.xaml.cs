@@ -148,9 +148,7 @@ namespace DrawingHammerDesktopApp
                 {
                     _client.SendPacketToServer(new JoinMatchPacket(selectedMatch.MatchUid, App.Uid, Router.ServerWildcard));
                 });
-            });
-
-           
+            });           
         }
 
         private void OnClosing(object sender, CancelEventArgs e)

@@ -187,6 +187,15 @@ namespace DrawingHammerServer
                         }
                         break;
                     #endregion
+                    #region match player status
+                    case var command when command.StartsWith("match player status"):                        
+                        foreach (var match in _matches)
+                        {
+                            Log.Info(match.ShowPlayerStatus());
+                        }
+                        break;
+                    #endregion
+
                     #region help                        
                     case var command when command == "help" || command == "h":
                         Log.Info("Available Commands:");
@@ -265,9 +274,11 @@ namespace DrawingHammerServer
                 case CreateMatchPacket p:
                     HandleCreateMatchPacket(p);
                     break;
+
                 case JoinMatchPacket p:
-                    HandleOnMatchJoin(p);
+                    HandleOnMatchJoin(p);                    
                     break;
+
                 case RequestMatchDataPacket p:
                     HandleMatchDataRequest(p);
                     break;
@@ -291,6 +302,7 @@ namespace DrawingHammerServer
             {               
                 Player player = new Player(client.User.Id, client.Uid, client.User.Username, 0);
                 match.Players.Add(player);
+                match.ShowPlayerStatus();
 
                 _server.Router.DistributePacket(new PlayerJoinedMatchPacket(                    
                     match.MatchUid,
@@ -301,7 +313,7 @@ namespace DrawingHammerServer
                 if (match.Players.Count > 1)
                 {
                     StartMatch(match);
-                }
+                }                
             }
             else
             {
@@ -319,8 +331,8 @@ namespace DrawingHammerServer
                     CreatorId = client.User.Id
                 };
 
-            match.PreparationTimeStarted += Match_PreparationTimeStarted;
-            match.PreparationTimeFinished += Match_PreparationTimeFinished;
+            match.PreparationTimeStarted += MatchPreparationTimeStarted;
+            match.PreparationTimeFinished += MatchPreparationTimeFinished;
             match.SubRoundStarted += Match_SubRoundStarted;
             match.SubRoundFinished += Match_SubRoundFinished;
             match.RoundStarted += Match_RoundStarted;
@@ -348,7 +360,7 @@ namespace DrawingHammerServer
             }
         }
 
-        private static void Match_PreparationTimeStarted(object sender, PreparationTimerStartedEventArgs e)
+        private static void MatchPreparationTimeStarted(object sender, PreparationTimerStartedEventArgs e)
         {
             var match = (Match)sender;
 
@@ -388,7 +400,7 @@ namespace DrawingHammerServer
             }
         }
 
-        private static void Match_PreparationTimeFinished(object sender, EventArgs e)
+        private static void MatchPreparationTimeFinished(object sender, EventArgs e)
         {
             var match = (Match) sender;
 

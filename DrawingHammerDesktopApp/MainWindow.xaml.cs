@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using DrawingHammerDesktopApp.ViewModel;
 using DrawingHammerPacketLibrary;
 using DrawingHammerPacketLibrary.Enums;
+using HelperLibrary.Logging;
 using HelperLibrary.Networking.ClientServer;
 
 namespace DrawingHammerDesktopApp
@@ -72,12 +73,9 @@ namespace DrawingHammerDesktopApp
                     SetPreparingPlayerToGuessing();
                     break;
                 case RoundStartedPacket p:
-                    ChangeRoundNumber(p.RoundNumber);
-                    //    MessageBox.Show(p.GetType().Name + "started" + p.RoundNumber);
-                    break;
-                ////case RoundFinishedPacket p:
-                ////    MessageBox.Show(p.GetType().Name);
-                ////    break;
+                    ChangeRoundNumber(p.RoundNumber);                    
+                    break; 
+                    
                 case PreparationTimeFinishedPacket p:
                     SetPreparingPlayerToDrawing();
                     break;
@@ -173,6 +171,7 @@ namespace DrawingHammerDesktopApp
                 var vm = (MainWindowViewModel) DataContext;
 
                 vm.Players.Add(packet.Player);
+                Log.Warn($"Player {packet.Player.Username} joind with status: {packet.Player.Status}");
             });
         }
 
