@@ -17,7 +17,7 @@ namespace HelperLibrary.Logging
             ClearCurrentConsoleLine();
             var defaultColor = Console.ForegroundColor;
             Console.ForegroundColor = ColorDebug;
-            Console.WriteLine(message);
+            //Console.WriteLine(message);
             Console.ForegroundColor = defaultColor;
         }
 
@@ -135,5 +135,10 @@ namespace HelperLibrary.Logging
             }
         }
         #endregion
+
+        public static void DisplaySelfCertDetails(X509Certificate2 certificate)
+        {
+            Console.WriteLine(certificate.ToString());
+        }
     }
 }

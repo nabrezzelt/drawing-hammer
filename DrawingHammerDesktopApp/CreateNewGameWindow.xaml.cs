@@ -56,16 +56,15 @@ namespace DrawingHammerDesktopApp
         }
 
         private void Create(object sender, RoutedEventArgs e)
-        {
-            var match = new Match(TextBoxGameName.Text, Convert.ToInt32(SliderRounds.Value), Convert.ToInt32(SliderPlayers.Value), Convert.ToInt32(Slider.Value));
-            SendCreateMassage(match);
+        {           
+            SendCreateMassage(TextBoxGameName.Text, Convert.ToInt32(SliderRounds.Value), Convert.ToInt32(SliderPlayers.Value), Convert.ToInt32(SliderRoundLength.Value));
         }
 
-        private async void SendCreateMassage(Match match)
+        private async void SendCreateMassage(string matchTitle, int maxRounds, int maxPlayers, int roundLength)
         {
             await Task.Run(() =>
             {
-                _client.SendPacketToServer(new CreateMatchPacket(match, App.Uid, Router.ServerWildcard));
+                _client.SendPacketToServer(new CreateMatchPacket(new MatchData(matchTitle, maxRounds, maxPlayers, roundLength), App.Uid, Router.ServerWildcard));
             });
         }
 

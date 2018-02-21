@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using DrawingHammerDesktopApp.ViewModel;
 using DrawingHammerPacketLibrary;
 using DrawingHammerPacketLibrary.Enums;
+using HelperLibrary.Logging;
 using HelperLibrary.Networking.ClientServer;
 
 namespace DrawingHammerDesktopApp
@@ -59,17 +60,117 @@ namespace DrawingHammerDesktopApp
                 case PlayerJoinedMatchPacket p:
                     HandleOnPlayerJoinedMatch(p);
                     break;
+
+                #region TimerEvents
+                case MatchFinishedPacket p:
+                    MessageBox.Show(p.GetType().Name);
+                    break;
+                case SubRoundStartedPacket p:
+                    StartTimer();
+                    break;
+                case SubRoundFinishedPacket p:
+                    StopTimer();                    
+                    break;
+                case RoundStartedPacket p:
+                    ChangeRoundNumber(p.RoundNumber);                    
+                    break;                     
+                case PreparationTimeFinishedPacket p:
+                    SetPreparingPlayerToDrawing();
+                    break;
+                case PreparationTimeStartedPacket p:
+                    SetDrawingPlayerToGuessing();
+                    SetPlayerToPreparing(p.PreparingPlayer);
+                    break;
+                    #endregion
             }
+        }
+
+        private void SetPreparingPlayerToDrawing()
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel)DataContext;
+
+                foreach (var player in vm.Players)
+                {
+                    if (player.Status == PlayerStatus.Preparing)
+                    {
+                        player.Status = PlayerStatus.Drawing;
+                    }
+                }
+            });
+        }
+
+        private void SetDrawingPlayerToGuessing()
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel)DataContext;
+
+                foreach (var player in vm.Players)
+                {
+                    if (player.Status == PlayerStatus.Drawing)
+                    {
+                        player.Status = PlayerStatus.Guessing;
+                    }
+                }
+            });
+        }
+
+        private void SetPlayerToPreparing(Player preparingPlayer)
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel)DataContext;
+
+                foreach (var player in vm.Players)
+                {
+                    if (player.Uid == preparingPlayer.Uid)
+                    {
+                        player.Status = PlayerStatus.Preparing;
+                    }
+                }
+            });
+        }
+
+        private void StartTimer()
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel)DataContext;
+
+                vm.StartTimer();
+            });
+        }
+
+        private void StopTimer()
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel)DataContext;
+
+                vm.ResetTimer();
+            });
+        }
+
+        private void ChangeRoundNumber(int roundNumber)
+        {
+            InvokeGui(() =>
+            {
+                var vm = (MainWindowViewModel)DataContext;
+
+                vm.CurrentRound = roundNumber;
+            });
         }
 
         private void HandleOnPlayerJoinedMatch(PlayerJoinedMatchPacket packet)
         {
             InvokeGui(() =>
-            {                
+            {
                 var vm = (MainWindowViewModel) DataContext;
 
-                if (packet.MatchUid == vm.MatchUid)
-                    vm.Players.Add(packet.Player);
+                vm.Players.Add(packet.Player);
+                Log.Warn($"Player {packet.Player.Username} joind with status: {packet.Player.Status}");
             });
         }
 
@@ -91,12 +192,12 @@ namespace DrawingHammerDesktopApp
             {
                 var vm = (MainWindowViewModel) DataContext;
 
-                vm.MatchUid = packet.Match.MatchUid;
-                vm.Rounds = packet.Match.Rounds;
-                vm.CurrentRound = packet.Match.CurrentRound;
-                vm.RemainingTime = packet.Match.RemainingTime;
-                vm.MatchTitle = packet.Match.Title;
-                vm.Players = packet.Match.Players;
+                vm.Rounds = packet.MatchData.Rounds;
+                vm.CurrentRound = packet.MatchData.CurrentRound;
+                vm.RemainingTime = packet.MatchData.RemainingTime;
+                vm.RoundLength = packet.MatchData.RoundLength;
+                vm.MatchTitle = packet.MatchData.Title;
+                vm.Players = packet.MatchData.Players;
             });
         }
 
@@ -132,7 +233,7 @@ namespace DrawingHammerDesktopApp
         }
 
         public void MatchJoined(string matchUid)
-        {           
+        {
             _client.SendPacketToServer(new RequestMatchDataPacket(matchUid, App.Uid, Router.ServerWildcard));
         }
     }
