@@ -10,11 +10,11 @@ namespace DrawingHammerServer
 
         public static List<Word> GetWord(IList<Word> pickedWords, int limit = 3)
         {
-            string query = $@"SELECT id, word
-                              FROM words 
-                              {BuildWhere(pickedWords)}
-                              ORDER BY RAND()
-                              LIMIT {limit}";
+            string query = "SELECT id, word " +
+                           "FROM words  " +
+                          $"{BuildWhere(pickedWords)} " +
+                           "ORDER BY RAND() " +
+                          $"LIMIT {limit}";
 
             var reader = DbManager.Select(query);            
 
@@ -35,14 +35,17 @@ namespace DrawingHammerServer
 
         private static string BuildWhere(IList<Word> words)
         {
-            var wheres = new List<string>();
+            var wheres = new List<string>();            
 
             foreach (var word in words)
             {
                 wheres.Add($"id != {word.Id}");
             }
 
-            return string.Join(" AND ", wheres);
+            if (wheres.Count > 0)
+                return "WHERE " + string.Join(" AND ", wheres);
+
+            return string.Empty;
         }
     }
 }

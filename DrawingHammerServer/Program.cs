@@ -285,8 +285,7 @@ namespace DrawingHammerServer
 
                 case PickedWordPacket p:
                     HandleOnPickedWord(p);
-                    break;
-                    
+                    break;                    
             }
         }
 
@@ -308,6 +307,9 @@ namespace DrawingHammerServer
             {
                 word = match.GetRandomWord();
             }
+
+            match.WordToDraw = word;
+            match.PickedWords.Add(word);
 
             _server.Router.DistributePacket(new WordToDrawPacket(word, Router.ServerWildcard, match.GetCurrentlyPreparingPlayer().Uid));
         }
@@ -422,6 +424,7 @@ namespace DrawingHammerServer
         private static void Match_SubRoundFinished(object sender, EventArgs e)
         {
             var match = (Match)sender;
+            match.WordToDraw = null;
 
             foreach (Player player in match.Players)
             {
@@ -439,13 +442,17 @@ namespace DrawingHammerServer
             }
         }
 
-        private static void MatchPreparationTimeFinished(object sender, EventArgs e)
+        private static void MatchPreparationTimeFinished(object sender, PreparationTimeFinishedEventArgs e)
         {
             var match = (Match) sender;
 
-            var randomWord = match.GetRandomWord();
+            if (match.WordToDraw == null)
+            {
+                var randomWord = match.GetRandomWord();
+                match.PickedWords.Add(randomWord);
 
-            _server.Router.DistributePacket(new WordToDrawPacket(randomWord, Router.ServerWildcard, match.GetCurrentlyPreparingPlayer().Uid));
+                _server.Router.DistributePacket(new WordToDrawPacket(randomWord, Router.ServerWildcard, e.PreparingPlayer.Uid));
+            }
 
             foreach (Player player in match.Players)
             {

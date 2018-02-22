@@ -66,6 +66,7 @@ namespace DrawingHammerDesktopApp
 
                 #region TimerEvents
                 case MatchFinishedPacket p:
+                    SetDrawingPlayerToGuessing();
                     MessageBox.Show(p.GetType().Name);
                     break;
                 case SubRoundStartedPacket p:
@@ -73,6 +74,7 @@ namespace DrawingHammerDesktopApp
                     break;
                 case SubRoundFinishedPacket p:
                     StopTimer();
+                    ClearDrawingAreaAndWord();
                     break;
                 case RoundStartedPacket p:
                     ChangeRoundNumber(p.RoundNumber);
@@ -95,6 +97,15 @@ namespace DrawingHammerDesktopApp
                     break;
                     #endregion
             }
+        }
+
+        private void ClearDrawingAreaAndWord()
+        {
+            InvokeGui(() =>
+            {
+                DrawingArea.Strokes.Clear();
+                _viewModel.WordToDraw = null;
+            });
         }
 
         private void HandleOnWordPicked(WordToDrawPacket packet)
@@ -252,6 +263,7 @@ namespace DrawingHammerDesktopApp
 
         public void MatchJoined(string matchUid)
         {
+            _viewModel.MatchUid = matchUid;
             _client.SendPacketToServer(new RequestMatchDataPacket(matchUid, App.Uid, Router.ServerWildcard));
         }
 

@@ -132,7 +132,7 @@
                             </ListView>
                         </Grid>
                     </materialDesign:DialogHost.DialogContent>
-                    <InkCanvas Margin="10"/>
+                    <InkCanvas Margin="10" x:Name="DrawingArea"/>
                 </materialDesign:DialogHost>
             </Grid>
             <Grid Grid.Column="2">
