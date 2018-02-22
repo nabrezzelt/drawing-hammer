@@ -1,5 +1,5 @@
-﻿using System;
-using HelperLibrary.Networking.ClientServer.Packets;
+﻿using HelperLibrary.Networking.ClientServer.Packets;
+using System;
 
 namespace DrawingHammerPacketLibrary
 {

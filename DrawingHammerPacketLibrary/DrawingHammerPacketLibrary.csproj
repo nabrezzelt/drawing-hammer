@@ -64,9 +64,12 @@
     <Compile Include="MatchDataPacket.cs" />
     <Compile Include="MatchFinishedPacket.cs" />
     <Compile Include="MatchJoinFailedPacket.cs" />
+    <Compile Include="PickedWordPacket.cs" />
+    <Compile Include="PickWordsPacket.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerJoinedMatchPacket.cs" />
     <Compile Include="Enums\PlayerStatus.cs" />
+    <Compile Include="PreparationTimeFinishedEventArgs.cs" />
     <Compile Include="PreparationTimeFinishedPacket.cs" />
     <Compile Include="PreparationTimerStartedEventArgs.cs" />
     <Compile Include="PreparationTimeStartedPacket.cs" />

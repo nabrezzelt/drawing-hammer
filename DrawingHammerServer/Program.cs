@@ -282,7 +282,34 @@ namespace DrawingHammerServer
                 case RequestMatchDataPacket p:
                     HandleMatchDataRequest(p);
                     break;
+
+                case PickedWordPacket p:
+                    HandleOnPickedWord(p);
+                    break;
+                    
             }
+        }
+
+        private static void HandleOnPickedWord(PickedWordPacket packet)
+        {
+            var match = GetMatchByUid(packet.MatchUid);
+
+            Word word = null;            
+
+            foreach (var randomWord in match.RandomWordsToPick)
+            {
+                if (randomWord.Id == packet.PickedWord.Id)
+                {
+                    word = packet.PickedWord;
+                }
+            }
+
+            if (word == null)
+            {
+                word = match.GetRandomWord();
+            }
+
+            _server.Router.DistributePacket(new WordToDrawPacket(word, Router.ServerWildcard, match.GetCurrentlyPreparingPlayer().Uid));
         }
 
         private static void HandleMatchDataRequest(RequestMatchDataPacket packet)
@@ -362,7 +389,19 @@ namespace DrawingHammerServer
 
         private static void MatchPreparationTimeStarted(object sender, PreparationTimerStartedEventArgs e)
         {
-            var match = (Match)sender;
+            var match = (Match) sender;
+
+            var words = WordManager.GetWord(match.PickedWords);
+
+            if (words.Count < 3)
+            {
+                match.PickedWords.Clear();
+            }
+
+            words = WordManager.GetWord(match.PickedWords);
+            match.RandomWordsToPick = new ObservableCollection<Word>(words);            
+
+            _server.Router.DistributePacket(new PickWordsPacket(words, Router.ServerWildcard, e.Player.Uid));
 
             foreach (Player player in match.Players)
             {
@@ -403,6 +442,10 @@ namespace DrawingHammerServer
         private static void MatchPreparationTimeFinished(object sender, EventArgs e)
         {
             var match = (Match) sender;
+
+            var randomWord = match.GetRandomWord();
+
+            _server.Router.DistributePacket(new WordToDrawPacket(randomWord, Router.ServerWildcard, match.GetCurrentlyPreparingPlayer().Uid));
 
             foreach (Player player in match.Players)
             {

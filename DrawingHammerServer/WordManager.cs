@@ -8,7 +8,7 @@ namespace DrawingHammerServer
     {
         private static readonly MySQLDatabaseManager DbManager = MySQLDatabaseManager.GetInstance();
 
-        public static List<Word> GetWord(List<Word> pickedWords, int limit = 3)
+        public static List<Word> GetWord(IList<Word> pickedWords, int limit = 3)
         {
             string query = $@"SELECT id, word
                               FROM words 
@@ -33,7 +33,7 @@ namespace DrawingHammerServer
             return words;
         }
 
-        private static string BuildWhere(List<Word> words)
+        private static string BuildWhere(IList<Word> words)
         {
             var wheres = new List<string>();
 

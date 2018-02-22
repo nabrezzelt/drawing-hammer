@@ -23,7 +23,7 @@ namespace DrawingHammerPacketLibrary
 
         public event EventHandler SubRoundStarted;
 
-        public event EventHandler PreparationTimeFinished;
+        public event EventHandler<PreparationTimeFinishedEventArgs> PreparationTimeFinished;
 
         public event EventHandler RoundFinished;
 
@@ -48,6 +48,11 @@ namespace DrawingHammerPacketLibrary
         public List<Player> PlayedPlayers { get; set; }
 
         public ObservableCollection<Word> PickedWords { get; set; }
+
+        /// <summary>
+        /// Stores the 3 random words witch the player should pick
+        /// </summary>
+        public ObservableCollection<Word> RandomWordsToPick { get; set; }
 
         public Word WordToDraw { get; set; }
 
@@ -142,7 +147,7 @@ namespace DrawingHammerPacketLibrary
             SubRoundStarted?.Invoke(this, EventArgs.Empty);
         }
 
-        private Player GetCurrentlyPreparingPlayer()
+        public Player GetCurrentlyPreparingPlayer()
         {
             foreach (var player in Players)
             {
@@ -186,7 +191,7 @@ namespace DrawingHammerPacketLibrary
             if (_currentPreparationTime <= 0)
             {
                 _preparationTimer.Stop();
-                PreparationTimeFinished?.Invoke(this, EventArgs.Empty);
+                PreparationTimeFinished?.Invoke(this, new PreparationTimeFinishedEventArgs(GetCurrentlyPreparingPlayer()));
             }
         }
 
@@ -218,6 +223,15 @@ namespace DrawingHammerPacketLibrary
             }
 
             return statusResult;
+        }
+
+        public Word GetRandomWord()
+        {
+            Random random = new Random();
+            
+            int randomIndex = random.Next(RandomWordsToPick.Count);
+
+            return RandomWordsToPick[randomIndex];            
         }
 
         //private void MatchPreparationTimeFinished(object sender, EventArgs e)
@@ -349,5 +363,6 @@ namespace DrawingHammerPacketLibrary
         //    SubRoundStarted?.Invoke(this, EventArgs.Empty);
         //    Log.Warn(DateTime.Now + " SubRoundTimer started!");            
         //}        
+       
     }
 }

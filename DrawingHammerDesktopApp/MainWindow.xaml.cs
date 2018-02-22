@@ -9,6 +9,7 @@ using DrawingHammerPacketLibrary;
 using DrawingHammerPacketLibrary.Enums;
 using HelperLibrary.Logging;
 using HelperLibrary.Networking.ClientServer;
+using MaterialDesignThemes.Wpf;
 
 namespace DrawingHammerDesktopApp
 {
@@ -89,8 +90,25 @@ namespace DrawingHammerDesktopApp
                 case PickWordsPacket p:
                     HandlePickingWords(p);
                     break;
+                case WordToDrawPacket p:
+                    HandleOnWordPicked(p);
+                    break;
                     #endregion
             }
+        }
+
+        private void HandleOnWordPicked(WordToDrawPacket packet)
+        {
+            InvokeGui(() =>
+            {
+                if (DialogHostPickWords.IsOpen)
+                {
+                    DialogHostPickWords.IsOpen = false;
+                }
+
+                _viewModel.WordToDraw = packet.WordToDraw;
+                //ToDo: Enable Drawingarea (maybe clear inkcanvas)
+            });
         }
 
         private void HandlePickingWords(PickWordsPacket packet)
@@ -98,6 +116,8 @@ namespace DrawingHammerDesktopApp
             InvokeGui(() =>
             {
                 _viewModel.Words = new ObservableCollection<Word>(packet.WordsToSelect);
+
+                DialogHostPickWords.IsOpen = true;
             });
         }
 
@@ -233,6 +253,16 @@ namespace DrawingHammerDesktopApp
         public void MatchJoined(string matchUid)
         {
             _client.SendPacketToServer(new RequestMatchDataPacket(matchUid, App.Uid, Router.ServerWildcard));
+        }
+
+        private void DialogHostPickWords_OnDialogClosing(object sender, DialogClosingEventArgs e)
+        {
+            if(e.Parameter == null)
+                return;            
+
+            var word = (Word) e.Parameter;
+            
+            _client.SendPacketToServer(new PickedWordPacket(new Word(word.Id, word.Value), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
         }
     }
 }

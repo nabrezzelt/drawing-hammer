@@ -68,7 +68,7 @@
         <TextBlock Grid.Column="1" 
                    Grid.Row="1" 
                    Margin="5" 
-                   Text="{Binding WordToDraw.Word}"
+                   Text="{Binding WordToDraw.Value}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    Style="{DynamicResource MaterialDesignTitleTextBlock}"/>
@@ -120,13 +120,13 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <materialDesign:DialogHost>
+                <materialDesign:DialogHost x:Name="DialogHostPickWords" DialogClosing="DialogHostPickWords_OnDialogClosing">
                     <materialDesign:DialogHost.DialogContent>
                         <Grid>
                             <ListView ItemsSource="{Binding Words}">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
-                                        <Button Content="{Binding Word}" Command="materialDesign:DialogHost.CloseDialogCommand" CommandParameter="{Binding .}" />
+                                        <Button Content="{Binding Value}" Command="materialDesign:DialogHost.CloseDialogCommand" CommandParameter="{Binding .}" />
                                     </DataTemplate>
                                 </ListView.ItemTemplate>
                             </ListView>
