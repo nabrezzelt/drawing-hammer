@@ -2,16 +2,13 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="drawing-hammer"
-        Height="500"
-        Width="790"
+        Height="800"
+        Width="1110"        
         WindowStartupLocation="CenterScreen"
         Closing="MainWindow_OnClosing"
         
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:viewModel="clr-namespace:DrawingHammerDesktopApp.ViewModel"
-        xmlns:drawingHammerPacketLibrary="clr-namespace:DrawingHammerPacketLibrary;assembly=DrawingHammerPacketLibrary"
         xmlns:converters="clr-namespace:DrawingHammerDesktopApp.Converters"
-        xmlns:system="clr-namespace:System;assembly=mscorlib"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
@@ -21,6 +18,7 @@
         FontFamily="{DynamicResource MaterialDesignFont}">
     <Window.Resources>
         <converters:StatusToIconConverter x:Key="StatusToIconConverter" />
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -109,7 +107,8 @@
                                 <TextBlock 
                                        Text="{Binding Score}"
                                        VerticalAlignment="Center" 
-                                       HorizontalAlignment="Center" Margin="6,0,0,0" />
+                                       HorizontalAlignment="Center" Margin="6,0,6,0" />
+                                <materialDesign:PackIcon Kind="Check" Foreground="{DynamicResource PrimaryHueMidBrush}" Visibility="{Binding HasGuessed, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Collapsed}}" />
                             </StackPanel>
                         </Grid>
                     </DataTemplate>
@@ -132,20 +131,88 @@
                             </ListView>
                         </Grid>
                     </materialDesign:DialogHost.DialogContent>
-                    <InkCanvas Margin="10" x:Name="DrawingArea"/>
+                    <Grid IsEnabled="{Binding CanDraw}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <InkCanvas Margin="10" x:Name="DrawingArea"
+                                   StrokeCollected="DrawingArea_OnChanged"
+                                   StrokeErased="DrawingArea_OnChanged"/>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,6">
+                            <Button Background="#e91e63" BorderBrush="#e91e63" Click="SetColor" Tag="#e91e63" Margin="2" />
+                            <Button Background="#9c27b0" BorderBrush="#9c27b0" Click="SetColor" Tag="#9c27b0" Margin="2" />
+                            <Button Background="#673ab7" BorderBrush="#673ab7" Click="SetColor" Tag="#673ab7" Margin="2" />
+                            <Button Background="#3f51b5" BorderBrush="#3f51b5" Click="SetColor" Tag="#3f51b5" Margin="2" />
+                            <Button Background="#2196f3" BorderBrush="#2196f3" Click="SetColor" Tag="#2196f3" Margin="2" />
+                            <Button Background="#03a9f4" BorderBrush="#03a9f4" Click="SetColor" Tag="#03a9f4" Margin="2" />
+                            <Button Background="#00bcd4" BorderBrush="#00bcd4" Click="SetColor" Tag="#00bcd4" Margin="2" />
+                            <Button Background="#009688" BorderBrush="#009688" Click="SetColor" Tag="#009688" Margin="2" />
+                            <Button Background="#4caf50" BorderBrush="#4caf50" Click="SetColor" Tag="#4caf50" Margin="2" />
+                            <Button Background="#8bc34a" BorderBrush="#8bc34a" Click="SetColor" Tag="#8bc34a" Margin="2" />
+                            <Button Background="#cddc39" BorderBrush="#cddc39" Click="SetColor" Tag="#cddc39" Margin="2" />
+                            <Button Background="#ffeb3b" BorderBrush="#ffeb3b" Click="SetColor" Tag="#ffeb3b" Margin="2" />
+                            <Button Background="#ffc107" BorderBrush="#ffc107" Click="SetColor" Tag="#ffc107" Margin="2" />
+                            <Button Background="#ff9800" BorderBrush="#ff9800" Click="SetColor" Tag="#ff9800" Margin="2" />
+                            <Button Background="#ff5722" BorderBrush="#ff5722" Click="SetColor" Tag="#ff5722" Margin="2" />
+                            <Button Background="#795548" BorderBrush="#795548" Click="SetColor" Tag="#795548" Margin="2" />
+                            <Button Background="#9e9e9e" BorderBrush="#9e9e9e" Click="SetColor" Tag="#9e9e9e" Margin="2" />
+                            <Button Background="#607d8b" BorderBrush="#607d8b" Click="SetColor" Tag="#607d8b" Margin="2" />
+                            <Button Background="#000000" BorderBrush="#000000" Click="SetColor" Tag="#000000" Margin="2" />
+                            <Button Background="#ffffff" BorderBrush="#ffffff" Click="SetEraser" Margin="2" Content="{materialDesign:PackIcon Kind=Eraser, Size=16}" Padding="8" />
+                        </StackPanel>
+                    </Grid>
+
                 </materialDesign:DialogHost>
             </Grid>
-            <Grid Grid.Column="2">
+            <Grid Grid.Column="2" IsEnabled="{Binding CanGuess}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <ListView>
-                    
+                <ListView ItemsSource="{Binding Guesses}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock FontWeight="Bold" Text="{Binding PlayerName}">Nabrezzelt:</TextBlock>
+                                <TextBlock Foreground="{DynamicResource PrimaryHueLightBrush}"
+                                           Text="{Binding PlayerName, StringFormat=' {0} has guessed the word!'}">
+                                    <TextBlock.Style>
+                                        <Style>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCorrect}" Value="True">
+                                                    <Setter Property="TextBlock.Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsCorrect}" Value="False">
+                                                    <Setter Property="TextBlock.Visibility" Value="Hidden" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Text="{Binding GuessMessage}">
+                                    <TextBlock.Style>
+                                        <Style>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCorrect}" Value="False">
+                                                    <Setter Property="TextBlock.Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsCorrect}" Value="True">
+                                                    <Setter Property="TextBlock.Visibility" Value="Hidden" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
                 </ListView>
                 <TextBox Grid.Row="1"
                          Margin="5"
-                         materialDesign:HintAssist.Hint="Your Guess"/>
+                         x:Name="TextBoxGuess"
+                         materialDesign:HintAssist.Hint="Your Guess"
+                         KeyDown="TextBoxGuess_OnKeyDown"/>
             </Grid>
         </Grid>
     </Grid>

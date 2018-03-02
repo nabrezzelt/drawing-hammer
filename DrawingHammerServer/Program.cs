@@ -14,7 +14,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace DrawingHammerServer
 {
-    class Program
+    internal static class Program
     {       
         private const string SettingsPath = "settings.ini";
         private const string CertificatePath = "certificate.pfx";
@@ -78,7 +78,7 @@ namespace DrawingHammerServer
                 switch (input)
                 {
                     #region lookup account
-                    case var command when command.StartsWith("lookup account "):
+                    case var command when command != null && command.StartsWith("lookup account "):
                         if (args.Length != 3)
                         {
                             Log.Info("Paramenters are missing!");
@@ -285,7 +285,50 @@ namespace DrawingHammerServer
 
                 case PickedWordPacket p:
                     HandleOnPickedWord(p);
-                    break;                    
+                    break;
+
+                case DrawingAreaChangedPacket p:
+                    HandleOnDrawingAreaChanged(p);
+                    break;
+
+                case WordGuessPacket p:
+                    HandleOnCheckGuessedWord(p);
+                    break;
+            }
+        }
+
+        private static void HandleOnCheckGuessedWord(WordGuessPacket packet)
+        {
+            var match = GetMatchByUid(packet.MatchUid);
+
+            if (String.Equals(match.WordToDraw.Value, packet.GuessedWord, StringComparison.InvariantCultureIgnoreCase))
+            {
+                foreach (var matchPlayer in match.Players)
+                {
+                    _server.Router.DistributePacket(new WordGuessCorrectPacket(packet.SenderUid, Router.ServerWildcard, matchPlayer.Uid));
+                }
+
+                match.CalculateAndRaiseScore(packet.SenderUid);
+            }
+            else
+            {
+                foreach (var matchPlayer in match.Players)
+                {
+                    _server.Router.DistributePacket(new WordGuessPacket(packet.GuessedWord, match.MatchUid, packet.PlayerUid, Router.ServerWildcard, matchPlayer.Uid));
+                }
+            }
+        }
+
+        private static void HandleOnDrawingAreaChanged(DrawingAreaChangedPacket packet)
+        {
+            var match = GetMatchByUid(packet.MatchUid);
+
+            foreach (var player in match.Players)
+            {
+                if (player.Uid != packet.SenderUid)
+                {
+                    _server.Router.DistributePacket(new DrawingAreaChangedPacket(packet.Strokes, match.MatchUid, Router.ServerWildcard, player.Uid));
+                }
             }
         }
 
@@ -367,6 +410,7 @@ namespace DrawingHammerServer
             match.RoundStarted += Match_RoundStarted;
             match.RoundFinished += Match_RoundFinished;            
             match.MatchFinished += Match_MatchFinished;
+            match.ScoreChanged += Match_ScoreChanged;
 
 
             _matches.Add(match);
@@ -377,6 +421,16 @@ namespace DrawingHammerServer
             Log.Debug("All clients notified recording new match.");  
             
             client.SendDataPacketToClient(new MatchCreatedPacket(Router.ServerWildcard, client.Uid));
+        }
+
+        private static void Match_ScoreChanged(object sender, ScoreChangedEventArgs e)
+        {
+            var match = (Match) sender;
+
+            foreach (var matchPlayer in match.Players)
+            {
+                _server.Router.DistributePacket(new ScoreChangedPacket(e.Player.Uid, e.RaisedScore, Router.ServerWildcard, matchPlayer.Uid));
+            }            
         }
 
         private static void Match_RoundStarted(object sender, RoundStartedEventArgs e)

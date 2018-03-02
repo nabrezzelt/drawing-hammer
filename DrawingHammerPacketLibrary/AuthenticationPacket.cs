@@ -1,13 +1,14 @@
 ﻿using HelperLibrary.Networking.ClientServer.Packets;
 using System;
+using HelperLibrary.Networking.ClientServer;
 
 namespace DrawingHammerPacketLibrary
 {
     [Serializable]
     public class AuthenticationPacket : BasePacket
     {
-        public readonly string Username;
-        public readonly string Password;
+        public string Username { get; set; }
+        public string Password { get; set; }
 
         public AuthenticationPacket(string username, string password, string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {

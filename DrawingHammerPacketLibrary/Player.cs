@@ -14,7 +14,9 @@ namespace DrawingHammerPacketLibrary
 
         public int Score { get; set; }
 
-        public PlayerStatus Status { get; set; }               
+        public PlayerStatus Status { get; set; } 
+        
+        public bool HasGuessed { get; set; }
 
         public Player(int id, string uid, string username, int score)
         {

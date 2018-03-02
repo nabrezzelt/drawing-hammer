@@ -1,15 +1,22 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Threading;
-using DrawingHammerDesktopApp.ViewModel;
+﻿using DrawingHammerDesktopApp.ViewModel;
 using DrawingHammerPacketLibrary;
 using DrawingHammerPacketLibrary.Enums;
 using HelperLibrary.Logging;
 using HelperLibrary.Networking.ClientServer;
 using MaterialDesignThemes.Wpf;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Ink;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
+
 
 namespace DrawingHammerDesktopApp
 {
@@ -19,7 +26,7 @@ namespace DrawingHammerDesktopApp
     public partial class MainWindow : Window
     {
         private readonly SslClient _client;
-        private MainWindowViewModel _viewModel;
+        private readonly MainWindowViewModel _viewModel;
         public MainWindow()
         {
             //if (!Properties.Settings.Default.IsConnectionConfigured)
@@ -40,6 +47,8 @@ namespace DrawingHammerDesktopApp
             _viewModel = (MainWindowViewModel)DataContext;
 
             InitializeComponent();
+
+            SetPenSize(5, 5);
         }
 
         private async void Connect()
@@ -69,23 +78,26 @@ namespace DrawingHammerDesktopApp
                     SetDrawingPlayerToGuessing();
                     MessageBox.Show(p.GetType().Name);
                     break;
-                case SubRoundStartedPacket p:
+                case SubRoundStartedPacket _:
                     StartTimer();
+                    EnableCorrectArea();
                     break;
-                case SubRoundFinishedPacket p:
+                case SubRoundFinishedPacket _:
                     StopTimer();
                     ClearDrawingAreaAndWord();
+                    ResetCorrectGuessesInPlayerList();
+                    ClearGuessList();
                     break;
                 case RoundStartedPacket p:
                     ChangeRoundNumber(p.RoundNumber);
                     break;
-                case PreparationTimeFinishedPacket p:
+                case PreparationTimeFinishedPacket _:
                     SetPreparingPlayerToDrawing();
                     break;
                 case PreparationTimeStartedPacket p:
                     SetDrawingPlayerToGuessing();
                     SetPlayerToPreparing(p.PreparingPlayer);
-                    break;
+                    break;                
                 #endregion
 
                 #region Wordhandling
@@ -95,8 +107,107 @@ namespace DrawingHammerDesktopApp
                 case WordToDrawPacket p:
                     HandleOnWordPicked(p);
                     break;
-                    #endregion
+                case WordGuessPacket p:
+                    HandleOnWordGuessedByOtherPlayer(p);
+                    break;
+                case WordGuessCorrectPacket p:
+                    HandleOnWordGuessCorrect(p);
+                    break;
+                case ScoreChangedPacket p:
+                    HandleOnScoreChanged(p);
+                    break;
+                #endregion
+
+                #region DrawingArea
+                case DrawingAreaChangedPacket p:
+                    HandleOnDrawingAreaChanged(p);
+                    break;                    
+                #endregion
             }
+        }
+
+        private void EnableCorrectArea()
+        {
+            InvokeGui(() =>
+            {
+                foreach (var player in _viewModel.Players)
+                {
+                    if (player.Status == PlayerStatus.Drawing && player.Uid == App.Uid)
+                    {
+                        _viewModel.CanDraw = true;
+                        return;
+                    }
+                }
+
+                _viewModel.CanGuess = true;
+            });            
+        }
+
+        private void HandleOnScoreChanged(ScoreChangedPacket packet)
+        {
+            InvokeGui(() =>
+            {
+                var player = _viewModel.Players.FirstOrDefault(p => p.Uid == packet.PlayerUid);
+
+                if (player != null)
+                {
+                    player.Score += packet.RaisedScore;
+                }
+            });            
+        }
+
+        private void ClearGuessList()
+        {
+            InvokeGui(() =>
+            {
+                _viewModel.Guesses.Clear();
+                TextBoxGuess.Clear();
+            });
+        }
+
+        private void ResetCorrectGuessesInPlayerList()
+        {
+            InvokeGui(() =>
+            {
+                foreach (var player in _viewModel.Players)
+                {
+                    player.HasGuessed = false;
+                }
+            });
+        }
+
+        private void HandleOnWordGuessCorrect(WordGuessCorrectPacket packet)
+        {
+            InvokeGui(() =>
+            {
+                var player = GetPlayerByUid(packet.PlayerUid);
+
+                if (player != null)
+                {
+                    _viewModel.Guesses.Add(new Guess(player.Username, String.Empty, true));
+                }
+            });                     
+        }
+
+        private void HandleOnWordGuessedByOtherPlayer(WordGuessPacket packet)
+        {
+            InvokeGui(() =>
+            {
+                var player = GetPlayerByUid(packet.PlayerUid);
+
+                if (player != null)
+                {
+                    _viewModel.Guesses.Add(new Guess(player.Username, packet.GuessedWord, true));
+                }
+            });            
+        }
+
+        private void HandleOnDrawingAreaChanged(DrawingAreaChangedPacket packet)
+        {
+            InvokeGui(() =>
+            {
+                DrawingArea.Strokes = new StrokeCollection(new MemoryStream(packet.Strokes));
+            });            
         }
 
         private void ClearDrawingAreaAndWord()
@@ -105,6 +216,7 @@ namespace DrawingHammerDesktopApp
             {
                 DrawingArea.Strokes.Clear();
                 _viewModel.WordToDraw = null;
+                _viewModel.CanDraw = false;
             });
         }
 
@@ -117,8 +229,7 @@ namespace DrawingHammerDesktopApp
                     DialogHostPickWords.IsOpen = false;
                 }
 
-                _viewModel.WordToDraw = packet.WordToDraw;
-                //ToDo: Enable Drawingarea (maybe clear inkcanvas)
+                _viewModel.WordToDraw = packet.WordToDraw;                
             });
         }
 
@@ -140,8 +251,14 @@ namespace DrawingHammerDesktopApp
                 {
                     if (player.Status == PlayerStatus.Preparing)
                     {
-                        player.Status = PlayerStatus.Drawing;
+                        player.Status = PlayerStatus.Drawing;                        
                     }
+
+                    if (player.Uid == App.Uid)
+                    {
+                        //I have to draw
+                        _viewModel.CanDraw = true;
+                    }                    
                 }
             });
         }
@@ -155,6 +272,12 @@ namespace DrawingHammerDesktopApp
                     if (player.Status == PlayerStatus.Drawing)
                     {
                         player.Status = PlayerStatus.Guessing;
+
+                        if (player.Uid == App.Uid)
+                        {
+                            //I have drawed
+                            _viewModel.CanDraw = false;                            
+                        }
                     }
                 }
             });
@@ -275,6 +398,55 @@ namespace DrawingHammerDesktopApp
             var word = (Word) e.Parameter;
             
             _client.SendPacketToServer(new PickedWordPacket(new Word(word.Id, word.Value), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
+        }
+       
+        private void SetEraser(object sender, RoutedEventArgs e)
+        {
+            DrawingArea.EditingMode = InkCanvasEditingMode.EraseByPoint;
+            SetPenSize(5, 5);
+        }
+
+        private void SetColor(object sender, RoutedEventArgs e)
+        {
+            var btn = (Button) sender;
+            // ReSharper disable once PossibleNullReferenceException
+            var color = (Color) ColorConverter.ConvertFromString(btn.Tag.ToString());
+
+            DrawingArea.DefaultDrawingAttributes.Color = color;
+            DrawingArea.EditingMode = InkCanvasEditingMode.Ink;
+            SetPenSize(5, 5);
+        }
+
+        private void SetPenSize(int height, int width)
+        {
+            DrawingArea.DefaultDrawingAttributes.Height = height;
+            DrawingArea.DefaultDrawingAttributes.Width = width;
+        }
+
+        private void DrawingArea_OnChanged(object sender, RoutedEventArgs e)
+        {
+            if (_viewModel.CanDraw)
+            {
+                var strokeMemoryStream = new MemoryStream();
+                DrawingArea.Strokes.Save(strokeMemoryStream);                                
+
+                _client.SendPacketToServer(new DrawingAreaChangedPacket(strokeMemoryStream.ToArray(), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
+            }            
+        }
+
+        private void TextBoxGuess_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && !String.IsNullOrWhiteSpace(TextBoxGuess.Text))
+            {
+                var guessedWord = TextBoxGuess.Text;
+
+                _client.SendPacketToServer(new WordGuessPacket(guessedWord, _viewModel.MatchUid, App.Uid, App.Uid, Router.ServerWildcard));
+            }
+        }
+
+        private Player GetPlayerByUid(string playerUid)
+        {
+            return _viewModel.Players.FirstOrDefault(player => player.Uid == playerUid);
         }
     }
 }

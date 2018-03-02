@@ -3,6 +3,7 @@ using HelperLibrary.Cryptography;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Timers;
 
 namespace DrawingHammerPacketLibrary
@@ -13,7 +14,12 @@ namespace DrawingHammerPacketLibrary
         /// <summary>
         /// Time to prepare and select a word in seconds
         /// </summary>
-        public const int PreparationTime = 10;
+        private const int PreparationTime = 10;
+
+        private const int DefaultScoreValue = 100;
+
+        private const double DrawerScoreAdditionPercentage = 0.3;
+
 
         public event EventHandler<PreparationTimerStartedEventArgs> PreparationTimeStarted;
 
@@ -30,6 +36,8 @@ namespace DrawingHammerPacketLibrary
         public event EventHandler SubRoundFinished;
 
         public event EventHandler MatchFinished;
+
+        public event EventHandler<ScoreChangedEventArgs> ScoreChanged;
 
         public string MatchUid { get; set; }
 
@@ -66,14 +74,14 @@ namespace DrawingHammerPacketLibrary
 
         private int _currentPreparationTime;
 
-        public Match(string title, int rounds, int maxPlayers, int roundLength) //ToDo: Add roundLength
+        public Match(string title, int rounds, int maxPlayers, int roundLength)
         {
             MatchUid = HashManager.GenerateSecureRandomToken();
 
             Title = title;
             Rounds = rounds;
             MaxPlayers = maxPlayers;
-            RoundLength = 10;
+            RoundLength = roundLength;
 
             Players = new ObservableCollection<Player>();
             PlayedPlayers = new List<Player>();
@@ -234,6 +242,36 @@ namespace DrawingHammerPacketLibrary
             return RandomWordsToPick[randomIndex];            
         }
 
+        public void CalculateAndRaiseScore(string playerUid)
+        {
+            var successfulPlayers = GetSuccessfulGuessedPlayerCount();
+
+            var score = Players.Count - 1 - successfulPlayers * DefaultScoreValue;
+
+            var player = Players.FirstOrDefault(p => p.Uid == playerUid);
+
+            if (player != null)
+            {
+                player.Score += score;
+                player.HasGuessed = true;
+                ScoreChanged?.Invoke(this, new ScoreChangedEventArgs(player, score));
+            }
+
+            //Raise score for drawing player
+            var drawingPlayerScore = (int) (score * DrawerScoreAdditionPercentage);
+
+            var drawingPlayer = GetCurrentlyDrawingPlayer();
+            drawingPlayer.Score += drawingPlayerScore;
+
+            ScoreChanged?.Invoke(this, new ScoreChangedEventArgs(drawingPlayer, score));
+        }
+
+        public int GetSuccessfulGuessedPlayerCount()
+        {
+            return 0;
+        }
+
+
         //private void MatchPreparationTimeFinished(object sender, EventArgs e)
         //{
         //    foreach (var player in Players)
@@ -321,48 +359,6 @@ namespace DrawingHammerPacketLibrary
             }
 
             return null;
-        }
-
-        //public void StartPreparationTimer(Player player)
-        //{
-        //    player.Status = PlayerStatus.Preparing;
-        //    _preparationTimer.Start();
-        //    PreparationTimeStarted?.Invoke(this, new PreparationTimerStartedEventArgs(player));
-        //    Log.Warn(DateTime.Now + " PreparationTimer started!");            
-        //}
-
-        //private void SubRoundTimerTicked(object sender, ElapsedEventArgs e)
-        //{
-        //    RemainingTime--;
-
-        //    if (RemainingTime <= 0)
-        //    {
-        //        RemainingTime = RoundLength;
-        //        _subRoundTimer.Stop();
-        //        Log.Warn(DateTime.Now + " SubRound finished!");                
-        //        SubRoundFinished?.Invoke(this, EventArgs.Empty);                
-        //    }
-        //}
-
-        //private void PreparationTimerTicked(object sender, ElapsedEventArgs e)
-        //{
-        //    _currentPreparationTime--;
-
-        //    if (_currentPreparationTime <= 0)
-        //    {
-        //        _currentPreparationTime = MaxPreparationTime;
-        //        _preparationTimer.Stop();
-        //        Log.Warn(DateTime.Now + " PreparationTimer finished!");                
-        //        PreparationTimeFinished?.Invoke(this, EventArgs.Empty);                
-        //    }
-        //}
-
-        //public void StartSubRound()
-        //{
-        //    _subRoundTimer.Start();
-        //    SubRoundStarted?.Invoke(this, EventArgs.Empty);
-        //    Log.Warn(DateTime.Now + " SubRoundTimer started!");            
-        //}        
-       
+        }            
     }
 }

@@ -84,6 +84,7 @@
     <Compile Include="ConnectionSettingsWindow.xaml.cs">
       <DependentUpon>ConnectionSettingsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\StatusToIconConverter.cs" />
     <Compile Include="CreateNewGameWindow.xaml.cs">
       <DependentUpon>CreateNewGameWindow.xaml</DependentUpon>
