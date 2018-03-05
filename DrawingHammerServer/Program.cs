@@ -508,6 +508,7 @@ namespace DrawingHammerServer
             {
                 var randomWord = match.GetRandomWord();
                 match.PickedWords.Add(randomWord);
+                match.WordToDraw = randomWord;
 
                 _server.Router.DistributePacket(new WordToDrawPacket(randomWord, Router.ServerWildcard, e.PreparingPlayer.Uid));
             }

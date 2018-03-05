@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Timers;
+using HelperLibrary.Logging;
 
 namespace DrawingHammerPacketLibrary
 {
@@ -16,7 +17,7 @@ namespace DrawingHammerPacketLibrary
         /// </summary>
         private const int PreparationTime = 10;
 
-        private const int DefaultScoreValue = 100;
+        private const int ScoreMultiplicator = 100;
 
         private const double DrawerScoreAdditionPercentage = 0.3;
 
@@ -122,7 +123,6 @@ namespace DrawingHammerPacketLibrary
                 //Runde Beendet
                 PlayedPlayers.Clear();
                 RoundFinished?.Invoke(this, EventArgs.Empty);
-
                 
                 if (CurrentRound == Rounds)
                 {
@@ -187,9 +187,14 @@ namespace DrawingHammerPacketLibrary
 
             if (RemainingTime <= 0)
             {
-                _subRoundTimer.Stop();
-                SubRoundFinished?.Invoke(this, EventArgs.Empty);
+                StopSubRoundTimer();
             }
+        }
+
+        public void StopSubRoundTimer()
+        {
+            _subRoundTimer.Stop();
+            SubRoundFinished?.Invoke(this, EventArgs.Empty);
         }
 
         private void PreparationTimerTicked(object sender, ElapsedEventArgs e)
@@ -198,9 +203,14 @@ namespace DrawingHammerPacketLibrary
 
             if (_currentPreparationTime <= 0)
             {
-                _preparationTimer.Stop();
-                PreparationTimeFinished?.Invoke(this, new PreparationTimeFinishedEventArgs(GetCurrentlyPreparingPlayer()));
+               StopPreparationTimer();
             }
+        }
+
+        public void StopPreparationTimer()
+        {
+            _preparationTimer.Stop();
+            PreparationTimeFinished?.Invoke(this, new PreparationTimeFinishedEventArgs(GetCurrentlyPreparingPlayer()));
         }
 
         public void StartMatch()
@@ -213,7 +223,7 @@ namespace DrawingHammerPacketLibrary
             StartPreparationTimer(player);
         }
 
-        public void StartPreparationTimer(Player player)
+        private void StartPreparationTimer(Player player)
         {
             player.Status = PlayerStatus.Preparing;
 
@@ -246,8 +256,9 @@ namespace DrawingHammerPacketLibrary
         {
             var successfulPlayers = GetSuccessfulGuessedPlayerCount();
 
-            var score = Players.Count - 1 - successfulPlayers * DefaultScoreValue;
-
+            var score = (Players.Count - 1 - successfulPlayers) * ScoreMultiplicator;
+            //score = 2 - 1 - 0 * 100;
+            Log.Info($"Calculated: ({Players.Count} - 1 - {successfulPlayers}) * {ScoreMultiplicator} = {score}");
             var player = Players.FirstOrDefault(p => p.Uid == playerUid);
 
             if (player != null)
@@ -257,20 +268,40 @@ namespace DrawingHammerPacketLibrary
                 ScoreChanged?.Invoke(this, new ScoreChangedEventArgs(player, score));
             }
 
-            //Raise score for drawing player
-            var drawingPlayerScore = (int) (score * DrawerScoreAdditionPercentage);
+            //Raise score for drawing player            
 
             var drawingPlayer = GetCurrentlyDrawingPlayer();
-            drawingPlayer.Score += drawingPlayerScore;
 
-            ScoreChanged?.Invoke(this, new ScoreChangedEventArgs(drawingPlayer, score));
+            if (drawingPlayer != null)
+            {
+                var drawingPlayerScore = (int)(score * DrawerScoreAdditionPercentage);
+                Log.Info($"Drawing-Score: {drawingPlayerScore}");
+                drawingPlayer.Score += drawingPlayerScore;
+
+                ScoreChanged?.Invoke(this, new ScoreChangedEventArgs(drawingPlayer, drawingPlayerScore));
+            }            
         }
 
-        public int GetSuccessfulGuessedPlayerCount()
+        private int GetSuccessfulGuessedPlayerCount()
         {
-            return 0;
+            int count = 0;
+
+            foreach (var player in Players)
+            {
+                if (player.HasGuessed)
+                    count++;
+            }
+
+            return count;
         }
 
+        private void ResetHasGuessed()
+        {
+            foreach (var player in Players)
+            {
+                player.HasGuessed = false;
+            }
+        }
 
         //private void MatchPreparationTimeFinished(object sender, EventArgs e)
         //{

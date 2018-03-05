@@ -132,13 +132,16 @@ namespace DrawingHammerDesktopApp
             {
                 foreach (var player in _viewModel.Players)
                 {
+                    //I have to draw
                     if (player.Status == PlayerStatus.Drawing && player.Uid == App.Uid)
                     {
                         _viewModel.CanDraw = true;
+                        _viewModel.CanGuess = false;
                         return;
                     }
                 }
 
+                _viewModel.CanDraw = false;
                 _viewModel.CanGuess = true;
             });            
         }
@@ -147,7 +150,8 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                var player = _viewModel.Players.FirstOrDefault(p => p.Uid == packet.PlayerUid);
+                Log.Info($"Score changed: {packet}");
+                var player = GetPlayerByUid(packet.PlayerUid);
 
                 if (player != null)
                 {
@@ -185,7 +189,11 @@ namespace DrawingHammerDesktopApp
                 if (player != null)
                 {
                     _viewModel.Guesses.Add(new Guess(player.Username, String.Empty, true));
-                }
+                    Log.Info($"Guess correct - Packet: {packet} - Username-by-Match: {player.Username}");                    
+                    player.HasGuessed = true;
+
+                    ScrollGuessListToLastItem();
+                }                
             });                     
         }
 
@@ -197,7 +205,10 @@ namespace DrawingHammerDesktopApp
 
                 if (player != null)
                 {
-                    _viewModel.Guesses.Add(new Guess(player.Username, packet.GuessedWord, true));
+                    _viewModel.Guesses.Add(new Guess(player.Username, packet.GuessedWord, false));                    
+                    Log.Info($"Other user guessed a word: {packet}");
+
+                    ScrollGuessListToLastItem();
                 }
             });            
         }
@@ -441,12 +452,19 @@ namespace DrawingHammerDesktopApp
                 var guessedWord = TextBoxGuess.Text;
 
                 _client.SendPacketToServer(new WordGuessPacket(guessedWord, _viewModel.MatchUid, App.Uid, App.Uid, Router.ServerWildcard));
+                TextBoxGuess.Clear();                
             }
         }
 
         private Player GetPlayerByUid(string playerUid)
         {
             return _viewModel.Players.FirstOrDefault(player => player.Uid == playerUid);
+        }
+
+        private void ScrollGuessListToLastItem()
+        {
+            if(_viewModel.Guesses.Count > 0)
+                ListViewGuesses.ScrollIntoView(ListViewGuesses.Items[ListViewGuesses.Items.Count-1]);
         }
     }
 }

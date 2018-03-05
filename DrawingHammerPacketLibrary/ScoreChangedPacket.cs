@@ -4,6 +4,7 @@ using HelperLibrary.Networking.ClientServer.Packets;
 namespace DrawingHammerPacketLibrary
 {
     [Serializable]
+    [ToString]
     public class ScoreChangedPacket : BasePacket
     {
         public string PlayerUid { get; set; }

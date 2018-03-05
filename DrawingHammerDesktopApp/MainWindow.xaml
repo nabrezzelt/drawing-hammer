@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="drawing-hammer"
-        Height="800"
-        Width="1110"        
+        Height="874.23"
+        Width="1156.61"        
         WindowStartupLocation="CenterScreen"
         Closing="MainWindow_OnClosing"
         
@@ -83,7 +83,7 @@
         </materialDesign:Chip>
         <Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="250" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="175" />
             </Grid.ColumnDefinitions>
@@ -108,7 +108,7 @@
                                        Text="{Binding Score}"
                                        VerticalAlignment="Center" 
                                        HorizontalAlignment="Center" Margin="6,0,6,0" />
-                                <materialDesign:PackIcon Kind="Check" Foreground="{DynamicResource PrimaryHueMidBrush}" Visibility="{Binding HasGuessed, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Collapsed}}" />
+                                <materialDesign:PackIcon Kind="Check" Foreground="{DynamicResource PrimaryHueMidBrush}" Visibility="{Binding HasGuessed, Converter={StaticResource BoolToVisibilityConverter}}" VerticalAlignment="Center" Margin="5,0,0,0" />
                             </StackPanel>
                         </Grid>
                     </DataTemplate>
@@ -170,12 +170,12 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <ListView ItemsSource="{Binding Guesses}">
+                <ListView ItemsSource="{Binding Guesses}" x:Name="ListViewGuesses">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock FontWeight="Bold" Text="{Binding PlayerName}">Nabrezzelt:</TextBlock>
-                                
+                                <TextBlock FontWeight="Bold" Text="{Binding PlayerName}" />
+
                                 <!-- ToDo: Chech that shit -->
                                 <TextBlock Foreground="{DynamicResource PrimaryHueLightBrush}"
                                            Text="{Binding PlayerName, StringFormat=' {0} has guessed the word!'}">
@@ -186,7 +186,7 @@
                                                     <Setter Property="TextBlock.Visibility" Value="Visible" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding IsCorrect}" Value="False">
-                                                    <Setter Property="TextBlock.Visibility" Value="Hidden" />
+                                                    <Setter Property="TextBlock.Visibility" Value="Collapsed" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -200,13 +200,13 @@
                                                     <Setter Property="TextBlock.Visibility" Value="Visible" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding IsCorrect}" Value="True">
-                                                    <Setter Property="TextBlock.Visibility" Value="Hidden" />
+                                                    <Setter Property="TextBlock.Visibility" Value="Collapsed" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
-                                
+
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>
