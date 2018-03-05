@@ -36,7 +36,7 @@
         </Grid>
         <Grid Grid.Row="1">
             <materialDesign:Card Margin="6">
-                <ListView x:Name="ListViewGamelist" MouseDoubleClick="lvGamelist_OnDoubleClick" ItemsSource="{Binding Matches}" SelectionChanged="lvGameList_OnSelectionChanged">
+                <ListView x:Name="ListViewGamelist" MouseDoubleClick="ListViewGamelist_OnDoubleClick" ItemsSource="{Binding Matches}" SelectionChanged="lvGameList_OnSelectionChanged">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -60,30 +60,6 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <!--<ListBoxItem>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Foreground="{DynamicResource PrimaryHueMidBrush}">RUNNING</TextBlock>
-                        <TextBlock Grid.Column="1" Margin="12,0">Main Faggot Match 1</TextBlock>
-                        <TextBlock Grid.Column="2" Style="{DynamicResource MaterialDesignCaptionTextBlock}" Foreground="Gray">(12/12 Players)</TextBlock>
-                    </Grid>
-                </ListBoxItem>
-                <ListBoxItem>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Foreground="{DynamicResource SecondaryAccentBrush}">WAITING</TextBlock>
-                        <TextBlock Grid.Column="1" Margin="12,0">Main Faggot Match 2</TextBlock>
-                        <TextBlock Grid.Column="2" Style="{DynamicResource MaterialDesignCaptionTextBlock}" IsEnabled="False" Foreground="Gray">(9/12 Players)</TextBlock>
-                    </Grid>
-                </ListBoxItem>-->                
             </materialDesign:Card>
         </Grid>
 
