@@ -21,37 +21,40 @@ namespace DrawingHammerDesktopApp
 
             _client = client;
 
-            _client.ConnectionLost += OnConnectionLost;
+            _client.ConnectionLost += OnConnectionLost;            
             _client.PacketReceived += OnPacketReceived;
         }
 
         private void OnPacketReceived(object sender, PacketReceivedEventArgs e)
         {
-            InvokeGui(() =>
+            switch (e.Packet)
             {
-                switch (e.Packet)
-                {
-                    case RegistrationResultPacket packet:
-                        HandleRegisterResult(packet);
-                        break;
-                }
-            });
+                case RegistrationResultPacket packet:
+                    HandleRegisterResult(packet);
+                    break;
+            }
         }
 
         private void OnConnectionLost(object sender, EventArgs e)
         {
-            StatusSnackbar.MessageQueue.Enqueue("Connection lost!");
+            InvokeGui(() =>
+            {
+                StatusSnackbar.MessageQueue.Enqueue("Connection lost!");
+            });
         }
 
         private void HandleRegisterResult(RegistrationResultPacket packet)
         {
-            ButtonRegister.Visibility = Visibility.Visible;
-            ProgressBarRegistering.Visibility = Visibility.Collapsed;
-
+            InvokeGui(() =>
+            {
+                ButtonRegister.Visibility = Visibility.Visible;
+                ProgressBarRegistering.Visibility = Visibility.Collapsed;
+            });
+            
             switch (packet.Result)
             {
                 case RegistrationResult.Ok:
-                    Task.Run(async () =>
+                    InvokeGui(async () =>
                     {
                         StatusSnackbar.MessageQueue.Enqueue("Account successfully created - you can login now!");
                         ButtonRegister.IsEnabled = false;
@@ -61,17 +64,29 @@ namespace DrawingHammerDesktopApp
                     });
                     break;
                 case RegistrationResult.Failed:
-                    StatusSnackbar.MessageQueue.Enqueue("Registration failed!");
+                    InvokeGui(() =>
+                    {
+                        StatusSnackbar.MessageQueue.Enqueue("Registration failed!");
+                    });
                     break;
                 case RegistrationResult.UsernameTooLong:
-                    StatusSnackbar.MessageQueue.Enqueue("Your username it so long");
+                    InvokeGui(() =>
+                    {
+                        StatusSnackbar.MessageQueue.Enqueue("Your username it so long");
+                    });
                     break;
                 case RegistrationResult.UsernameTooShort:
-                    StatusSnackbar.MessageQueue.Enqueue("Your username is to short!");
+                    InvokeGui(() =>
+                    {
+                        StatusSnackbar.MessageQueue.Enqueue("Your username is to short!");
+                    });
                     break;
                 case RegistrationResult.UsernameAlreadyExists:
-                    StatusSnackbar.MessageQueue.Enqueue("A user with this name already exitsts. Please choose another one.");
-                    break;
+                    InvokeGui(() =>
+                    {
+                        StatusSnackbar.MessageQueue.Enqueue("A user with this name already exitsts. Please choose another one.");
+                    });
+                    break;                
             }
         }
 
@@ -95,14 +110,17 @@ namespace DrawingHammerDesktopApp
             SendRegisterMessage(TextBoxUsername.Text, TextBoxPassword.Password);
         }
 
-        private void SendRegisterMessage(string username, string password)
-        {
-            _client.SendPacketToServer(new RegistrationPacket(
-                username,
-                password,
-                App.Uid,
-                Router.ServerWildcard
-                ));
+        private async void SendRegisterMessage(string username, string password)
+        {            
+            await Task.Run(() =>
+            {
+                _client.SendPacketToServer(new RegistrationPacket(
+                    username,
+                    password,
+                    App.Uid,
+                    Router.ServerWildcard
+                    ));
+            });
         }
 
         private void RegisterWhenEnterPressed(object sender, KeyEventArgs e)

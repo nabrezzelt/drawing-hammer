@@ -36,68 +36,83 @@ namespace DrawingHammerDesktopApp
             RequestGameList();
         }
 
-        private void RequestGameList()
+        private async void RequestGameList()
         {
-            _client.SendPacketToServer(new RequestGamelistPacket(App.Uid, Router.ServerWildcard));
-            Log.Debug("Matchlist requested.");
+            await Task.Run(() =>
+            {
+                _client.SendPacketToServer(new RequestGamelistPacket(App.Uid, Router.ServerWildcard));
+                Log.Debug("Matchlist requested.");
+            });
         }
 
         private void OnPacketReceived(object sender, PacketReceivedEventArgs e)
         {
-            InvokeGui(() =>
+            switch (e.Packet)
             {
-                switch (e.Packet)
-                {
-                    case GameListPacket p:
-                        HandleOnGameListReceived(p);
-                        break;
-                    case CreateMatchPacket p:
-                        AddMatchToList(p.MatchData);
-                        break;
-                    case PlayerJoinedMatchPacket p:
-                        HandleOnPlayerChangedMatch(p);
-                        break;
-                    case MatchJoinFailedPacket p:
-                        HandleOnJoinMatchFailed(p);
-                        break;
-                }
-            });
+                case GameListPacket p:
+                    HandleOnGameListReceived(p);
+                    break;                
+                case CreateMatchPacket p:
+                    AddMatchToList(p.MatchData);
+                    break;
+                case PlayerJoinedMatchPacket p:
+                    HandleOnPlayerChangedMatch(p);
+                    break;
+                case MatchJoinFailedPacket p:
+                    HandleOnJoinMatchFailed(p);
+                    break;
+            }
         }
 
         private void HandleOnJoinMatchFailed(MatchJoinFailedPacket packet)
         {
-            StatusSnackbar.MessageQueue.Enqueue($"Could not join this match (Reason: {packet.Reason})");
+            InvokeGui(() =>
+            {
+                StatusSnackbar.MessageQueue.Enqueue($"Could not join this match (Reason: {packet.Reason})");
+            });
         }
 
         private void HandleOnPlayerChangedMatch(PlayerJoinedMatchPacket packet)
         {
-            if (packet.Player.Uid == App.Uid)
-            {
-                _mainWindow.MatchJoined(packet.MatchUid);
-                _matchJoined = true;
-                Close();
-            }
+            InvokeGui(() =>
+            {                
+                if (packet.Player.Uid == App.Uid)
+                {
+                    _mainWindow.MatchJoined(packet.MatchUid);
+                    _matchJoined = true;
+                    Close();
+                }
 
-            var match = ((GameBrowserViewModel)DataContext).GetMatch(packet.MatchUid);
-            match.Players.Add(packet.Player);
+                var match = ((GameBrowserViewModel) DataContext).GetMatch(packet.MatchUid);
+                match.Players.Add(packet.Player);                                
+            });            
         }
 
         private void AddMatchToList(MatchData matchData)
         {
-            var vm = (GameBrowserViewModel)DataContext;
-            vm.Matches.Add(matchData);
+            InvokeGui(() =>
+            {
+                var vm = (GameBrowserViewModel) DataContext;
+                vm.Matches.Add(matchData);
+            });
         }
 
         private void HandleOnGameListReceived(GameListPacket packet)
         {
-            var vm = (GameBrowserViewModel)DataContext;
-            vm.Matches = packet.Matches;
+            InvokeGui(() =>
+            {
+                var vm = (GameBrowserViewModel)DataContext;
+                vm.Matches = packet.Matches;
+            });          
         }
 
-
+    
         private void OnConnectionLost(object sender, EventArgs e)
         {
-            StatusSnackbar.MessageQueue.Enqueue("Connection lost!");
+            InvokeGui(() =>
+            {
+               StatusSnackbar.MessageQueue.Enqueue("Connection lost!");
+            });           
         }
 
         private void CreateNewGame(object sender, RoutedEventArgs e)
@@ -116,7 +131,7 @@ namespace DrawingHammerDesktopApp
             ButtonJoin.IsEnabled = ListViewGamelist.SelectedItem != null;
         }
 
-        private void ListViewGamelist_OnDoubleClick(object sender, MouseButtonEventArgs e)
+        private void lvGamelist_OnDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (ListViewGamelist.SelectedItem != null)
             {
@@ -125,15 +140,20 @@ namespace DrawingHammerDesktopApp
         }
 
         private void JoinMatch(object sender, RoutedEventArgs e)
-        {
-            MatchData selectedMatch = (MatchData)ListViewGamelist.SelectedItem;
-
-            _client.SendPacketToServer(new JoinMatchPacket(selectedMatch.MatchUid, App.Uid, Router.ServerWildcard));
+        {            
+            InvokeGui(async () =>
+            {
+                MatchData selectedMatch = (MatchData) ListViewGamelist.SelectedItem;
+                await Task.Run(() =>
+                {
+                    _client.SendPacketToServer(new JoinMatchPacket(selectedMatch.MatchUid, App.Uid, Router.ServerWildcard));
+                });
+            });           
         }
 
         private void OnClosing(object sender, CancelEventArgs e)
-        {
-            if (!_matchJoined)
+        {            
+            if(!_matchJoined)
                 Environment.Exit(0);
         }
     }

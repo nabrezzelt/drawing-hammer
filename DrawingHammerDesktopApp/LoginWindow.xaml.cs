@@ -13,7 +13,7 @@ namespace DrawingHammerDesktopApp
     /// <summary>
     /// Interaktionslogik für LoginWindow.xaml
     /// </summary>
-    public partial class LoginWindow
+    public partial class LoginWindow : Window
     {
         private bool LoggedIn { get; set; }
 
@@ -24,34 +24,35 @@ namespace DrawingHammerDesktopApp
 
             _client = client;
 
-            _client.ConnectionLost += OnConnectionLost;
+            _client.ConnectionLost += OnConnectionLost;            
             _client.PacketReceived += OnPacketReceived;
         }
 
         private void OnPacketReceived(object sender, PacketReceivedEventArgs e)
         {
-            InvokeGui(() =>
+            switch (e.Packet)
             {
-                switch (e.Packet)
-                {
-                    case AuthenticationResultPacket p:
-                        HandleAuthenticationResult(p);
-                        break;
-                }
-            });
+                case AuthenticationResultPacket p:
+                    HandleAuthenticationResult(p);
+                    break;
+            }
         }
 
         private void HandleAuthenticationResult(AuthenticationResultPacket packet)
         {
-            StackPanelButtons.Visibility = Visibility.Visible;
-            StackPanelLoggingIn.Visibility = Visibility.Collapsed;
+            InvokeGui(() =>
+            {
+                StackPanelButtons.Visibility = Visibility.Visible;
+                StackPanelLoggingIn.Visibility = Visibility.Collapsed;
+            });
 
+            
             switch (packet.Result)
             {
                 case AuthenticationResult.Ok:
                     LoggedIn = true;
-                    Task.Run(async () =>
-                    {
+                    InvokeGui(async () =>
+                    {                        
                         StatusSnackbar.MessageQueue.Enqueue("Login was successfull.");
                         ButtonLogin.IsEnabled = false;
                         ButtonRegister.IsEnabled = false;
@@ -60,16 +61,21 @@ namespace DrawingHammerDesktopApp
                         Close();
                     });
                     break;
-
                 case AuthenticationResult.Failed:
-                    StatusSnackbar.MessageQueue.Enqueue("Login failed. Check username and/or password and try it again.");
-                    break;
-            }
+                    InvokeGui(() =>
+                    {
+                        StatusSnackbar.MessageQueue.Enqueue("Login failed. Check username and/or password and try it again.");
+                    });
+                    break;                
+            }            
         }
 
         private void OnConnectionLost(object sender, EventArgs e)
         {
-            StatusSnackbar.MessageQueue.Enqueue("Connection lost!");
+            InvokeGui(() =>
+            {
+                StatusSnackbar.MessageQueue.Enqueue("Connection lost!");
+            });            
         }
 
         private void ShowRegisterWindow(object sender, RoutedEventArgs e)
@@ -79,24 +85,30 @@ namespace DrawingHammerDesktopApp
         }
 
         private void Login(object sender, RoutedEventArgs routedEventArgs)
-        {
+        {                                   
             SendLoginMessage(TextBoxUsername.Text, TextBoxPassword.Password);
 
-            StackPanelButtons.Visibility = Visibility.Collapsed;
-            StackPanelLoggingIn.Visibility = Visibility.Visible;
+            InvokeGui(() =>
+            {                
+                StackPanelButtons.Visibility = Visibility.Collapsed;
+                StackPanelLoggingIn.Visibility = Visibility.Visible;
+            });            
         }
 
-        private void SendLoginMessage(string username, string password)
-        {
+        private async void SendLoginMessage(string username, string password)
+        {            
             App.Username = username;
 
-            var loginPacket = new AuthenticationPacket(
-                username,
-                password,
-                App.Uid,
-                Router.ServerWildcard);
-
-            _client.SendPacketToServer(loginPacket);
+            await Task.Run(() =>
+            {                
+                var loginPacket = new AuthenticationPacket(
+                    username, 
+                    password, 
+                    App.Uid, 
+                    Router.ServerWildcard);
+                
+                _client.SendPacketToServer(loginPacket);
+            });
         }
 
         private void CheckForEnablingLoginButton(object sender, RoutedEventArgs routedEventArgs)
@@ -124,8 +136,8 @@ namespace DrawingHammerDesktopApp
             if (!LoggedIn)
             {
                 Environment.Exit(0);
-            }
-        }
+            }            
+        }        
 
         private void InvokeGui(Action action)
         {
