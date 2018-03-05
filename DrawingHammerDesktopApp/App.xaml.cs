@@ -1,12 +1,11 @@
-﻿using System.Windows;
-using HelperLibrary.Cryptography;
+﻿using HelperLibrary.Cryptography;
 
 namespace DrawingHammerDesktopApp
-{    
+{
     /// <summary>
     /// Interaktionslogik für "App.xaml"
     /// </summary>
-    public partial class App : Application
+    public partial class App
     {
         public static string Uid { get; set; }
         public static string Username { get; set; }

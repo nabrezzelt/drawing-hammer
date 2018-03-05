@@ -26,6 +26,7 @@ namespace DrawingHammerServer
 
         private static ObservableCollection<Match> _matches;
 
+        // ReSharper disable once UnusedParameter.Local
         private static void Main(string[] args)
         {
             _settingsManager = new SettingsManager(SettingsPath);
@@ -103,6 +104,7 @@ namespace DrawingHammerServer
                     #endregion
                     #region account delete                    
                     case var command when command.StartsWith("account delete "):
+                        // ReSharper disable once PossibleNullReferenceException
                         if (args.Length != 3)
                         {
                             Log.Info("Paramenter is missing!");
@@ -124,6 +126,7 @@ namespace DrawingHammerServer
                     #endregion
                     #region account create
                     case var command when command.StartsWith("account create "):                        
+                        // ReSharper disable once PossibleNullReferenceException
                         if (args.Length != 4)
                         {
                             Log.Info("Paramenters are missing!");
@@ -156,6 +159,7 @@ namespace DrawingHammerServer
                     #region account reset password
                     case var command when command.StartsWith("account reset password "):
                     
+                        // ReSharper disable once PossibleNullReferenceException
                         if (args.Length != 5)
                         {
                             Log.Info("Paramenters are missing!");

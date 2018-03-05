@@ -12,7 +12,7 @@ namespace DrawingHammerDesktopApp
     /// <summary>
     /// Interaktionslogik für RegisterWindow.xaml
     /// </summary>
-    public partial class RegisterWindow : Window
+    public partial class RegisterWindow
     {
         private readonly SslClient _client;
         public RegisterWindow(SslClient client)

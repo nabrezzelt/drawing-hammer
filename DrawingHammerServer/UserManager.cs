@@ -132,29 +132,29 @@ namespace DrawingHammerServer
             DbManager.BindValue("@password", passwordHash);
             DbManager.ExecutePreparedInsertUpdateDelete();
 
-            int userID = DbManager.GetLastID();
+            int userId = DbManager.GetLastID();
 
             query = "INSERT INTO user_salt (userID, salt) VALUES " +
-                    "(" + userID + ", '" + salt + "')";
+                    "(" + userId + ", '" + salt + "')";
             DbManager.InsertUpdateDelete(query);
 
-            return userID;
+            return userId;
         }
 
-        public static void ResetPassword(int userID, string password)
+        public static void ResetPassword(int userId, string password)
         {
-            string salt = GetUserSalt(userID);
+            string salt = GetUserSalt(userId);
             string passwordHash = HashManager.HashSha256(password + salt);
 
             string query = "UPDATE users " +
                            "SET password = '" + passwordHash + "' " +
-                           "WHERE id = " + userID;
+                           "WHERE id = " + userId;
             DbManager.InsertUpdateDelete(query);
         }
 
-        public static void DeleteUser(int userID)
+        public static void DeleteUser(int userId)
         {
-            string query = "DELETE FROM users WHERE id = " + userID;
+            string query = "DELETE FROM users WHERE id = " + userId;
             DbManager.InsertUpdateDelete(query);
         }
 

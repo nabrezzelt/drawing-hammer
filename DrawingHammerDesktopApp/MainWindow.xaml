@@ -175,6 +175,8 @@
                         <DataTemplate>
                             <StackPanel>
                                 <TextBlock FontWeight="Bold" Text="{Binding PlayerName}">Nabrezzelt:</TextBlock>
+                                
+                                <!-- ToDo: Chech that shit -->
                                 <TextBlock Foreground="{DynamicResource PrimaryHueLightBrush}"
                                            Text="{Binding PlayerName, StringFormat=' {0} has guessed the word!'}">
                                     <TextBlock.Style>
@@ -204,6 +206,7 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
+                                
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>
