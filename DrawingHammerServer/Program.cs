@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 
 namespace DrawingHammerServer
 {
@@ -311,6 +312,13 @@ namespace DrawingHammerServer
                 }
 
                 match.CalculateAndRaiseScore(packet.SenderUid);
+
+
+                //Check if all players (exept the drawing player) have guessed the word and stop this subround!
+                if (match.EveryPlayerGuessedTheWord())
+                {
+                    match.StopSubRoundTimer();
+                }
             }
             else
             {
@@ -362,6 +370,9 @@ namespace DrawingHammerServer
                 match.PickedWords.Add(word);
 
                 _server.Router.DistributePacket(new WordToDrawPacket(word, Router.ServerWildcard, preparingPlayer.Uid));
+
+                match.StopPreparationTimer();
+                Log.Debug("PreparationTimer should be stopped now!");
             }            
         }
 

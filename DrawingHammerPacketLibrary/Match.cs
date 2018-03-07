@@ -304,5 +304,15 @@ namespace DrawingHammerPacketLibrary
 
             return null;
         }
+
+        public bool EveryPlayerGuessedTheWord()
+        {
+            foreach (var player in Players)
+            {
+                if (!player.HasGuessed && player.Status != PlayerStatus.Drawing) return false;
+            }
+
+            return true;
+        }
     }
 }

@@ -83,9 +83,9 @@
         </materialDesign:Chip>
         <Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="210" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="175" />
+                <ColumnDefinition Width="220" />
             </Grid.ColumnDefinitions>
             <ListView Grid.Column="0" ItemsSource="{Binding Players}">
                 <ListView.ItemTemplate>
@@ -192,7 +192,7 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
-                                <TextBlock Text="{Binding GuessMessage}">
+                                <TextBlock Text="{Binding GuessMessage}" Margin="4,0,0,0">
                                     <TextBlock.Style>
                                         <Style>
                                             <Style.Triggers>
