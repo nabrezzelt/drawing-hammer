@@ -6,11 +6,11 @@ namespace DrawingHammerPacketLibrary
     [Serializable]
     public class Player : ViewModelBase
     {
-        public int Id { get; set; }
+        public int Id { get; }
 
-        public string Uid { get; set; }
+        public string Uid { get; }
 
-        public string Username { get; set; }
+        public string Username { get; }
 
         public int Score { get; set; }
 

@@ -6,7 +6,7 @@ namespace DrawingHammerPacketLibrary
     [Serializable]
     public class JoinMatchPacket : BasePacket
     {
-        public string MatchUid { get; set; }
+        public string MatchUid { get; }
 
         public JoinMatchPacket(string matchUid, string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {

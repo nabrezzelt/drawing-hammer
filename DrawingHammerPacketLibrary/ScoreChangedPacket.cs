@@ -7,9 +7,9 @@ namespace DrawingHammerPacketLibrary
     [ToString]
     public class ScoreChangedPacket : BasePacket
     {
-        public string PlayerUid { get; set; }
+        public string PlayerUid { get; }
 
-        public int RaisedScore { get; set; }
+        public int RaisedScore { get; }
 
         public ScoreChangedPacket(string playerUid, int raisedScore, string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {

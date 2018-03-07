@@ -165,7 +165,7 @@
 
                 </materialDesign:DialogHost>
             </Grid>
-            <Grid Grid.Column="2" IsEnabled="{Binding CanGuess}">
+            <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
@@ -213,6 +213,7 @@
                 </ListView>
                 <TextBox Grid.Row="1"
                          Margin="5"
+                         IsEnabled="{Binding CanGuess}"
                          x:Name="TextBoxGuess"
                          materialDesign:HintAssist.Hint="Your Guess"
                          KeyDown="TextBoxGuess_OnKeyDown"/>

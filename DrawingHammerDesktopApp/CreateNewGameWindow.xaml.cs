@@ -43,7 +43,10 @@ namespace DrawingHammerDesktopApp
 
         private void OnConnectionLost(object sender, EventArgs e)
         {
-            StatusSnackbar.MessageQueue.Enqueue("Connection lost!");
+            InvokeGui(() =>
+            {
+                StatusSnackbar.MessageQueue.Enqueue("Connection lost!");
+            });            
         }
 
         private void CheckToEnableCreateButton(object sender, TextChangedEventArgs e)

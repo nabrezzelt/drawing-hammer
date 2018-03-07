@@ -6,7 +6,7 @@ namespace DrawingHammerPacketLibrary
     [Serializable]
     public class WordToDrawPacket : BasePacket
     {
-        public Word WordToDraw { get; set; }
+        public Word WordToDraw { get; }
 
         public WordToDrawPacket(Word wordToDraw, string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {

@@ -7,7 +7,7 @@ namespace DrawingHammerPacketLibrary
     [ToString]
     public class WordGuessCorrectPacket : BasePacket
     {
-        public string PlayerUid { get; set; }                
+        public string PlayerUid { get; }                
 
         public WordGuessCorrectPacket(string playerUid, string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {

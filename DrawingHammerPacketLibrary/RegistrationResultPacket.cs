@@ -7,7 +7,7 @@ namespace DrawingHammerPacketLibrary
     [Serializable]
     public class RegistrationResultPacket : BasePacket
     {
-        public readonly RegistrationResult Result;
+        public RegistrationResult Result { get; }
         
         public RegistrationResultPacket(RegistrationResult result, string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {

@@ -6,9 +6,9 @@ namespace DrawingHammerPacketLibrary
     [Serializable]
     public class DrawingAreaChangedPacket : BasePacket
     {
-        public byte[] Strokes { get; set; }
+        public byte[] Strokes { get; }
 
-        public string MatchUid { get; set; }
+        public string MatchUid { get; }
 
         public DrawingAreaChangedPacket(byte[] strokes, string matchUid, string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {

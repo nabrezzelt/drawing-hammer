@@ -132,9 +132,13 @@ namespace DrawingHammerDesktopApp
             {
                 foreach (var player in _viewModel.Players)
                 {
+                    Log.Debug($"Iterating-Player-Uid: {player.Uid}, Status: {player.Status}");
+                    Log.Debug($"My-Player-Uid:        {App.Uid}");
+
                     //I have to draw
-                    if (player.Status == PlayerStatus.Drawing && player.Uid == App.Uid)
+                    if ((player.Status == PlayerStatus.Preparing || player.Status == PlayerStatus.Drawing) && player.Uid == App.Uid)
                     {
+                        Log.Debug("I have to draw! Enable 'CanDraw', disable 'CanGuess'");
                         _viewModel.CanDraw = true;
                         _viewModel.CanGuess = false;
                         return;
@@ -143,6 +147,7 @@ namespace DrawingHammerDesktopApp
 
                 _viewModel.CanDraw = false;
                 _viewModel.CanGuess = true;
+                Log.Debug("Someone else is drawing! Disable 'CanDraw', enable 'CanGuess'");
             });            
         }
 
@@ -150,7 +155,7 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                Log.Info($"Score changed: {packet}");
+                Log.Debug($"Score changed: {packet}");
                 var player = GetPlayerByUid(packet.PlayerUid);
 
                 if (player != null)
@@ -169,13 +174,25 @@ namespace DrawingHammerDesktopApp
             });
         }
 
+        private void ClearDrawingAreaAndWord()
+        {
+            InvokeGui(() =>
+            {
+                DrawingArea.Strokes.Clear();
+                _viewModel.WordToDraw = null;
+            });
+        }
+
         private void ResetCorrectGuessesInPlayerList()
         {
             InvokeGui(() =>
             {
                 foreach (var player in _viewModel.Players)
                 {
-                    player.HasGuessed = false;
+                    if (player.HasGuessed)
+                    {
+                        player.HasGuessed = false;
+                    }                    
                 }
             });
         }
@@ -189,11 +206,17 @@ namespace DrawingHammerDesktopApp
                 if (player != null)
                 {
                     _viewModel.Guesses.Add(new Guess(player.Username, String.Empty, true));
-                    Log.Info($"Guess correct - Packet: {packet} - Username-by-Match: {player.Username}");                    
+                    Log.Debug($"Guess correct - Packet: {packet} - Username-by-Match: {player.Username}");                    
                     player.HasGuessed = true;
 
                     ScrollGuessListToLastItem();
-                }                
+                }
+
+                if (packet.PlayerUid == App.Uid)
+                {
+                    //Disable GuessingArea
+                    _viewModel.CanGuess = false;
+                }
             });                     
         }
 
@@ -206,7 +229,7 @@ namespace DrawingHammerDesktopApp
                 if (player != null)
                 {
                     _viewModel.Guesses.Add(new Guess(player.Username, packet.GuessedWord, false));                    
-                    Log.Info($"Other user guessed a word: {packet}");
+                    Log.Debug($"Other user guessed a word: {packet}");
 
                     ScrollGuessListToLastItem();
                 }
@@ -219,17 +242,7 @@ namespace DrawingHammerDesktopApp
             {
                 DrawingArea.Strokes = new StrokeCollection(new MemoryStream(packet.Strokes));
             });            
-        }
-
-        private void ClearDrawingAreaAndWord()
-        {
-            InvokeGui(() =>
-            {
-                DrawingArea.Strokes.Clear();
-                _viewModel.WordToDraw = null;
-                _viewModel.CanDraw = false;
-            });
-        }
+        }       
 
         private void HandleOnWordPicked(WordToDrawPacket packet)
         {
@@ -263,13 +276,7 @@ namespace DrawingHammerDesktopApp
                     if (player.Status == PlayerStatus.Preparing)
                     {
                         player.Status = PlayerStatus.Drawing;                        
-                    }
-
-                    if (player.Uid == App.Uid)
-                    {
-                        //I have to draw
-                        _viewModel.CanDraw = true;
-                    }                    
+                    }                  
                 }
             });
         }
@@ -287,7 +294,7 @@ namespace DrawingHammerDesktopApp
                         if (player.Uid == App.Uid)
                         {
                             //I have drawed
-                            _viewModel.CanDraw = false;                            
+                            //_viewModel.CanDraw = false;                            
                         }
                     }
                 }
@@ -361,6 +368,19 @@ namespace DrawingHammerDesktopApp
                 _viewModel.RemainingTime = packet.MatchData.RemainingTime;
                 _viewModel.RoundLength = packet.MatchData.RoundLength;
                 _viewModel.Players = packet.MatchData.Players;
+
+                if(packet.MatchData.Strokes != null)
+                    DrawingArea.Strokes = new StrokeCollection(new MemoryStream(packet.MatchData.Strokes));
+
+                foreach (var player in _viewModel.Players)
+                {
+                    if (player.Status == PlayerStatus.Drawing)
+                    {
+                        //If any players of the match is drawing, enable Guessing.
+                        _viewModel.CanGuess = true;
+                        return;                        
+                    }
+                }
             });
         }
 
@@ -464,7 +484,7 @@ namespace DrawingHammerDesktopApp
         private void ScrollGuessListToLastItem()
         {
             if(_viewModel.Guesses.Count > 0)
-                ListViewGuesses.ScrollIntoView(ListViewGuesses.Items[ListViewGuesses.Items.Count-1]);
+                ListViewGuesses.ScrollIntoView(ListViewGuesses.Items[ListViewGuesses.Items.Count-1]);            
         }
     }
 }

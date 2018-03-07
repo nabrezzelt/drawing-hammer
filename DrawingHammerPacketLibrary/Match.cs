@@ -21,6 +21,7 @@ namespace DrawingHammerPacketLibrary
 
         private const double DrawerScoreAdditionPercentage = 0.3;
 
+        public bool IsRunning { get; private set; }
 
         public event EventHandler<PreparationTimerStartedEventArgs> PreparationTimeStarted;
 
@@ -40,23 +41,23 @@ namespace DrawingHammerPacketLibrary
 
         public event EventHandler<ScoreChangedEventArgs> ScoreChanged;
 
-        public string MatchUid { get; set; }
+        public string MatchUid { get; }
 
         public int CreatorId { get; set; }
 
-        public string Title { get; set; }
+        public string Title { get; }
 
-        public int Rounds { get; set; }
+        public int Rounds { get; }
 
-        public int MaxPlayers { get; set; }
+        public int MaxPlayers { get; }
 
-        public int RoundLength { get; set; }
+        public int RoundLength { get; }
 
-        public ObservableCollection<Player> Players { get; set; }
+        public ObservableCollection<Player> Players { get; }
 
-        public List<Player> PlayedPlayers { get; set; }
+        public List<Player> PlayedPlayers { get; }
 
-        public ObservableCollection<Word> PickedWords { get; set; }
+        public ObservableCollection<Word> PickedWords { get; }
 
         /// <summary>
         /// Stores the 3 random words witch the player should pick
@@ -65,9 +66,11 @@ namespace DrawingHammerPacketLibrary
 
         public Word WordToDraw { get; set; }
 
-        public int RemainingTime { get; set; }
+        public int RemainingTime { get; private set; }
 
-        public int CurrentRound { get; set; }
+        public int CurrentRound { get; private set; }
+
+        public byte[] Strokes { get; set; }
 
         private readonly Timer _preparationTimer;
 
@@ -96,22 +99,16 @@ namespace DrawingHammerPacketLibrary
 
             _subRoundTimer = new Timer(1000);
             _subRoundTimer.Elapsed += SubRoundTimerTicked;
-            
-            PreparationTimeFinished += MatchPreparationTimeFinished;
+
+            PreparationTimeFinished += Match_PreparationTimeFinished;
             SubRoundFinished += Match_SubRoundFinished;
-
-            SubRoundStarted += OnSubRoundStarted;
         }
-
-        private void OnSubRoundStarted(object sender, EventArgs eventArgs)
-        {
-            ShowPlayerStatus();
-        }
-
 
         private void Match_SubRoundFinished(object sender, EventArgs e)
         {
+            WordToDraw = null;
             RemainingTime = RoundLength;
+            ResetHasGuessed();
 
             var player = GetCurrentlyDrawingPlayer();
             player.Status = PlayerStatus.Guessing;
@@ -123,23 +120,24 @@ namespace DrawingHammerPacketLibrary
                 //Runde Beendet
                 PlayedPlayers.Clear();
                 RoundFinished?.Invoke(this, EventArgs.Empty);
-                
+
                 if (CurrentRound == Rounds)
                 {
+                    IsRunning = false;
                     MatchFinished?.Invoke(this, EventArgs.Empty);
-                    return;                    
+                    return;
                 }
 
                 CurrentRound++;
 
                 RoundStarted?.Invoke(this, new RoundStartedEventArgs(CurrentRound));
             }
-            
+
             player = GetPlayerWhoHasNotPlayed();
-            StartPreparationTimer(player);                     
+            StartPreparationTimer(player);
         }
 
-        private void MatchPreparationTimeFinished(object sender, EventArgs e)
+        private void Match_PreparationTimeFinished(object sender, EventArgs e)
         {
             _currentPreparationTime = PreparationTime;
 
@@ -203,7 +201,7 @@ namespace DrawingHammerPacketLibrary
 
             if (_currentPreparationTime <= 0)
             {
-               StopPreparationTimer();
+                StopPreparationTimer();
             }
         }
 
@@ -215,71 +213,62 @@ namespace DrawingHammerPacketLibrary
 
         public void StartMatch()
         {
-            var player = GetPlayerWhoHasNotPlayed();
+            if (!IsRunning)
+            {
+                IsRunning = true;
+                var player = GetPlayerWhoHasNotPlayed();
 
-            MatchStarted?.Invoke(this, EventArgs.Empty);
-            RoundStarted?.Invoke(this, new RoundStartedEventArgs(CurrentRound));
+                MatchStarted?.Invoke(this, EventArgs.Empty);
+                RoundStarted?.Invoke(this, new RoundStartedEventArgs(CurrentRound));
 
-            StartPreparationTimer(player);
+                StartPreparationTimer(player);
+            }
         }
 
         private void StartPreparationTimer(Player player)
         {
             player.Status = PlayerStatus.Preparing;
 
-            PreparationTimeStarted?.Invoke(this, new PreparationTimerStartedEventArgs(player));            
+            PreparationTimeStarted?.Invoke(this, new PreparationTimerStartedEventArgs(player));
             _preparationTimer.Start();
         }
 
-        public string ShowPlayerStatus()
-        {
-            var statusResult = string.Empty;
-
-            foreach (var player in Players)
-            {
-                statusResult += $"[{player.Username}] {player.Status} \n";                
-            }
-
-            return statusResult;
-        }
-
-        public Word GetRandomWord()
+        public Word GetRandomWordFromPreselectedWords()
         {
             Random random = new Random();
-            
+
             int randomIndex = random.Next(RandomWordsToPick.Count);
 
-            return RandomWordsToPick[randomIndex];            
+            return RandomWordsToPick[randomIndex];
         }
 
         public void CalculateAndRaiseScore(string playerUid)
         {
             var successfulPlayers = GetSuccessfulGuessedPlayerCount();
-
-            var score = (Players.Count - 1 - successfulPlayers) * ScoreMultiplicator;
-            //score = 2 - 1 - 0 * 100;
-            Log.Info($"Calculated: ({Players.Count} - 1 - {successfulPlayers}) * {ScoreMultiplicator} = {score}");
             var player = Players.FirstOrDefault(p => p.Uid == playerUid);
 
-            if (player != null)
+            if (player != null && !player.HasGuessed)
             {
+                var score = (Players.Count - 1 - successfulPlayers) * ScoreMultiplicator;
+                //score = 2 - 1 - 0 * 100;
+                Log.Debug($"Calculated: ({Players.Count} - 1 - {successfulPlayers}) * {ScoreMultiplicator} = {score}");
+
                 player.Score += score;
                 player.HasGuessed = true;
                 ScoreChanged?.Invoke(this, new ScoreChangedEventArgs(player, score));
-            }
+                //Raise score for drawing player            
 
-            //Raise score for drawing player            
+                var drawingPlayer = GetCurrentlyDrawingPlayer();
 
-            var drawingPlayer = GetCurrentlyDrawingPlayer();
+                if (drawingPlayer != null)
+                {
+                    var drawingPlayerScore = (int)(score * DrawerScoreAdditionPercentage);
+                    Log.Debug($"Drawing-Score: {drawingPlayerScore}");
+                    drawingPlayer.Score += drawingPlayerScore;
 
-            if (drawingPlayer != null)
-            {
-                var drawingPlayerScore = (int)(score * DrawerScoreAdditionPercentage);
-                Log.Info($"Drawing-Score: {drawingPlayerScore}");
-                drawingPlayer.Score += drawingPlayerScore;
-
-                ScoreChanged?.Invoke(this, new ScoreChangedEventArgs(drawingPlayer, drawingPlayerScore));
-            }            
+                    ScoreChanged?.Invoke(this, new ScoreChangedEventArgs(drawingPlayer, drawingPlayerScore));
+                }
+            }                                    
         }
 
         private int GetSuccessfulGuessedPlayerCount()
@@ -303,82 +292,6 @@ namespace DrawingHammerPacketLibrary
             }
         }
 
-        //private void MatchPreparationTimeFinished(object sender, EventArgs e)
-        //{
-        //    foreach (var player in Players)
-        //    {
-        //        if (player.Status == PlayerStatus.Preparing)
-        //        {
-        //            player.Status = PlayerStatus.Drawing;
-        //        }
-        //    }
-        //    StartSubRound();
-        //}
-
-        //private void Match_SubRoundFinished(object sender, EventArgs e)
-        //{
-        //    foreach (var player in Players)
-        //    {
-        //        if (player.Status == PlayerStatus.Drawing)
-        //        {
-        //            player.Status = PlayerStatus.Guessing;
-        //        }
-        //    }
-
-        //    StartRound();            
-        //}
-
-        //public void StartMatch()
-        //{
-        //    MatchStarted?.Invoke(this, EventArgs.Empty);
-
-        //    _firstRound = true;
-        //    StartRound();
-        //}
-
-        //public void StartRound()
-        //{
-        //    if (_firstRound)
-        //    {
-        //        RoundStarted?.Invoke(this, new RoundStartedEventArgs(CurrentRound));
-        //        Log.Warn(DateTime.Now + " Round started");
-        //        Log.Warn(this.ShowPlayerStatus());
-        //        _firstRound = false;
-        //    }
-
-        //    if (CurrentRound < Rounds + 1)
-        //    {
-        //        if (PlayedPlayers.Count < Players.Count)
-        //        {
-        //            var playerToPlay = GetPlayerWhoHasNotPlayed();
-        //            //ToDo: Notifiy "playerToPlay" to draw a word.
-        //            Log.Warn($"Player should be play now: {playerToPlay.Username}");
-        //            PlayedPlayers.Add(playerToPlay);                    
-        //            StartPreparationTimer(playerToPlay);
-        //            Log.Warn(this.ShowPlayerStatus());
-        //        }
-        //        else
-        //        {
-        //            RoundFinished?.Invoke(this, EventArgs.Empty); //Roundennummer mit an client/Event senden.
-        //            Log.Warn(DateTime.Now + " Round finished");                    
-        //            PlayedPlayers.Clear();
-        //            CurrentRound++;
-
-        //            if (CurrentRound <= Rounds)
-        //            {
-        //                RoundStarted?.Invoke(this, new RoundStartedEventArgs(CurrentRound));
-        //                Log.Warn(DateTime.Now + " Round started");                        
-        //                StartRound();
-        //            }
-        //            else
-        //            {
-        //                MatchFinished?.Invoke(this, EventArgs.Empty);
-        //                Log.Warn(DateTime.Now + " Match finished");                        
-        //            }
-        //        }
-        //    }
-        //}
-
         private Player GetPlayerWhoHasNotPlayed()
         {
             foreach (var player in Players)
@@ -390,6 +303,6 @@ namespace DrawingHammerPacketLibrary
             }
 
             return null;
-        }            
+        }
     }
 }
