@@ -6,8 +6,7 @@ namespace DrawingHammerDesktopApp.ViewModel
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        public string MyUsername { get; set; }
-        public string MatchTitle { get; set; }
+        public string MyUsername { get; set; }        
         public string MatchUid {get; set;}
         public int CurrentRound { get; set; }
         public int Rounds { get; set; }
@@ -15,10 +14,21 @@ namespace DrawingHammerDesktopApp.ViewModel
         public int RoundLength { get; set;  }
         public ObservableCollection<Player> Players { get; set; }
 
+        public bool CanDraw { get; set; }
+
+        public bool CanGuess { get; set; }
+
+        public Word WordToDraw { get; set; }
+
+        public ObservableCollection<Word> Words { get; set; }
+
+        public ObservableCollection<Guess> Guesses { get; set; }
+
         private readonly Timer _roundTimer;
 
         public MainWindowViewModel()
         {
+            Guesses = new ObservableCollection<Guess>();
             Players = new ObservableCollection<Player>();
 
             _roundTimer = new Timer(1000);

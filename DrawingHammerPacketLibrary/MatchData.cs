@@ -6,23 +6,25 @@ namespace DrawingHammerPacketLibrary
     [Serializable]
     public class MatchData : ViewModelBase
     {
-        public string MatchUid { get; set; }
+        public string MatchUid { get; }
 
-        public int CreatorId { get; set; }
+        public int CreatorId { get; }
 
-        public string Title { get; set; }
+        public string Title { get; }
 
-        public int Rounds { get; set; }
+        public int Rounds { get; }
 
-        public int MaxPlayers { get; set; }
+        public int MaxPlayers { get; }
 
-        public int RoundLength { get; set; }
+        public int RoundLength { get; }
 
-        public ObservableCollection<Player> Players { get; set; }
+        public ObservableCollection<Player> Players { get; }
 
-        public int RemainingTime { get; set; }
+        public int RemainingTime { get; }
 
-        public int CurrentRound { get; set; }
+        public int CurrentRound { get; }
+
+        public byte[] Strokes { get; }
 
         public MatchData(Match match)
         {
@@ -37,6 +39,8 @@ namespace DrawingHammerPacketLibrary
             Players = match.Players;
             RemainingTime = match.RemainingTime;
             CurrentRound = match.CurrentRound;
+
+            Strokes = match.Strokes;
         }
         
         public MatchData(string title, int rounds, int maxPlayers, int roundLength)
@@ -50,21 +54,7 @@ namespace DrawingHammerPacketLibrary
 
             Players = new ObservableCollection<Player>();
             RemainingTime = RoundLength;
-            CurrentRound = 1;            
-        }
-
-        public MatchData(string title, int creatorId, int rounds, int maxPlayers, int roundLength, ObservableCollection<Player> players, int remainingTime, int currentRound)
-        {
-            MatchUid = "";
-            CreatorId = creatorId;
-            Title = title;
-            Rounds = rounds;
-            MaxPlayers = maxPlayers;
-            RoundLength = roundLength;
-
-            Players = players;
-            RemainingTime = remainingTime;
-            CurrentRound = currentRound;
+            CurrentRound = 1;                             
         }
     }
 }

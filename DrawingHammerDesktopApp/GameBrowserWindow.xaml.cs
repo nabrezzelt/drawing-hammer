@@ -15,7 +15,7 @@ namespace DrawingHammerDesktopApp
     /// <summary>
     /// Interaktionslogik für GameBrowserWindow.xaml
     /// </summary>
-    public partial class GameBrowserWindow : Window
+    public partial class GameBrowserWindow
     {
         private readonly MainWindow _mainWindow;
         private readonly SslClient _client;

@@ -7,7 +7,7 @@ namespace DrawingHammerPacketLibrary
     [Serializable]
     public class GameListPacket : BasePacket
     {
-        public ObservableCollection<MatchData> Matches; 
+        public ObservableCollection<MatchData> Matches { get; }
 
         public GameListPacket(ObservableCollection<MatchData> matches, string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {

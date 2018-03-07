@@ -11,10 +11,11 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 
 namespace DrawingHammerServer
 {
-    class Program
+    internal static class Program
     {       
         private const string SettingsPath = "settings.ini";
         private const string CertificatePath = "certificate.pfx";
@@ -26,6 +27,7 @@ namespace DrawingHammerServer
 
         private static ObservableCollection<Match> _matches;
 
+        // ReSharper disable once UnusedParameter.Local
         private static void Main(string[] args)
         {
             _settingsManager = new SettingsManager(SettingsPath);
@@ -78,7 +80,7 @@ namespace DrawingHammerServer
                 switch (input)
                 {
                     #region lookup account
-                    case var command when command.StartsWith("lookup account "):
+                    case var command when command != null && command.StartsWith("lookup account "):
                         if (args.Length != 3)
                         {
                             Log.Info("Paramenters are missing!");
@@ -92,6 +94,7 @@ namespace DrawingHammerServer
                         filteredUsers.ForEach(u => Log.Info(u.Id + " " + u.Username + ", IsBanned:" + (u.IsBanned ? "True" : "False")));
                         break;
                     #endregion
+
                     #region account list
                     case var command when command == "account list":
                         var users = UserManager.GetUsers();
@@ -101,8 +104,10 @@ namespace DrawingHammerServer
                         users.ForEach(u => Log.Info(u.Id + " " + u.Username + ", IsBanned:" + (u.IsBanned ? "True" : "False")));                        
                         break;
                     #endregion
+
                     #region account delete                    
                     case var command when command.StartsWith("account delete "):
+                        // ReSharper disable once PossibleNullReferenceException
                         if (args.Length != 3)
                         {
                             Log.Info("Paramenter is missing!");
@@ -122,8 +127,10 @@ namespace DrawingHammerServer
                         }
                         break;
                     #endregion
+
                     #region account create
                     case var command when command.StartsWith("account create "):                        
+                        // ReSharper disable once PossibleNullReferenceException
                         if (args.Length != 4)
                         {
                             Log.Info("Paramenters are missing!");
@@ -153,9 +160,11 @@ namespace DrawingHammerServer
                         }
                         break;
                     #endregion
+
                     #region account reset password
                     case var command when command.StartsWith("account reset password "):
                     
+                        // ReSharper disable once PossibleNullReferenceException
                         if (args.Length != 5)
                         {
                             Log.Info("Paramenters are missing!");
@@ -178,6 +187,7 @@ namespace DrawingHammerServer
                         break;                    
 
                     #endregion
+
                     #region match list
                     case var command when command.StartsWith("match list"):
                         Log.Info("Found " + _matches.Count + " matches:");
@@ -186,15 +196,7 @@ namespace DrawingHammerServer
                             Log.Info(match.Title);
                         }
                         break;
-                    #endregion
-                    #region match player status
-                    case var command when command.StartsWith("match player status"):                        
-                        foreach (var match in _matches)
-                        {
-                            Log.Info(match.ShowPlayerStatus());
-                        }
-                        break;
-                    #endregion
+                    #endregion                    
 
                     #region help                        
                     case var command when command == "help" || command == "h":
@@ -207,8 +209,9 @@ namespace DrawingHammerServer
                         Log.Info("account delete [username]                        | Delete a existing account");                        
                         Log.Info("account create [username] [password]             | Create a new account");
                         Log.Info("account reset password [username] [new_password] | Reset the password of a account");
+                        Log.Info("match list                                       | Shows currently running matches");
                         Log.Info("exit                                             | Shutdown the server");
-                        Log.Info("help|h                                           | Shows this helptext");
+                        Log.Info("help | h                                         | Shows this helptext");
                         break;
                     #endregion
 
@@ -260,32 +263,120 @@ namespace DrawingHammerServer
             switch (packet)
             {
                 case AuthenticationPacket p:
-                    HandleOnAuthenticationRequest(p, e.SenderTcpClient);
+                    HandleOnAuthenticationPacket(p, e.SenderTcpClient);
                     break;
 
                 case RegistrationPacket p:
-                    HandleOnRegistrationRequest(p, e.SenderTcpClient);
+                    HandleOnRegistrationPacket(p, e.SenderTcpClient);
                     break;
 
                 case RequestGamelistPacket p:
-                    HandleOnGamelistRequest(p);
+                    HandleOnRequestGamelistPacket(p);
                     break;
 
                 case CreateMatchPacket p:
-                    HandleCreateMatchPacket(p);
+                    HandleOnCreateMatchPacket(p);
                     break;
 
                 case JoinMatchPacket p:
-                    HandleOnMatchJoin(p);                    
+                    HandleOnJoinMatchPacket(p);                    
                     break;
 
                 case RequestMatchDataPacket p:
-                    HandleMatchDataRequest(p);
+                    HandleOnRequestMatchDataPacket(p);
+                    break;
+
+                case PickedWordPacket p:
+                    HandleOnPickedWordPacket(p);
+                    break;
+
+                case DrawingAreaChangedPacket p:
+                    HandleOnDrawingAreaChangedPacket(p);
+                    break;
+
+                case WordGuessPacket p:
+                    HandleOnWordGuessPacket(p);
                     break;
             }
         }
 
-        private static void HandleMatchDataRequest(RequestMatchDataPacket packet)
+        private static void HandleOnWordGuessPacket(WordGuessPacket packet)
+        {
+            var match = GetMatchByUid(packet.MatchUid);
+
+            if (String.Equals(match.WordToDraw.Value, packet.GuessedWord, StringComparison.InvariantCultureIgnoreCase))
+            {
+                foreach (var matchPlayer in match.Players)
+                {
+                    _server.Router.DistributePacket(new WordGuessCorrectPacket(packet.SenderUid, Router.ServerWildcard, matchPlayer.Uid));
+                }
+
+                match.CalculateAndRaiseScore(packet.SenderUid);
+
+
+                //Check if all players (exept the drawing player) have guessed the word and stop this subround!
+                if (match.EveryPlayerGuessedTheWord())
+                {
+                    match.StopSubRoundTimer();
+                }
+            }
+            else
+            {
+                foreach (var matchPlayer in match.Players)
+                {
+                    _server.Router.DistributePacket(new WordGuessPacket(packet.GuessedWord, match.MatchUid, packet.PlayerUid, Router.ServerWildcard, matchPlayer.Uid));
+                }
+            }
+        }
+
+        private static void HandleOnDrawingAreaChangedPacket(DrawingAreaChangedPacket packet)
+        {
+            var match = GetMatchByUid(packet.MatchUid);
+
+            match.Strokes = packet.Strokes;
+
+            foreach (var player in match.Players)
+            {
+                if (player.Uid != packet.SenderUid)
+                {
+                    _server.Router.DistributePacket(new DrawingAreaChangedPacket(packet.Strokes, match.MatchUid, Router.ServerWildcard, player.Uid));
+                }
+            }
+        }
+
+        private static void HandleOnPickedWordPacket(PickedWordPacket packet)
+        {
+            var match = GetMatchByUid(packet.MatchUid);
+            var preparingPlayer = match.GetCurrentlyPreparingPlayer();
+
+            if (preparingPlayer != null)
+            {
+                Word word = null;
+
+                foreach (var randomWord in match.RandomWordsToPick)
+                {
+                    if (randomWord.Id == packet.PickedWord.Id)
+                    {
+                        word = packet.PickedWord;
+                    }
+                }
+
+                if (word == null)
+                {
+                    word = match.GetRandomWordFromPreselectedWords();
+                }
+
+                match.WordToDraw = word;
+                match.PickedWords.Add(word);
+
+                _server.Router.DistributePacket(new WordToDrawPacket(word, Router.ServerWildcard, preparingPlayer.Uid));
+
+                match.StopPreparationTimer();
+                Log.Debug("PreparationTimer should be stopped now!");
+            }            
+        }
+
+        private static void HandleOnRequestMatchDataPacket(RequestMatchDataPacket packet)
         {
             var match = GetMatchByUid(packet.MatchUid);
             DrawingHammerClientData client = (DrawingHammerClientData)_server.GetClientByUid(packet.SenderUid);
@@ -293,7 +384,7 @@ namespace DrawingHammerServer
             client.SendDataPacketToClient(new MatchDataPacket(new MatchData(match), Router.ServerWildcard, client.Uid));
         }
 
-        private static void HandleOnMatchJoin(JoinMatchPacket packet)
+        private static void HandleOnJoinMatchPacket(JoinMatchPacket packet)
         {
             Match match = GetMatchByUid(packet.MatchUid);
             DrawingHammerClientData client = (DrawingHammerClientData) _server.GetClientByUid(packet.SenderUid);
@@ -301,8 +392,7 @@ namespace DrawingHammerServer
             if (match.Players.Count < match.MaxPlayers)
             {               
                 Player player = new Player(client.User.Id, client.Uid, client.User.Username, 0);
-                match.Players.Add(player);
-                match.ShowPlayerStatus();
+                match.Players.Add(player);                
 
                 _server.Router.DistributePacket(new PlayerJoinedMatchPacket(                    
                     match.MatchUid,
@@ -312,7 +402,7 @@ namespace DrawingHammerServer
 
                 if (match.Players.Count > 1)
                 {
-                    StartMatch(match);
+                    match.StartMatch();
                 }                
             }
             else
@@ -321,7 +411,7 @@ namespace DrawingHammerServer
             }            
         }        
 
-        private static void HandleCreateMatchPacket(CreateMatchPacket packet)
+        private static void HandleOnCreateMatchPacket(CreateMatchPacket packet)
         {
             var client = (DrawingHammerClientData) _server.GetClientByUid(packet.SenderUid);
 
@@ -331,13 +421,14 @@ namespace DrawingHammerServer
                     CreatorId = client.User.Id
                 };
 
-            match.PreparationTimeStarted += MatchPreparationTimeStarted;
-            match.PreparationTimeFinished += MatchPreparationTimeFinished;
+            match.PreparationTimeStarted += Match_PreparationTimeStarted;
+            match.PreparationTimeFinished += Match_PreparationTimeFinished;
             match.SubRoundStarted += Match_SubRoundStarted;
             match.SubRoundFinished += Match_SubRoundFinished;
             match.RoundStarted += Match_RoundStarted;
             match.RoundFinished += Match_RoundFinished;            
             match.MatchFinished += Match_MatchFinished;
+            match.ScoreChanged += Match_ScoreChanged;
 
 
             _matches.Add(match);
@@ -350,6 +441,16 @@ namespace DrawingHammerServer
             client.SendDataPacketToClient(new MatchCreatedPacket(Router.ServerWildcard, client.Uid));
         }
 
+        private static void Match_ScoreChanged(object sender, ScoreChangedEventArgs e)
+        {
+            var match = (Match) sender;
+
+            foreach (var matchPlayer in match.Players)
+            {
+                _server.Router.DistributePacket(new ScoreChangedPacket(e.Player.Uid, e.RaisedScore, Router.ServerWildcard, matchPlayer.Uid));
+            }            
+        }
+
         private static void Match_RoundStarted(object sender, RoundStartedEventArgs e)
         {
             var match = (Match)sender;
@@ -360,9 +461,21 @@ namespace DrawingHammerServer
             }
         }
 
-        private static void MatchPreparationTimeStarted(object sender, PreparationTimerStartedEventArgs e)
+        private static void Match_PreparationTimeStarted(object sender, PreparationTimerStartedEventArgs e)
         {
-            var match = (Match)sender;
+            var match = (Match) sender;
+
+            var words = WordManager.GetWord(match.PickedWords);
+
+            if (words.Count < 3)
+            {
+                match.PickedWords.Clear();
+            }
+
+            words = WordManager.GetWord(match.PickedWords);
+            match.RandomWordsToPick = new ObservableCollection<Word>(words);            
+
+            _server.Router.DistributePacket(new PickWordsPacket(words, Router.ServerWildcard, e.Player.Uid));
 
             foreach (Player player in match.Players)
             {
@@ -382,7 +495,7 @@ namespace DrawingHammerServer
 
         private static void Match_SubRoundFinished(object sender, EventArgs e)
         {
-            var match = (Match)sender;
+            var match = (Match)sender;            
 
             foreach (Player player in match.Players)
             {
@@ -400,9 +513,18 @@ namespace DrawingHammerServer
             }
         }
 
-        private static void MatchPreparationTimeFinished(object sender, EventArgs e)
+        private static void Match_PreparationTimeFinished(object sender, PreparationTimeFinishedEventArgs e)
         {
             var match = (Match) sender;
+
+            if (match.WordToDraw == null)
+            {
+                var randomWord = match.GetRandomWordFromPreselectedWords();
+                match.PickedWords.Add(randomWord);
+                match.WordToDraw = randomWord;
+
+                _server.Router.DistributePacket(new WordToDrawPacket(randomWord, Router.ServerWildcard, e.PreparingPlayer.Uid));
+            }
 
             foreach (Player player in match.Players)
             {
@@ -422,7 +544,7 @@ namespace DrawingHammerServer
             }
         }
 
-        private static void HandleOnGamelistRequest(RequestGamelistPacket packet)
+        private static void HandleOnRequestGamelistPacket(RequestGamelistPacket packet)
         {
             var matchDataList = new ObservableCollection<MatchData>();
             foreach (var match in _matches)
@@ -434,7 +556,7 @@ namespace DrawingHammerServer
             client.SendDataPacketToClient(new GameListPacket(matchDataList, Router.ServerWildcard, client.Uid));
         }
 
-        private static void HandleOnRegistrationRequest(RegistrationPacket packet, TcpClient senderTcpClient)
+        private static void HandleOnRegistrationPacket(RegistrationPacket packet, TcpClient senderTcpClient)
         {
             var client = _server.GetClientByTcpClient(senderTcpClient);
             client.Uid = packet.SenderUid;
@@ -463,7 +585,7 @@ namespace DrawingHammerServer
             }            
         }
 
-        private static void HandleOnAuthenticationRequest(AuthenticationPacket packet, TcpClient senderTcpClient)
+        private static void HandleOnAuthenticationPacket(AuthenticationPacket packet, TcpClient senderTcpClient)
         {
             var client = (DrawingHammerClientData) _server.GetClientByTcpClient(senderTcpClient);
             client.Uid = packet.SenderUid;
@@ -504,11 +626,6 @@ namespace DrawingHammerServer
             }
 
             return null;
-        }
-
-        private static void StartMatch(Match match)
-        {
-            match.StartMatch();            
-        }
+        }        
     }
 }

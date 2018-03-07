@@ -7,7 +7,8 @@ namespace DrawingHammerPacketLibrary
     [Serializable]
     public class AuthenticationResultPacket : BasePacket
     {
-        public readonly AuthenticationResult Result;
+        public AuthenticationResult Result { get; }
+
         public AuthenticationResultPacket(AuthenticationResult result, string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {
             Result = result;
