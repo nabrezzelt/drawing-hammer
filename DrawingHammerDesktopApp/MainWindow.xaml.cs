@@ -116,6 +116,9 @@ namespace DrawingHammerDesktopApp
                 case ScoreChangedPacket p:
                     HandleOnScoreChanged(p);
                     break;
+                case WordSolutionPacket p:
+                    HandleOnWordSolution(p);
+                    break;
                 #endregion
 
                 #region DrawingArea
@@ -124,6 +127,14 @@ namespace DrawingHammerDesktopApp
                     break;                    
                 #endregion
             }
+        }
+
+        private void HandleOnWordSolution(WordSolutionPacket packet)
+        {
+            InvokeGui(() =>
+            {
+                StatusSnackbar.MessageQueue.Enqueue($"The word to guess was: '{packet.Word.Value}'", "Ok", () => {});
+            });
         }
 
         private void EnableCorrectArea()

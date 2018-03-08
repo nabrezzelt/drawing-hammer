@@ -35,7 +35,7 @@ namespace DrawingHammerPacketLibrary
 
         public event EventHandler RoundFinished;
 
-        public event EventHandler SubRoundFinished;
+        public event EventHandler<SubroundFinishedEventArgs> SubRoundFinished;
 
         public event EventHandler MatchFinished;
 
@@ -192,7 +192,7 @@ namespace DrawingHammerPacketLibrary
         public void StopSubRoundTimer()
         {
             _subRoundTimer.Stop();
-            SubRoundFinished?.Invoke(this, EventArgs.Empty);
+            SubRoundFinished?.Invoke(this, new SubroundFinishedEventArgs(WordToDraw, GetCurrentlyDrawingPlayer()));
         }
 
         private void PreparationTimerTicked(object sender, ElapsedEventArgs e)

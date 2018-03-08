@@ -115,10 +115,6 @@
                 </ListView.ItemTemplate>
             </ListView>
             <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
                 <materialDesign:DialogHost x:Name="DialogHostPickWords" DialogClosing="DialogHostPickWords_OnDialogClosing">
                     <materialDesign:DialogHost.DialogContent>
                         <Grid>
@@ -162,8 +158,10 @@
                             <Button Background="#ffffff" BorderBrush="#ffffff" Click="SetEraser" Margin="2" Content="{materialDesign:PackIcon Kind=Eraser, Size=16}" Padding="8" />
                         </StackPanel>
                     </Grid>
-
                 </materialDesign:DialogHost>
+                <materialDesign:Snackbar MessageQueue="{materialDesign:MessageQueue}"
+                                         x:Name="StatusSnackbar"
+                                         Margin="5,0" />
             </Grid>
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
@@ -175,7 +173,6 @@
                         <DataTemplate>
                             <StackPanel>
                                 <TextBlock FontWeight="Bold" Text="{Binding PlayerName}" />
-
                                 <!-- ToDo: Chech that shit -->
                                 <TextBlock Foreground="{DynamicResource PrimaryHueLightBrush}"
                                            Text="{Binding PlayerName, StringFormat=' {0} has guessed the word!'}">
@@ -206,7 +203,6 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
-
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>

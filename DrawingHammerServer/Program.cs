@@ -493,13 +493,21 @@ namespace DrawingHammerServer
             }
         }
 
-        private static void Match_SubRoundFinished(object sender, EventArgs e)
+        private static void Match_SubRoundFinished(object sender, SubroundFinishedEventArgs e)
         {
             var match = (Match)sender;            
 
             foreach (Player player in match.Players)
             {
                 _server.Router.DistributePacket(new SubRoundFinishedPacket(Router.ServerWildcard, player.Uid));
+            }
+
+            foreach (var player in match.Players)
+            {
+                if (player.Uid != e.LastDrawingPlayer.Uid)
+                {
+                    _server.Router.DistributePacket(new WordSolutionPacket(e.LastWord, Router.ServerWildcard, player.Uid));
+                }
             }
         }
 

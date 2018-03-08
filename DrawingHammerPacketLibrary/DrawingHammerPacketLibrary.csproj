@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="AuthenticationPacket.cs" />
     <Compile Include="Guess.cs" />
+    <Compile Include="SubroundFinishedEventArgs.cs" />
     <Compile Include="WordGuessPacket.cs" />
     <Compile Include="CreateMatchPacket.cs" />
     <Compile Include="DrawingAreaChangedPacket.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="SubRoundStartedPacket.cs" />
     <Compile Include="ViewModelBase.cs" />
     <Compile Include="Word.cs" />
+    <Compile Include="WordSolutionPacket.cs" />
     <Compile Include="WordToDrawPacket.cs" />
   </ItemGroup>
   <ItemGroup>
