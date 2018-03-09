@@ -166,7 +166,7 @@ namespace DrawingHammerPacketLibrary
             return null;
         }
 
-        private Player GetCurrentlyDrawingPlayer()
+        public Player GetCurrentlyDrawingPlayer()
         {
             foreach (var player in Players)
             {

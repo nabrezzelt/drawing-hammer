@@ -11,7 +11,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading;
 
 namespace DrawingHammerServer
 {
@@ -304,6 +303,9 @@ namespace DrawingHammerServer
         {
             var match = GetMatchByUid(packet.MatchUid);
 
+            if (match.WordToDraw == null)
+                return;
+
             if (String.Equals(match.WordToDraw.Value, packet.GuessedWord, StringComparison.InvariantCultureIgnoreCase))
             {
                 foreach (var matchPlayer in match.Players)
@@ -312,7 +314,6 @@ namespace DrawingHammerServer
                 }
 
                 match.CalculateAndRaiseScore(packet.SenderUid);
-
 
                 //Check if all players (exept the drawing player) have guessed the word and stop this subround!
                 if (match.EveryPlayerGuessedTheWord())
@@ -332,15 +333,20 @@ namespace DrawingHammerServer
         private static void HandleOnDrawingAreaChangedPacket(DrawingAreaChangedPacket packet)
         {
             var match = GetMatchByUid(packet.MatchUid);
+            var drawingPlayer = match.GetCurrentlyDrawingPlayer();
 
-            match.Strokes = packet.Strokes;
-
-            foreach (var player in match.Players)
+            if (drawingPlayer != null && packet.SenderUid == drawingPlayer.Uid)
             {
-                if (player.Uid != packet.SenderUid)
+                match.Strokes = packet.Strokes;
+
+                foreach (var player in match.Players)
                 {
-                    _server.Router.DistributePacket(new DrawingAreaChangedPacket(packet.Strokes, match.MatchUid, Router.ServerWildcard, player.Uid));
+                    if (player.Uid != packet.SenderUid)
+                    {
+                        _server.Router.DistributePacket(new DrawingAreaChangedPacket(packet.Strokes, match.MatchUid, Router.ServerWildcard, player.Uid));
+                    }
                 }
+
             }
         }
 

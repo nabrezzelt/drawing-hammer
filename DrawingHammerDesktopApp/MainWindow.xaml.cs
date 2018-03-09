@@ -76,7 +76,10 @@ namespace DrawingHammerDesktopApp
                 #region TimerEvents
                 case MatchFinishedPacket p:
                     SetDrawingPlayerToGuessing();
-                    MessageBox.Show(p.GetType().Name);
+                    StopTimer();
+                    ClearDrawingAreaAndWord();
+                    ClearGuessList();
+                    HandleOnMatchFinished();
                     break;
                 case SubRoundStartedPacket _:
                     StartTimer();
@@ -87,6 +90,8 @@ namespace DrawingHammerDesktopApp
                     ClearDrawingAreaAndWord();
                     ResetCorrectGuessesInPlayerList();
                     ClearGuessList();
+                    DisableDrawingArea();
+                    DisableGuessingArea();
                     break;
                 case RoundStartedPacket p:
                     ChangeRoundNumber(p.RoundNumber);
@@ -97,7 +102,7 @@ namespace DrawingHammerDesktopApp
                 case PreparationTimeStartedPacket p:
                     SetDrawingPlayerToGuessing();
                     SetPlayerToPreparing(p.PreparingPlayer);
-                    break;                
+                    break;
                 #endregion
 
                 #region Wordhandling
@@ -124,16 +129,34 @@ namespace DrawingHammerDesktopApp
                 #region DrawingArea
                 case DrawingAreaChangedPacket p:
                     HandleOnDrawingAreaChanged(p);
-                    break;                    
-                #endregion
+                    break;
+                    #endregion
             }
+        }
+
+        private void DisableGuessingArea()
+        {
+            InvokeGui(() => { _viewModel.CanGuess = false; });
+        }
+
+        private void DisableDrawingArea()
+        {
+            InvokeGui(() => { _viewModel.CanDraw = false; });
+        }
+
+        private void HandleOnMatchFinished()
+        {
+            InvokeGui(() =>
+            {
+                DialogHostMatchFinished.IsOpen = true;
+            });
         }
 
         private void HandleOnWordSolution(WordSolutionPacket packet)
         {
             InvokeGui(() =>
             {
-                StatusSnackbar.MessageQueue.Enqueue($"The word to guess was: '{packet.Word.Value}'", "Ok", () => {});
+                StatusSnackbar.MessageQueue.Enqueue($"The word to guess was: '{packet.Word.Value}'", "Ok", () => { });
             });
         }
 
@@ -159,7 +182,7 @@ namespace DrawingHammerDesktopApp
                 _viewModel.CanDraw = false;
                 _viewModel.CanGuess = true;
                 Log.Debug("Someone else is drawing! Disable 'CanDraw', enable 'CanGuess'");
-            });            
+            });
         }
 
         private void HandleOnScoreChanged(ScoreChangedPacket packet)
@@ -173,7 +196,10 @@ namespace DrawingHammerDesktopApp
                 {
                     player.Score += packet.RaisedScore;
                 }
-            });            
+
+                //ToDo: Maybe sort all players by Score:
+                //Solution: https://stackoverflow.com/a/19113072/7518830
+            });
         }
 
         private void ClearGuessList()
@@ -203,7 +229,7 @@ namespace DrawingHammerDesktopApp
                     if (player.HasGuessed)
                     {
                         player.HasGuessed = false;
-                    }                    
+                    }
                 }
             });
         }
@@ -217,7 +243,7 @@ namespace DrawingHammerDesktopApp
                 if (player != null)
                 {
                     _viewModel.Guesses.Add(new Guess(player.Username, String.Empty, true));
-                    Log.Debug($"Guess correct - Packet: {packet} - Username-by-Match: {player.Username}");                    
+                    Log.Debug($"Guess correct - Packet: {packet} - Username-by-Match: {player.Username}");
                     player.HasGuessed = true;
 
                     ScrollGuessListToLastItem();
@@ -228,7 +254,7 @@ namespace DrawingHammerDesktopApp
                     //Disable GuessingArea
                     _viewModel.CanGuess = false;
                 }
-            });                     
+            });
         }
 
         private void HandleOnWordGuessedByOtherPlayer(WordGuessPacket packet)
@@ -239,12 +265,12 @@ namespace DrawingHammerDesktopApp
 
                 if (player != null)
                 {
-                    _viewModel.Guesses.Add(new Guess(player.Username, packet.GuessedWord, false));                    
+                    _viewModel.Guesses.Add(new Guess(player.Username, packet.GuessedWord, false));
                     Log.Debug($"Other user guessed a word: {packet}");
 
                     ScrollGuessListToLastItem();
                 }
-            });            
+            });
         }
 
         private void HandleOnDrawingAreaChanged(DrawingAreaChangedPacket packet)
@@ -252,8 +278,8 @@ namespace DrawingHammerDesktopApp
             InvokeGui(() =>
             {
                 DrawingArea.Strokes = new StrokeCollection(new MemoryStream(packet.Strokes));
-            });            
-        }       
+            });
+        }
 
         private void HandleOnWordPicked(WordToDrawPacket packet)
         {
@@ -264,7 +290,7 @@ namespace DrawingHammerDesktopApp
                     DialogHostPickWords.IsOpen = false;
                 }
 
-                _viewModel.WordToDraw = packet.WordToDraw;                
+                _viewModel.WordToDraw = packet.WordToDraw;
             });
         }
 
@@ -286,8 +312,8 @@ namespace DrawingHammerDesktopApp
                 {
                     if (player.Status == PlayerStatus.Preparing)
                     {
-                        player.Status = PlayerStatus.Drawing;                        
-                    }                  
+                        player.Status = PlayerStatus.Drawing;
+                    }
                 }
             });
         }
@@ -329,7 +355,7 @@ namespace DrawingHammerDesktopApp
         private void StartTimer()
         {
             InvokeGui(() =>
-            {                
+            {
                 _viewModel.StartTimer();
             });
         }
@@ -380,7 +406,7 @@ namespace DrawingHammerDesktopApp
                 _viewModel.RoundLength = packet.MatchData.RoundLength;
                 _viewModel.Players = packet.MatchData.Players;
 
-                if(packet.MatchData.Strokes != null)
+                if (packet.MatchData.Strokes != null)
                     DrawingArea.Strokes = new StrokeCollection(new MemoryStream(packet.MatchData.Strokes));
 
                 foreach (var player in _viewModel.Players)
@@ -389,7 +415,7 @@ namespace DrawingHammerDesktopApp
                     {
                         //If any players of the match is drawing, enable Guessing.
                         _viewModel.CanGuess = true;
-                        return;                        
+                        return;
                     }
                 }
             });
@@ -413,7 +439,10 @@ namespace DrawingHammerDesktopApp
 
         private void OnConnectionLost(object sender, EventArgs e)
         {
-
+            InvokeGui(() =>
+            {
+                StatusSnackbar.MessageQueue.Enqueue("Connection lost! Please reconnect");
+            });
         }
 
         private void InvokeGui(Action action)
@@ -434,14 +463,14 @@ namespace DrawingHammerDesktopApp
 
         private void DialogHostPickWords_OnDialogClosing(object sender, DialogClosingEventArgs e)
         {
-            if(e.Parameter == null)
-                return;            
+            if (e.Parameter == null)
+                return;
 
-            var word = (Word) e.Parameter;
-            
+            var word = (Word)e.Parameter;
+
             _client.EnqueueDataForWrite(new PickedWordPacket(new Word(word.Id, word.Value), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
         }
-       
+
         private void SetEraser(object sender, RoutedEventArgs e)
         {
             DrawingArea.EditingMode = InkCanvasEditingMode.EraseByPoint;
@@ -450,9 +479,9 @@ namespace DrawingHammerDesktopApp
 
         private void SetColor(object sender, RoutedEventArgs e)
         {
-            var btn = (Button) sender;
+            var btn = (Button)sender;
             // ReSharper disable once PossibleNullReferenceException
-            var color = (Color) ColorConverter.ConvertFromString(btn.Tag.ToString());
+            var color = (Color)ColorConverter.ConvertFromString(btn.Tag.ToString());
 
             DrawingArea.DefaultDrawingAttributes.Color = color;
             DrawingArea.EditingMode = InkCanvasEditingMode.Ink;
@@ -470,10 +499,10 @@ namespace DrawingHammerDesktopApp
             if (_viewModel.CanDraw)
             {
                 var strokeMemoryStream = new MemoryStream();
-                DrawingArea.Strokes.Save(strokeMemoryStream);                                
+                DrawingArea.Strokes.Save(strokeMemoryStream);
 
                 _client.EnqueueDataForWrite(new DrawingAreaChangedPacket(strokeMemoryStream.ToArray(), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
-            }            
+            }
         }
 
         private void TextBoxGuess_OnKeyDown(object sender, KeyEventArgs e)
@@ -483,7 +512,7 @@ namespace DrawingHammerDesktopApp
                 var guessedWord = TextBoxGuess.Text;
 
                 _client.EnqueueDataForWrite(new WordGuessPacket(guessedWord, _viewModel.MatchUid, App.Uid, App.Uid, Router.ServerWildcard));
-                TextBoxGuess.Clear();                
+                TextBoxGuess.Clear();
             }
         }
 
@@ -494,8 +523,13 @@ namespace DrawingHammerDesktopApp
 
         private void ScrollGuessListToLastItem()
         {
-            if(_viewModel.Guesses.Count > 0)
-                ListViewGuesses.ScrollIntoView(ListViewGuesses.Items[ListViewGuesses.Items.Count-1]);            
+            if (_viewModel.Guesses.Count > 0)
+                ListViewGuesses.ScrollIntoView(ListViewGuesses.Items[ListViewGuesses.Items.Count - 1]);
+        }
+
+        private void DialogHostMatchFinished_OnDialogClosing(object sender, DialogClosingEventArgs eventargs)
+        {
+            //ToDo: Quit Match - show GameBrowser
         }
     }
 }

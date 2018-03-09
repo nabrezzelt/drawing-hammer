@@ -115,50 +115,60 @@
                 </ListView.ItemTemplate>
             </ListView>
             <Grid Grid.Column="1">
-                <materialDesign:DialogHost x:Name="DialogHostPickWords" DialogClosing="DialogHostPickWords_OnDialogClosing">
+                <materialDesign:DialogHost x:Name="DialogHostMatchFinished" DialogClosing="DialogHostMatchFinished_OnDialogClosing">
                     <materialDesign:DialogHost.DialogContent>
-                        <Grid>
-                            <ListView ItemsSource="{Binding Words}">
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <Button Content="{Binding Value}" Command="materialDesign:DialogHost.CloseDialogCommand" CommandParameter="{Binding .}" />
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-                        </Grid>
+                        <StackPanel>
+                            <TextBlock HorizontalAlignment="Center">Match finished!</TextBlock>
+                            <Button Content="Quit Match and close" HorizontalAlignment="Center"
+                                    Command="materialDesign:DialogHost.CloseDialogCommand"/>
+                        </StackPanel>
                     </materialDesign:DialogHost.DialogContent>
-                    <Grid IsEnabled="{Binding CanDraw}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <InkCanvas Margin="10" x:Name="DrawingArea"
+                    <materialDesign:DialogHost x:Name="DialogHostPickWords" DialogClosing="DialogHostPickWords_OnDialogClosing">
+                        <materialDesign:DialogHost.DialogContent>
+                            <Grid>
+                                <ListView ItemsSource="{Binding Words}">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Content="{Binding Value}" Command="materialDesign:DialogHost.CloseDialogCommand" CommandParameter="{Binding .}" />
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                            </Grid>
+                        </materialDesign:DialogHost.DialogContent>
+                        <Grid IsEnabled="{Binding CanDraw}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <InkCanvas Margin="10" x:Name="DrawingArea"
                                    StrokeCollected="DrawingArea_OnChanged"
                                    StrokeErased="DrawingArea_OnChanged"/>
-                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,6">
-                            <Button Background="#e91e63" BorderBrush="#e91e63" Click="SetColor" Tag="#e91e63" Margin="2" />
-                            <Button Background="#9c27b0" BorderBrush="#9c27b0" Click="SetColor" Tag="#9c27b0" Margin="2" />
-                            <Button Background="#673ab7" BorderBrush="#673ab7" Click="SetColor" Tag="#673ab7" Margin="2" />
-                            <Button Background="#3f51b5" BorderBrush="#3f51b5" Click="SetColor" Tag="#3f51b5" Margin="2" />
-                            <Button Background="#2196f3" BorderBrush="#2196f3" Click="SetColor" Tag="#2196f3" Margin="2" />
-                            <Button Background="#03a9f4" BorderBrush="#03a9f4" Click="SetColor" Tag="#03a9f4" Margin="2" />
-                            <Button Background="#00bcd4" BorderBrush="#00bcd4" Click="SetColor" Tag="#00bcd4" Margin="2" />
-                            <Button Background="#009688" BorderBrush="#009688" Click="SetColor" Tag="#009688" Margin="2" />
-                            <Button Background="#4caf50" BorderBrush="#4caf50" Click="SetColor" Tag="#4caf50" Margin="2" />
-                            <Button Background="#8bc34a" BorderBrush="#8bc34a" Click="SetColor" Tag="#8bc34a" Margin="2" />
-                            <Button Background="#cddc39" BorderBrush="#cddc39" Click="SetColor" Tag="#cddc39" Margin="2" />
-                            <Button Background="#ffeb3b" BorderBrush="#ffeb3b" Click="SetColor" Tag="#ffeb3b" Margin="2" />
-                            <Button Background="#ffc107" BorderBrush="#ffc107" Click="SetColor" Tag="#ffc107" Margin="2" />
-                            <Button Background="#ff9800" BorderBrush="#ff9800" Click="SetColor" Tag="#ff9800" Margin="2" />
-                            <Button Background="#ff5722" BorderBrush="#ff5722" Click="SetColor" Tag="#ff5722" Margin="2" />
-                            <Button Background="#795548" BorderBrush="#795548" Click="SetColor" Tag="#795548" Margin="2" />
-                            <Button Background="#9e9e9e" BorderBrush="#9e9e9e" Click="SetColor" Tag="#9e9e9e" Margin="2" />
-                            <Button Background="#607d8b" BorderBrush="#607d8b" Click="SetColor" Tag="#607d8b" Margin="2" />
-                            <Button Background="#000000" BorderBrush="#000000" Click="SetColor" Tag="#000000" Margin="2" />
-                            <Button Background="#ffffff" BorderBrush="#ffffff" Click="SetEraser" Margin="2" Content="{materialDesign:PackIcon Kind=Eraser, Size=16}" Padding="8" />
-                        </StackPanel>
-                    </Grid>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,6">
+                                <Button Background="#e91e63" BorderBrush="#e91e63" Click="SetColor" Tag="#e91e63" Margin="2" />
+                                <Button Background="#9c27b0" BorderBrush="#9c27b0" Click="SetColor" Tag="#9c27b0" Margin="2" />
+                                <Button Background="#673ab7" BorderBrush="#673ab7" Click="SetColor" Tag="#673ab7" Margin="2" />
+                                <Button Background="#3f51b5" BorderBrush="#3f51b5" Click="SetColor" Tag="#3f51b5" Margin="2" />
+                                <Button Background="#2196f3" BorderBrush="#2196f3" Click="SetColor" Tag="#2196f3" Margin="2" />
+                                <Button Background="#03a9f4" BorderBrush="#03a9f4" Click="SetColor" Tag="#03a9f4" Margin="2" />
+                                <Button Background="#00bcd4" BorderBrush="#00bcd4" Click="SetColor" Tag="#00bcd4" Margin="2" />
+                                <Button Background="#009688" BorderBrush="#009688" Click="SetColor" Tag="#009688" Margin="2" />
+                                <Button Background="#4caf50" BorderBrush="#4caf50" Click="SetColor" Tag="#4caf50" Margin="2" />
+                                <Button Background="#8bc34a" BorderBrush="#8bc34a" Click="SetColor" Tag="#8bc34a" Margin="2" />
+                                <Button Background="#cddc39" BorderBrush="#cddc39" Click="SetColor" Tag="#cddc39" Margin="2" />
+                                <Button Background="#ffeb3b" BorderBrush="#ffeb3b" Click="SetColor" Tag="#ffeb3b" Margin="2" />
+                                <Button Background="#ffc107" BorderBrush="#ffc107" Click="SetColor" Tag="#ffc107" Margin="2" />
+                                <Button Background="#ff9800" BorderBrush="#ff9800" Click="SetColor" Tag="#ff9800" Margin="2" />
+                                <Button Background="#ff5722" BorderBrush="#ff5722" Click="SetColor" Tag="#ff5722" Margin="2" />
+                                <Button Background="#795548" BorderBrush="#795548" Click="SetColor" Tag="#795548" Margin="2" />
+                                <Button Background="#9e9e9e" BorderBrush="#9e9e9e" Click="SetColor" Tag="#9e9e9e" Margin="2" />
+                                <Button Background="#607d8b" BorderBrush="#607d8b" Click="SetColor" Tag="#607d8b" Margin="2" />
+                                <Button Background="#000000" BorderBrush="#000000" Click="SetColor" Tag="#000000" Margin="2" />
+                                <Button Background="#ffffff" BorderBrush="#ffffff" Click="SetEraser" Margin="2" Content="{materialDesign:PackIcon Kind=Eraser, Size=16}" Padding="8" />
+                            </StackPanel>
+                        </Grid>
+                    </materialDesign:DialogHost>
                 </materialDesign:DialogHost>
+                
                 <materialDesign:Snackbar MessageQueue="{materialDesign:MessageQueue}"
                                          x:Name="StatusSnackbar"
                                          Margin="5,0" />
