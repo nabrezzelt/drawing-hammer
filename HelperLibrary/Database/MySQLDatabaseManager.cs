@@ -143,7 +143,7 @@ namespace HelperLibrary.Database
             try
             {
                 MySqlDataReader reader = _prepareSQLCommand.ExecuteReader();
-                SQLQueryExcecuted?.Invoke(this, new SQLQueryEventArgs(ReplacePlaceholderInPreparedQuery(), SQLQueryEventArgs.QueryType.PreparedInsertUpdateDelete));
+                SQLQueryExcecuted?.Invoke(this, new SQLQueryEventArgs(ReplacePlaceholderInPreparedQuery(), SQLQueryEventArgs.QueryType.PreparedSelect));
 
                 return reader;
             }

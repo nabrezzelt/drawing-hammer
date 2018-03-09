@@ -36,7 +36,7 @@
         </Grid>
         <Grid Grid.Row="1">
             <materialDesign:Card Margin="6">
-                <ListView x:Name="ListViewGamelist" MouseDoubleClick="lvGamelist_OnDoubleClick" ItemsSource="{Binding Matches}" SelectionChanged="lvGameList_OnSelectionChanged">
+                <ListView x:Name="ListViewGamelist" MouseDoubleClick="ListViewGamelist_OnDoubleClick" ItemsSource="{Binding Matches}" SelectionChanged="ListViewGameList_OnSelectionChanged">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid>

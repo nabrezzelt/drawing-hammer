@@ -126,12 +126,12 @@ namespace DrawingHammerDesktopApp
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
         }
 
-        private void lvGameList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ListViewGameList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ButtonJoin.IsEnabled = ListViewGamelist.SelectedItem != null;
         }
 
-        private void lvGamelist_OnDoubleClick(object sender, MouseButtonEventArgs e)
+        private void ListViewGamelist_OnDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (ListViewGamelist.SelectedItem != null)
             {
