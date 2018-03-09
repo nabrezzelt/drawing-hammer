@@ -40,7 +40,7 @@ namespace DrawingHammerDesktopApp
         {
             await Task.Run(() =>
             {
-                _client.SendPacketToServer(new RequestGamelistPacket(App.Uid, Router.ServerWildcard));
+                _client.EnqueueDataForWrite(new RequestGamelistPacket(App.Uid, Router.ServerWildcard));
                 Log.Debug("Matchlist requested.");
             });
         }
@@ -146,7 +146,7 @@ namespace DrawingHammerDesktopApp
                 MatchData selectedMatch = (MatchData) ListViewGamelist.SelectedItem;
                 await Task.Run(() =>
                 {
-                    _client.SendPacketToServer(new JoinMatchPacket(selectedMatch.MatchUid, App.Uid, Router.ServerWildcard));
+                    _client.EnqueueDataForWrite(new JoinMatchPacket(selectedMatch.MatchUid, App.Uid, Router.ServerWildcard));
                 });
             });           
         }

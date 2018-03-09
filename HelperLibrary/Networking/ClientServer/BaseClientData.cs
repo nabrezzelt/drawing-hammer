@@ -34,24 +34,15 @@ namespace HelperLibrary.Networking.ClientServer
             _clientThread.Start(this);
         }       
 
-        [Obsolete("Use BaseClientData.EnqueueDataForWrite(object packet) instead!")]
-        public void SendDataPacketToClient(object packet)
-        {
-            //var packetBytes = SerializePacket(packet);
-
-            //var length = packetBytes.Length;
-            //var lengthBytes = BitConverter.GetBytes(length);
-            //ClientStream.Write(lengthBytes, 0, 4); //Senden der Länge/Größe des Textes
-            //ClientStream.Write(packetBytes, 0, packetBytes.Length); //Senden der eingentlichen Daten/des Textes    
-            
-            EnqueueDataForWrite(packet);
-
-            Log.Debug($"Packet of type {packet.GetType().Name} will be send to: {Uid}");
+        [Obsolete("Use EnqueueDataForWrite(BasePacket packet) instead!")]
+        public void SendDataPacketToClient(BasePacket packet)
+        {                        
+            EnqueueDataForWrite(packet);            
         }
 
-        public void EnqueueDataForWrite(object packet)
+        public void EnqueueDataForWrite(BasePacket packet)
         {
-            var packetBytes = SerializePacket(packet);
+            byte[] packetBytes = BasePacket.Serialize(packet);
 
             var length = packetBytes.Length;
             var lengthBytes = BitConverter.GetBytes(length);
@@ -70,13 +61,7 @@ namespace HelperLibrary.Networking.ClientServer
             }
 
             WriteData();
-        }
-
-        public virtual byte[] SerializePacket(object packet)
-        {
-            byte[] packetBytes = BasePacket.Serialize(packet);
-            return packetBytes;
-        }
+        }       
 
         private void WriteData()
         {

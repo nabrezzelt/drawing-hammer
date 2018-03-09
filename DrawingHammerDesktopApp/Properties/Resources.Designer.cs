@@ -99,15 +99,5 @@ namespace DrawingHammerDesktopApp.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap DrawingHammerTestLogo {
-            get {
-                object obj = ResourceManager.GetObject("DrawingHammerTestLogo", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
     }
 }

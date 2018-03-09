@@ -114,7 +114,7 @@ namespace DrawingHammerDesktopApp
         {            
             await Task.Run(() =>
             {
-                _client.SendPacketToServer(new RegistrationPacket(
+                _client.EnqueueDataForWrite(new RegistrationPacket(
                     username,
                     password,
                     App.Uid,

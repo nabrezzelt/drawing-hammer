@@ -41,7 +41,7 @@ namespace HelperLibrary.Networking.ClientServer
                     foreach (BaseClientData client in _serverInstance.Clients)
                     {
                         if (client.Authenticated && !IsInArray(client.Uid, excludedClients))
-                            client.SendDataPacketToClient(packet);
+                            client.EnqueueDataForWrite(packet);
                     }
                     break;
 
@@ -49,7 +49,7 @@ namespace HelperLibrary.Networking.ClientServer
                     foreach (BaseClientData client in _serverInstance.Clients)
                     {
                         if (!client.Authenticated && !IsInArray(client.Uid, excludedClients))
-                            client.SendDataPacketToClient(packet);
+                            client.EnqueueDataForWrite(packet);
                     }
                     break;
 
@@ -57,12 +57,12 @@ namespace HelperLibrary.Networking.ClientServer
                     foreach (BaseClientData client in _serverInstance.Clients)
                     {
                         if (!IsInArray(client.Uid, excludedClients))
-                            client.SendDataPacketToClient(packet);
+                            client.EnqueueDataForWrite(packet);
                     }
                     break;
                 default:
                     //Send to packet to DestinationUID
-                    GetClientFromList(packet.DestinationUid)?.SendDataPacketToClient(packet);
+                    GetClientFromList(packet.DestinationUid)?.EnqueueDataForWrite(packet);
                     break;
             }
         }

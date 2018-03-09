@@ -429,7 +429,7 @@ namespace DrawingHammerDesktopApp
         public void MatchJoined(string matchUid)
         {
             _viewModel.MatchUid = matchUid;
-            _client.SendPacketToServer(new RequestMatchDataPacket(matchUid, App.Uid, Router.ServerWildcard));
+            _client.EnqueueDataForWrite(new RequestMatchDataPacket(matchUid, App.Uid, Router.ServerWildcard));
         }
 
         private void DialogHostPickWords_OnDialogClosing(object sender, DialogClosingEventArgs e)
@@ -439,7 +439,7 @@ namespace DrawingHammerDesktopApp
 
             var word = (Word) e.Parameter;
             
-            _client.SendPacketToServer(new PickedWordPacket(new Word(word.Id, word.Value), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
+            _client.EnqueueDataForWrite(new PickedWordPacket(new Word(word.Id, word.Value), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
         }
        
         private void SetEraser(object sender, RoutedEventArgs e)
@@ -472,7 +472,7 @@ namespace DrawingHammerDesktopApp
                 var strokeMemoryStream = new MemoryStream();
                 DrawingArea.Strokes.Save(strokeMemoryStream);                                
 
-                _client.SendPacketToServer(new DrawingAreaChangedPacket(strokeMemoryStream.ToArray(), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
+                _client.EnqueueDataForWrite(new DrawingAreaChangedPacket(strokeMemoryStream.ToArray(), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
             }            
         }
 
@@ -482,7 +482,7 @@ namespace DrawingHammerDesktopApp
             {
                 var guessedWord = TextBoxGuess.Text;
 
-                _client.SendPacketToServer(new WordGuessPacket(guessedWord, _viewModel.MatchUid, App.Uid, App.Uid, Router.ServerWildcard));
+                _client.EnqueueDataForWrite(new WordGuessPacket(guessedWord, _viewModel.MatchUid, App.Uid, App.Uid, Router.ServerWildcard));
                 TextBoxGuess.Clear();                
             }
         }

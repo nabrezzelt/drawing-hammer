@@ -61,7 +61,7 @@ namespace DrawingHammerDesktopApp
 
         private void SendCreateMassage(string matchTitle, int maxRounds, int maxPlayers, int roundLength)
         {
-            _client.SendPacketToServer(new CreateMatchPacket(new MatchData(matchTitle, maxRounds, maxPlayers, roundLength), App.Uid, Router.ServerWildcard));
+            _client.EnqueueDataForWrite(new CreateMatchPacket(new MatchData(matchTitle, maxRounds, maxPlayers, roundLength), App.Uid, Router.ServerWildcard));
         }
 
         private void InvokeGui(Action action)

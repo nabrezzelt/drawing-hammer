@@ -381,7 +381,7 @@ namespace DrawingHammerServer
             var match = GetMatchByUid(packet.MatchUid);
             DrawingHammerClientData client = (DrawingHammerClientData)_server.GetClientByUid(packet.SenderUid);
 
-            client.SendDataPacketToClient(new MatchDataPacket(new MatchData(match), Router.ServerWildcard, client.Uid));
+            client.EnqueueDataForWrite(new MatchDataPacket(new MatchData(match), Router.ServerWildcard, client.Uid));
         }
 
         private static void HandleOnJoinMatchPacket(JoinMatchPacket packet)
@@ -407,7 +407,7 @@ namespace DrawingHammerServer
             }
             else
             {
-                client.SendDataPacketToClient(new MatchJoinFailedPacket("Maximum player count reached!", packet.SenderUid, Router.ServerWildcard));
+                client.EnqueueDataForWrite(new MatchJoinFailedPacket("Maximum player count reached!", packet.SenderUid, Router.ServerWildcard));
             }            
         }        
 
@@ -438,7 +438,7 @@ namespace DrawingHammerServer
                 new CreateMatchPacket(new MatchData(match), Router.ServerWildcard, Router.AllAuthenticatedWildCard));
             Log.Debug("All clients notified recording new match.");  
             
-            client.SendDataPacketToClient(new MatchCreatedPacket(Router.ServerWildcard, client.Uid));
+            client.EnqueueDataForWrite(new MatchCreatedPacket(Router.ServerWildcard, client.Uid));
         }
 
         private static void Match_ScoreChanged(object sender, ScoreChangedEventArgs e)
@@ -561,7 +561,7 @@ namespace DrawingHammerServer
             }
 
             var client  = _server.GetClientByUid(packet.SenderUid);
-            client.SendDataPacketToClient(new GameListPacket(matchDataList, Router.ServerWildcard, client.Uid));
+            client.EnqueueDataForWrite(new GameListPacket(matchDataList, Router.ServerWildcard, client.Uid));
         }
 
         private static void HandleOnRegistrationPacket(RegistrationPacket packet, TcpClient senderTcpClient)
@@ -574,22 +574,22 @@ namespace DrawingHammerServer
                 UserManager.CreateUser(packet.Username, packet.Password);
                 Log.Info("User successfull created with username: " + packet.Username);
 
-                client.SendDataPacketToClient(new RegistrationResultPacket(RegistrationResult.Ok, Router.ServerWildcard, packet.SenderUid));
+                client.EnqueueDataForWrite(new RegistrationResultPacket(RegistrationResult.Ok, Router.ServerWildcard, packet.SenderUid));
             }
             catch (UserAlreadyExitsException)
             {
                 Log.Info("Registration failed. User with username '" + packet.Username + "' already exitsts");
-                client.SendDataPacketToClient(new RegistrationResultPacket(RegistrationResult.UsernameAlreadyExists, Router.ServerWildcard, packet.SenderUid));
+                client.EnqueueDataForWrite(new RegistrationResultPacket(RegistrationResult.UsernameAlreadyExists, Router.ServerWildcard, packet.SenderUid));
             }
             catch (UsernameTooLongException)
             {
                 Log.Info("Registration failed. User '" + packet.Username + "' is too long.");
-                client.SendDataPacketToClient(new RegistrationResultPacket(RegistrationResult.UsernameTooLong, Router.ServerWildcard, packet.SenderUid));
+                client.EnqueueDataForWrite(new RegistrationResultPacket(RegistrationResult.UsernameTooLong, Router.ServerWildcard, packet.SenderUid));
             }
             catch (UsernameTooShortException)
             {
                 Log.Info("Registration failed. User '" + packet.Username + "' is too short.");
-                client.SendDataPacketToClient(new RegistrationResultPacket(RegistrationResult.UsernameTooShort, Router.ServerWildcard, packet.SenderUid));
+                client.EnqueueDataForWrite(new RegistrationResultPacket(RegistrationResult.UsernameTooShort, Router.ServerWildcard, packet.SenderUid));
             }            
         }
 
@@ -605,12 +605,12 @@ namespace DrawingHammerServer
                 Log.Info("Authenticationcredentials are valid!");
                 client.Authenticated = true;
                 client.User = authResult.User;
-                client.SendDataPacketToClient(new AuthenticationResultPacket(AuthenticationResult.Ok, Router.ServerWildcard, packet.SenderUid));
+                client.EnqueueDataForWrite(new AuthenticationResultPacket(AuthenticationResult.Ok, Router.ServerWildcard, packet.SenderUid));
             }
             else
             {
                 Log.Info("Authenticationcredentials are not valid!");
-                client.SendDataPacketToClient(new AuthenticationResultPacket(AuthenticationResult.Failed, Router.ServerWildcard, packet.SenderUid));
+                client.EnqueueDataForWrite(new AuthenticationResultPacket(AuthenticationResult.Failed, Router.ServerWildcard, packet.SenderUid));
             }                
         }
 

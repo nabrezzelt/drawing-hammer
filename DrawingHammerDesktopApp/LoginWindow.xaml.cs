@@ -107,7 +107,7 @@ namespace DrawingHammerDesktopApp
                     App.Uid, 
                     Router.ServerWildcard);
                 
-                _client.SendPacketToServer(loginPacket);
+                _client.EnqueueDataForWrite(loginPacket);
             });
         }
 
