@@ -92,6 +92,7 @@
     </Compile>
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\ColorToBrushConverter.cs" />
+    <Compile Include="Converters\IndexConverter.cs" />
     <Compile Include="Converters\StatusToIconConverter.cs" />
     <Compile Include="CreateNewGameWindow.xaml.cs">
       <DependentUpon>CreateNewGameWindow.xaml</DependentUpon>

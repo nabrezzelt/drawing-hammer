@@ -21,57 +21,131 @@ namespace DrawingHammerPacketLibrary
 
         private const double DrawerScoreAdditionPercentage = 0.3;
 
+        /// <summary>
+        /// Indicateds if the match is running
+        /// </summary>
         public bool IsRunning { get; private set; }
 
+        /// <summary>
+        /// Indicates whether a subround is currently running
+        /// </summary>
+        public bool IsSubRoundRunning { get; private set; }        
+
+        /// <summary>
+        /// Event, that is fired when the preparationtimer started
+        /// </summary>
         public event EventHandler<PreparationTimerStartedEventArgs> PreparationTimeStarted;
 
+        /// <summary>
+        /// Event, that is fired when a new round started
+        /// </summary>
         public event EventHandler<RoundStartedEventArgs> RoundStarted;
-
+        
+        /// <summary>
+        /// Event, that is fired when the match started
+        /// </summary>
         public event EventHandler MatchStarted;
 
+        /// <summary>
+        /// Event, that is fired when a subround started
+        /// </summary>
         public event EventHandler SubRoundStarted;
 
+        /// <summary>
+        /// Event, that is fired when the preparation timer is finished
+        /// </summary>
         public event EventHandler<PreparationTimeFinishedEventArgs> PreparationTimeFinished;
 
+        /// <summary>
+        /// Event, that is fired when a round is finished
+        /// </summary>
         public event EventHandler RoundFinished;
 
+        /// <summary>
+        /// Event, that is fired when a subround is finished
+        /// </summary>
         public event EventHandler<SubroundFinishedEventArgs> SubRoundFinished;
 
+        /// <summary>
+        /// Event, that is fired when the match is finished
+        /// </summary>
         public event EventHandler MatchFinished;
 
+        /// <summary>
+        /// Event that is fired when the score of a player changed
+        /// </summary>
         public event EventHandler<ScoreChangedEventArgs> ScoreChanged;
 
+        /// <summary>
+        /// Unique Id of this match
+        /// </summary>
         public string MatchUid { get; }
 
+        /// <summary>
+        /// ClientId (DbId) of the user who created the match
+        /// </summary>
         public int CreatorId { get; set; }
 
+        /// <summary>
+        /// Title of the match
+        /// </summary>
         public string Title { get; }
 
+        /// <summary>
+        /// Rounds
+        /// </summary>
         public int Rounds { get; }
 
+        /// <summary>
+        /// Maximum Players for this match
+        /// </summary>
         public int MaxPlayers { get; }
 
+        /// <summary>
+        /// Roundlength in Seconds
+        /// </summary>
         public int RoundLength { get; }
 
+        /// <summary>
+        /// Players of this match
+        /// </summary>
         public ObservableCollection<Player> Players { get; }
 
+        /// <summary>
+        /// Player who have already drawed
+        /// </summary>
         public List<Player> PlayedPlayers { get; }
 
+        /// <summary>
+        /// Already suggested words
+        /// </summary>
         public ObservableCollection<Word> PickedWords { get; }
 
         /// <summary>
-        /// Stores the 3 random words witch the player should pick
+        /// Stores the 3 random words which the player should pick
         /// </summary>
         public ObservableCollection<Word> RandomWordsToPick { get; set; }
 
+        /// <summary>
+        /// Word that the current drawing player needs to draw
+        /// </summary>
         public Word WordToDraw { get; set; }
 
+        /// <summary>
+        /// Remaining Time to draw.
+        /// </summary>
         public int RemainingTime { get; private set; }
 
+        /// <summary>
+        /// Current Round
+        /// </summary>
         public int CurrentRound { get; private set; }
 
+        /// <summary>
+        /// Strokes of the InkCanvas as byte-array
+        /// </summary>
         public byte[] Strokes { get; set; }
-
+        
         private readonly Timer _preparationTimer;
 
         private readonly Timer _subRoundTimer;
@@ -105,7 +179,7 @@ namespace DrawingHammerPacketLibrary
         }
 
         private void Match_SubRoundFinished(object sender, EventArgs e)
-        {
+        {            
             WordToDraw = null;
             RemainingTime = RoundLength;
             ResetHasGuessed();
@@ -119,7 +193,7 @@ namespace DrawingHammerPacketLibrary
             {
                 //Runde Beendet
                 PlayedPlayers.Clear();
-                RoundFinished?.Invoke(this, EventArgs.Empty);
+                RoundFinished?.Invoke(this, EventArgs.Empty);                
 
                 if (CurrentRound == Rounds)
                 {
@@ -150,6 +224,7 @@ namespace DrawingHammerPacketLibrary
         private void StartSubRound()
         {
             _subRoundTimer.Start();
+            IsSubRoundRunning = true;
             SubRoundStarted?.Invoke(this, EventArgs.Empty);
         }
 
@@ -192,6 +267,7 @@ namespace DrawingHammerPacketLibrary
         public void StopSubRoundTimer()
         {
             _subRoundTimer.Stop();
+            IsSubRoundRunning = false;
             SubRoundFinished?.Invoke(this, new SubroundFinishedEventArgs(WordToDraw, GetCurrentlyDrawingPlayer()));
         }
 
@@ -212,17 +288,14 @@ namespace DrawingHammerPacketLibrary
         }
 
         public void StartMatch()
-        {
-            if (!IsRunning)
-            {
-                IsRunning = true;
-                var player = GetPlayerWhoHasNotPlayed();
+        {            
+            IsRunning = true;
+            var player = GetPlayerWhoHasNotPlayed();
 
-                MatchStarted?.Invoke(this, EventArgs.Empty);
-                RoundStarted?.Invoke(this, new RoundStartedEventArgs(CurrentRound));
+            MatchStarted?.Invoke(this, EventArgs.Empty);
+            RoundStarted?.Invoke(this, new RoundStartedEventArgs(CurrentRound));
 
-                StartPreparationTimer(player);
-            }
+            StartPreparationTimer(player);            
         }
 
         private void StartPreparationTimer(Player player)

@@ -29,11 +29,8 @@ namespace DrawingHammerDesktopApp
         private readonly MainWindowViewModel _viewModel;
         public MainWindow()
         {
-            //if (!Properties.Settings.Default.IsConnectionConfigured)
-            //{
             ConnectionSettingsWindow settingsWindow = new ConnectionSettingsWindow();
             settingsWindow.ShowDialog();
-            //}
 
             _client = new SslClient(Properties.Settings.Default.Host, true);
 
@@ -74,7 +71,7 @@ namespace DrawingHammerDesktopApp
                     break;
 
                 #region TimerEvents
-                case MatchFinishedPacket p:
+                case MatchFinishedPacket _:
                     SetDrawingPlayerToGuessing();
                     StopTimer();
                     ClearDrawingAreaAndWord();
@@ -148,7 +145,12 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
+                _viewModel.Players = new ObservableCollection<Player>(_viewModel.Players.OrderByDescending(player => player.Score));
+                //ToDo: Sort all players by Score
+                //Solution: https://stackoverflow.com/a/19113072/7518830
+
                 DialogHostMatchFinished.IsOpen = true;
+
             });
         }
 
@@ -156,7 +158,7 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                StatusSnackbar.MessageQueue.Enqueue($"The word to guess was: '{packet.Word.Value}'", "Ok", () => { });
+                _viewModel.MessageQueue.Enqueue($"The word to guess was: '{packet.Word.Value}'", "Ok", () => { });
             });
         }
 
@@ -196,9 +198,6 @@ namespace DrawingHammerDesktopApp
                 {
                     player.Score += packet.RaisedScore;
                 }
-
-                //ToDo: Maybe sort all players by Score:
-                //Solution: https://stackoverflow.com/a/19113072/7518830
             });
         }
 
@@ -380,8 +379,11 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                _viewModel.Players.Add(packet.Player);
-                Log.Warn($"Player {packet.Player.Username} joind with status: {packet.Player.Status}");
+                if (_viewModel.MatchUid == packet.MatchUid)
+                {
+                    _viewModel.Players.Add(packet.Player);
+                    Log.Warn($"Player {packet.Player.Username} joind with status: {packet.Player.Status}");
+                }
             });
         }
 
@@ -441,7 +443,7 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                StatusSnackbar.MessageQueue.Enqueue("Connection lost! Please reconnect");
+                _viewModel.MessageQueue.Enqueue("Connection lost! Please reconnect");
             });
         }
 
@@ -471,13 +473,13 @@ namespace DrawingHammerDesktopApp
             _client.EnqueueDataForWrite(new PickedWordPacket(new Word(word.Id, word.Value), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
         }
 
-        private void SetEraser(object sender, RoutedEventArgs e)
+        private void ButtonSetEraser_OnClick(object sender, RoutedEventArgs e)
         {
             DrawingArea.EditingMode = InkCanvasEditingMode.EraseByPoint;
-            SetPenSize(5, 5);
+            SetPenSize(6, 6);
         }
 
-        private void SetColor(object sender, RoutedEventArgs e)
+        private void ButtonSetColor_OnClick(object sender, RoutedEventArgs e)
         {
             var btn = (Button)sender;
             // ReSharper disable once PossibleNullReferenceException
@@ -498,11 +500,16 @@ namespace DrawingHammerDesktopApp
         {
             if (_viewModel.CanDraw)
             {
-                var strokeMemoryStream = new MemoryStream();
-                DrawingArea.Strokes.Save(strokeMemoryStream);
-
-                _client.EnqueueDataForWrite(new DrawingAreaChangedPacket(strokeMemoryStream.ToArray(), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
+                SendCurrentDrawingAreaContent();                
             }
+        }
+
+        private void SendCurrentDrawingAreaContent()
+        {
+            var strokeMemoryStream = new MemoryStream();
+            DrawingArea.Strokes.Save(strokeMemoryStream);
+
+            _client.EnqueueDataForWrite(new DrawingAreaChangedPacket(strokeMemoryStream.ToArray(), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
         }
 
         private void TextBoxGuess_OnKeyDown(object sender, KeyEventArgs e)
@@ -530,6 +537,12 @@ namespace DrawingHammerDesktopApp
         private void DialogHostMatchFinished_OnDialogClosing(object sender, DialogClosingEventArgs eventargs)
         {
             //ToDo: Quit Match - show GameBrowser
+        }
+
+        private void ButtonResetDrawingAreaContent_OnClick(object sender, RoutedEventArgs e)
+        {
+            DrawingArea.Strokes.Clear();
+            SendCurrentDrawingAreaContent();
         }
     }
 }

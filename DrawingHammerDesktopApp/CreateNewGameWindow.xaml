@@ -46,7 +46,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <StackPanel Margin="0,36,31,0" Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="Numeric" Foreground="#FFA8A8A8" />
+                            <materialDesign:PackIcon Kind="Numeric" />
                             <TextBlock Text="Rounds:" Margin="2,0,0,0" Foreground="#FFA8A8A8" />
                         </StackPanel>
                         <Slider x:Name="SliderRounds" Minimum="1" Maximum="10" Style="{DynamicResource MaterialDesignDiscreteSlider}"
@@ -54,19 +54,22 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <StackPanel Margin="0,36,31,0" Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="AccountMultiple" Foreground="#FFA8A8A8" />
+                            <materialDesign:PackIcon Kind="AccountMultiple" />
                             <TextBlock Text="Players:" Margin="2,0,0,0" Foreground="#FFA8A8A8" />
                         </StackPanel>
-                        <Slider x:Name="SliderPlayers" Minimum="2" Maximum="48" Style="{DynamicResource MaterialDesignDiscreteSlider}"
-                                Width="180" Value="8" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="33,0,0,0"/>
+                        <Slider x:Name="SliderPlayers" Minimum="2" Maximum="32" Style="{DynamicResource MaterialDesignDiscreteSlider}"
+                                Width="180" Value="4" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="33,0,0,0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5,5,5,15">
                         <StackPanel Margin="0,36,31,0" Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="Clock" Foreground="#FFA8A8A8" />
+                            <materialDesign:PackIcon Kind="Clock" />
                             <TextBlock Text="Roundlength:" Margin="2,0,0,0" Foreground="#FFA8A8A8" />
                         </StackPanel>
-                        <Slider x:Name="SliderRoundLength" Minimum="60" Maximum="120" Style="{DynamicResource MaterialDesignDiscreteSlider}"
-                                Width="180" Value="70" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0"/>
+                        <Slider x:Name="SliderRoundLength" 
+                                Minimum="40" Maximum="80" Value="60"
+                                Style="{DynamicResource MaterialDesignDiscreteSlider}"
+                                Width="180" HorizontalAlignment="Center"
+                                VerticalAlignment="Center" Margin="0"/>
                     </StackPanel>
 
                 </StackPanel>

@@ -1,6 +1,8 @@
-﻿using DrawingHammerPacketLibrary;
+﻿using System;
+using DrawingHammerPacketLibrary;
 using System.Collections.ObjectModel;
 using System.Timers;
+using MaterialDesignThemes.Wpf;
 
 namespace DrawingHammerDesktopApp.ViewModel
 {
@@ -24,6 +26,8 @@ namespace DrawingHammerDesktopApp.ViewModel
 
         public ObservableCollection<Guess> Guesses { get; set; }
 
+        public SnackbarMessageQueue MessageQueue { get; }
+
         private readonly Timer _roundTimer;
 
         public MainWindowViewModel()
@@ -33,6 +37,8 @@ namespace DrawingHammerDesktopApp.ViewModel
 
             _roundTimer = new Timer(1000);
             _roundTimer.Elapsed += _roundTimer_Elapsed;
+
+            MessageQueue = new SnackbarMessageQueue(TimeSpan.FromMilliseconds(5000));
         }
 
         private void _roundTimer_Elapsed(object sender, ElapsedEventArgs e)

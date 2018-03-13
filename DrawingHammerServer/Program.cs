@@ -246,7 +246,7 @@ namespace DrawingHammerServer
             catch (CouldNotConnectException e)
             {
                 Log.Fatal(e.InnerException?.Message);
-                Log.Info("Press <enter> to exit...");
+                Log.Info("Press any key to exit...");
                 Console.ReadLine();
                 Environment.Exit(1);
             }
@@ -346,7 +346,6 @@ namespace DrawingHammerServer
                         _server.Router.DistributePacket(new DrawingAreaChangedPacket(packet.Strokes, match.MatchUid, Router.ServerWildcard, player.Uid));
                     }
                 }
-
             }
         }
 
@@ -406,7 +405,14 @@ namespace DrawingHammerServer
                     Router.ServerWildcard,
                     Router.AllAuthenticatedWildCard));
 
-                if (match.Players.Count > 1)
+                if (match.IsSubRoundRunning)
+                {
+                    //Notify player that a round already started
+                    Log.Debug("Match is currently running - send subround started again!");
+                    _server.Router.DistributePacket(new SubRoundStartedPacket(Router.ServerWildcard, packet.SenderUid));
+                }
+
+                if (match.Players.Count > 1 && !match.IsRunning)
                 {
                     match.StartMatch();
                 }                
@@ -608,14 +614,14 @@ namespace DrawingHammerServer
 
             if (authResult.Result)
             {
-                Log.Info("Authenticationcredentials are valid!");
+                Log.Info("Authenticationcredentials for username '{packet.Username}' are valid!");
                 client.Authenticated = true;
                 client.User = authResult.User;
                 client.EnqueueDataForWrite(new AuthenticationResultPacket(AuthenticationResult.Ok, Router.ServerWildcard, packet.SenderUid));
             }
             else
             {
-                Log.Info("Authenticationcredentials are not valid!");
+                Log.Info("Authenticationcredentials for username '{packet.Username}' are not valid!");
                 client.EnqueueDataForWrite(new AuthenticationResultPacket(AuthenticationResult.Failed, Router.ServerWildcard, packet.SenderUid));
             }                
         }
