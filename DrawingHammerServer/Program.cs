@@ -68,7 +68,7 @@ namespace DrawingHammerServer
                 return;
 
             _settingsManager.InitializeSettingsFile();
-            Log.Info(".ini-File initialized. Please setup your database login!");
+            Log.Warn(".ini-File generated. Please setup your settings!");
             Console.ReadLine();
             Environment.Exit(0);
         }
