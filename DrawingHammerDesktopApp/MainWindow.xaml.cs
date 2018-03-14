@@ -73,6 +73,9 @@ namespace DrawingHammerDesktopApp
                 case PlayerJoinedMatchPacket p:
                     HandleOnPlayerJoinedMatch(p);
                     break;
+                case PlayerLeftMatchPacket p:
+                    HandleOnPlayerLeftMatch(p);
+                    break;
                 #endregion
 
                 #region TimerEvents
@@ -136,6 +139,17 @@ namespace DrawingHammerDesktopApp
             }
         }
 
+        private void HandleOnPlayerLeftMatch(PlayerLeftMatchPacket packet)
+        {
+            var playerToRemove = _viewModel.Players
+                .FirstOrDefault(player => player.Uid == packet.PlayerUid);
+
+            if (playerToRemove != null)
+            {
+                _viewModel.Players.Remove(playerToRemove);
+            }
+        }
+
         private void DisableGuessingArea()
         {
             InvokeGui(() => { _viewModel.CanGuess = false; });
@@ -150,8 +164,7 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {                
-                _viewModel.Players = new ObservableCollection<Player>(_viewModel.Players.OrderByDescending(player => player.Score));                
-                //ToDo: Fix ranking -> 1,2,2,4... 
+                _viewModel.Players = new ObservableCollection<Player>(_viewModel.Players.OrderByDescending(player => player.Score));                                
                 DialogHostMatchFinished.IsOpen = true;
             });
         }
@@ -251,8 +264,7 @@ namespace DrawingHammerDesktopApp
                 }
 
                 if (packet.PlayerUid == App.Uid)
-                {
-                    //Disable GuessingArea
+                {                    
                     _viewModel.CanGuess = false;
                 }
             });
@@ -328,12 +340,6 @@ namespace DrawingHammerDesktopApp
                     if (player.Status == PlayerStatus.Drawing)
                     {
                         player.Status = PlayerStatus.Guessing;
-
-                        if (player.Uid == App.Uid)
-                        {
-                            //I have drawed
-                            //_viewModel.CanDraw = false;                            
-                        }
                     }
                 }
             });
@@ -463,17 +469,7 @@ namespace DrawingHammerDesktopApp
         {
             _viewModel.MatchUid = matchUid;
             _client.EnqueueDataForWrite(new RequestMatchDataPacket(matchUid, App.Uid, Router.ServerWildcard));
-        }
-
-        private void DialogHostPickWords_OnDialogClosing(object sender, DialogClosingEventArgs e)
-        {
-            if (e.Parameter == null)
-                return;
-
-            var word = (Word)e.Parameter;
-
-            _client.EnqueueDataForWrite(new PickedWordPacket(new Word(word.Id, word.Value), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
-        }
+        }       
 
         private void ButtonSetEraser_OnClick(object sender, RoutedEventArgs e)
         {
@@ -536,9 +532,27 @@ namespace DrawingHammerDesktopApp
                 ListViewGuesses.ScrollIntoView(ListViewGuesses.Items[ListViewGuesses.Items.Count - 1]);
         }
 
-        private void DialogHostMatchFinished_OnDialogClosing(object sender, DialogClosingEventArgs eventargs)
+        private void DialogHost_OnDialogClosing(object sender, DialogClosingEventArgs e)
         {
-            //ToDo: Quit Match - show GameBrowser
+            if (e.Parameter.GetType() == typeof(Word))
+            {
+                if (e.Parameter == null)
+                    return;
+
+                var word = (Word)e.Parameter;
+
+                _client.EnqueueDataForWrite(new PickedWordPacket(new Word(word.Id, word.Value), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
+            }
+            else //if(e.Parameter == "QuitMatch")
+            {
+                //Quit-Match clicked
+                _viewModel.Reset();
+
+                var gameBrowser = new GameBrowserWindow(_client, this);
+                gameBrowser.ShowDialog();
+
+                ProgressBarLoading.Visibility = Visibility.Visible;
+            }            
         }
 
         private void ButtonResetDrawingAreaContent_OnClick(object sender, RoutedEventArgs e)
@@ -546,5 +560,16 @@ namespace DrawingHammerDesktopApp
             DrawingArea.Strokes.Clear();
             SendCurrentDrawingAreaContent();
         }
+
+        private void ProfileClipDisconnect_OnClick(object sender, RoutedEventArgs e)
+        {
+            _client.EnqueueDataForWrite(new LeaveMatchPacket(_viewModel.MatchUid, App.Uid, Router.ServerWildcard));
+            _viewModel.Reset();
+
+            var gameBrowser = new GameBrowserWindow(_client, this);
+            gameBrowser.ShowDialog();
+
+            ProgressBarLoading.Visibility = Visibility.Visible;
+        }        
     }
 }

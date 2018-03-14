@@ -4,15 +4,13 @@ namespace DrawingHammerServer
     {        
         public int Id { get; }
         public string Username { get; }
-        public string PasswordHash { get; }
-        public bool IsBanned { get; }
+        public string PasswordHash { get; }        
 
-        public User(int id, string username, string passwordHash, bool isBanned)
+        public User(int id, string username, string passwordHash)
         {
             Id = id;
             Username = username;
-            PasswordHash = passwordHash;
-            IsBanned = isBanned;
+            PasswordHash = passwordHash;            
         }
     }
 }

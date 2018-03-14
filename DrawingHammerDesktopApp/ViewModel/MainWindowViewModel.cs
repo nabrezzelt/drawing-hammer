@@ -8,12 +8,18 @@ namespace DrawingHammerDesktopApp.ViewModel
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        public string MyUsername { get; set; }        
+        public string MyUsername { get; set; }     
+        
         public string MatchUid {get; set;}
+
         public int CurrentRound { get; set; }
+
         public int Rounds { get; set; }
-        public int RemainingTime { get; set; }        
+
+        public int RemainingTime { get; set; }       
+        
         public int RoundLength { get; set;  }
+
         public ObservableCollection<Player> Players { get; set; }
 
         public bool CanDraw { get; set; }
@@ -61,6 +67,13 @@ namespace DrawingHammerDesktopApp.ViewModel
         public void StartTimer()
         {
             _roundTimer.Start();
-        }           
+        }
+
+        public void Reset()
+        {
+            ResetTimer();
+            Players.Clear();
+            MatchUid = String.Empty;           
+        }
     }
 }

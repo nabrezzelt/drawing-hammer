@@ -3,8 +3,7 @@ using HelperLibrary.Networking.ClientServer.Packets;
 
 namespace DrawingHammerPacketLibrary
 {
-    [Serializable]
-    [ToString]
+    [Serializable]    
     public class WordGuessCorrectPacket : BasePacket
     {
         public string PlayerUid { get; }                

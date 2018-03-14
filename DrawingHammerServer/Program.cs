@@ -9,6 +9,7 @@ using HelperLibrary.Networking.ClientServer;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 
@@ -46,7 +47,7 @@ namespace DrawingHammerServer
             InitializeDatabaseConnection();
             Log.Info("");
 
-            string ip = _settingsManager.GetStartupIp() != "" ? _settingsManager.GetStartupIp() : NetworkUtilities.GetThisIPv4Adress();
+            string ip = !String.IsNullOrWhiteSpace(_settingsManager.GetStartupIp()) ? _settingsManager.GetStartupIp() : NetworkUtilities.GetThisIPv4Adress();
 
             _server = new DrawingHammerServer(new X509Certificate2(_settingsManager.GetSslCertificatePath(), _settingsManager.GetSslCertificatePassword()), ip, 9999);
 
@@ -98,7 +99,7 @@ namespace DrawingHammerServer
                         Log.Info(filteredUsers.Count + " account(s) found.");
                         Log.Info("");
 
-                        filteredUsers.ForEach(u => Log.Info(u.Id + " " + u.Username + ", IsBanned:" + (u.IsBanned ? "True" : "False")));
+                        filteredUsers.ForEach(u => Log.Info(u.Id + " " + u.Username));
                         break;
                     #endregion
 
@@ -108,7 +109,7 @@ namespace DrawingHammerServer
                         Log.Info(users.Count + " account(s) found.");
                         Log.Info("");
 
-                        users.ForEach(u => Log.Info(u.Id + " " + u.Username + ", IsBanned:" + (u.IsBanned ? "True" : "False")));
+                        users.ForEach(u => Log.Info(u.Id + " " + u.Username));
                         break;
                     #endregion
 
@@ -289,6 +290,9 @@ namespace DrawingHammerServer
                     HandleOnJoinMatchPacket(p);
                     break;
 
+                case LeaveMatchPacket p:
+                    HandleOnLeaveMatchPacket(p);
+                    break;
                 case RequestMatchDataPacket p:
                     HandleOnRequestMatchDataPacket(p);
                     break;
@@ -304,6 +308,25 @@ namespace DrawingHammerServer
                 case WordGuessPacket p:
                     HandleOnWordGuessPacket(p);
                     break;
+            }
+        }
+
+        private static void HandleOnLeaveMatchPacket(LeaveMatchPacket packet)
+        {
+            var match = GetMatchByUid(packet.MatchUid);
+
+            var playerToRemove =
+                match?.PlayedPlayers.FirstOrDefault(player => player.Uid == packet.SenderUid);
+
+            if (playerToRemove != null)
+            {
+                match.PlayedPlayers.Remove(playerToRemove);
+                match.Players.Remove(playerToRemove);
+
+                foreach (var client in _server.Clients)
+                {
+                    client.EnqueueDataForWrite(new PlayerLeftMatchPacket(match.MatchUid, playerToRemove.Uid, Router.ServerWildcard, client.Uid));
+                }
             }
         }
 
@@ -566,9 +589,7 @@ namespace DrawingHammerServer
 
             foreach (Player player in match.Players)
             {
-                _server.Router.DistributePacket(new MatchFinishedPacket(Router.ServerWildcard, player.Uid));
-                //ToDo: Notifiy players and show score overview
-                Log.Debug("Notifiy players and show score overview");
+                _server.Router.DistributePacket(new MatchFinishedPacket(Router.ServerWildcard, player.Uid));                
             }
         }
 
@@ -637,7 +658,23 @@ namespace DrawingHammerServer
         private static void OnClientDisconnected(object sender, ClientDisconnectedEventArgs e)
         {
             Console.WriteLine("Client disconnected with Uid: {0}", e.ClientUid);
-            //ToDo: Von allen Matches usw. entfernen und an die anderen Clients syncen.
+
+            foreach (var match in _matches)
+            {                
+                var player = match.Players.FirstOrDefault(p => p.Uid == e.ClientUid);
+
+                match.PlayedPlayers.Remove(player);
+                match.Players.Remove(player);
+
+                if (player != null)
+                {
+                    foreach (var client in _server.Clients)
+                    {
+                        client.EnqueueDataForWrite(new PlayerLeftMatchPacket(match.MatchUid, player.Uid, Router.ServerWildcard, client.Uid));
+                    }
+                    return; //Player can be in only on match
+                }        
+            }
         }
 
         private static void OnClientConnected(object sender, ClientConnectedEventArgs e)

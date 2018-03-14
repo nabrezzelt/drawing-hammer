@@ -4,6 +4,7 @@ using HelperLibrary.Logging;
 using HelperLibrary.Networking.ClientServer;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,9 +22,13 @@ namespace DrawingHammerDesktopApp
         private readonly SslClient _client;
         private bool _matchJoined;
 
+        private readonly GameBrowserViewModel _viewModel;
+
         public GameBrowserWindow(SslClient client, MainWindow mainWindow)
         {
             DataContext = new GameBrowserViewModel();
+
+            _viewModel = (GameBrowserViewModel) DataContext;
 
             InitializeComponent();
 
@@ -61,7 +66,26 @@ namespace DrawingHammerDesktopApp
                 case MatchJoinFailedPacket p:
                     HandleOnJoinMatchFailed(p);
                     break;
+                case PlayerLeftMatchPacket p:
+                    HandleOnPlayerLeftMatch(p);
+                    break;
             }
+        }
+
+        private void HandleOnPlayerLeftMatch(PlayerLeftMatchPacket packet)
+        {
+           InvokeGui(() =>
+           {
+               var match = _viewModel.GetMatch(packet.MatchUid);
+
+               var playerToRemove = match?.Players
+                   .FirstOrDefault(player => player.Uid == packet.PlayerUid);
+
+               if (playerToRemove != null)
+               {
+                   match.Players.Remove(playerToRemove);
+               }
+           });
         }
 
         private void HandleOnJoinMatchFailed(MatchJoinFailedPacket packet)
@@ -83,7 +107,7 @@ namespace DrawingHammerDesktopApp
                     Close();
                 }
 
-                var match = ((GameBrowserViewModel) DataContext).GetMatch(packet.MatchUid);
+                var match = _viewModel.GetMatch(packet.MatchUid);
                 match.Players.Add(packet.Player);                                
             });            
         }
@@ -92,8 +116,7 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                var vm = (GameBrowserViewModel) DataContext;
-                vm.Matches.Add(matchData);
+                _viewModel.Matches.Add(matchData);
             });
         }
 
@@ -101,8 +124,7 @@ namespace DrawingHammerDesktopApp
         {
             InvokeGui(() =>
             {
-                var vm = (GameBrowserViewModel)DataContext;
-                vm.Matches = packet.Matches;
+                _viewModel.Matches = packet.Matches;
             });          
         }
 

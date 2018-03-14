@@ -13,7 +13,7 @@ namespace DrawingHammerServer
         
         public static User GetUser(int id)
         {
-            string query = "SELECT username, password, isBanned " +
+            string query = "SELECT username, password " +
                            "FROM users " +
                            "WHERE id = " + id;
 
@@ -28,17 +28,16 @@ namespace DrawingHammerServer
             }
 
             var username = reader.GetString(0);
-            var passwordHash = reader.GetString(1);
-            var isSuspended = reader.GetBoolean(2);
+            var passwordHash = reader.GetString(1);            
 
             reader.Close();
 
-            return new User(id, username, passwordHash, isSuspended);
+            return new User(id, username, passwordHash);
         }
 
         public static User GetUser(string username)
         {
-            string query = "SELECT id, password, isBanned " +
+            string query = "SELECT id, password " +
                            "FROM users " +
                            "WHERE username = @username";
             DbManager.PrepareQuery(query);
@@ -54,12 +53,11 @@ namespace DrawingHammerServer
             }
                 
             var id = reader.GetInt32(0);
-            var passwordHash = reader.GetString(1);
-            var isSuspended = reader.GetBoolean(2);
+            var passwordHash = reader.GetString(1);            
 
             reader.Close();
 
-            return new User(id, username, passwordHash, isSuspended);
+            return new User(id, username, passwordHash);
         }
 
         public static string GetUserSalt(string username)
@@ -170,10 +168,9 @@ namespace DrawingHammerServer
             {
                 var id = reader.GetInt32(0);
                 var username = reader.GetString(1);
-                var passwordHash = reader.GetString(2);
-                var isSuspended = reader.GetBoolean(3);                
+                var passwordHash = reader.GetString(2);                            
 
-                users.Add(new User(id, username, passwordHash, isSuspended));
+                users.Add(new User(id, username, passwordHash));
             }
 
             reader.Close();
@@ -196,10 +193,9 @@ namespace DrawingHammerServer
             {
                 var id = reader.GetInt32(0);
                 var username = reader.GetString(1);
-                var passwordHash = reader.GetString(2);
-                var isSuspended = reader.GetBoolean(3);
+                var passwordHash = reader.GetString(2);                
                 
-                users.Add(new User(id, username, passwordHash, isSuspended));
+                users.Add(new User(id, username, passwordHash));
             }
 
             reader.Close();
