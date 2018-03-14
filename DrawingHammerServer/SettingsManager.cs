@@ -7,14 +7,17 @@ namespace DrawingHammerServer
         private readonly IniFile _iniFile;
 
         private const string DatabaseSettingsSection = "Database Settings",
-            GeneralSettings = "General Settings";
+            GeneralSettingsSection = "General Settings",
+            SslCertificateSection = "Certificate Settings";
 
         private const string
             DatabaseHostKey = "DatabaseHost",
             DatabaseUserKey = "DatabaseUser",
             DatabasePasswordKey = "DatabasePassword",
             DatabasenameKey = "Databasename",
-            StartupIpKey = "StartupIp";
+            StartupIpKey = "StartupIp",
+            SslCertificatePathKey = "SslCertificatePath",
+            SslCertificatePasswordKey = "SslCertificatePassword";
 
         public SettingsManager(string iniFilePath)
         {
@@ -27,7 +30,9 @@ namespace DrawingHammerServer
             _iniFile.WriteValue(DatabaseUserKey, "", DatabaseSettingsSection);
             _iniFile.WriteValue(DatabasePasswordKey, "", DatabaseSettingsSection);
             _iniFile.WriteValue(DatabasenameKey, "", DatabaseSettingsSection);
-            _iniFile.WriteValue(StartupIpKey, "", GeneralSettings);
+            _iniFile.WriteValue(StartupIpKey, "", GeneralSettingsSection);
+            _iniFile.WriteValue(SslCertificatePathKey, "", SslCertificateSection);
+            _iniFile.WriteValue(SslCertificatePasswordKey, "", SslCertificateSection);
         }
 
         public string GetDatabaseHost()
@@ -52,7 +57,17 @@ namespace DrawingHammerServer
 
         public string GetStartupIp()
         {
-            return _iniFile.ReadValue(StartupIpKey, GeneralSettings);
+            return _iniFile.ReadValue(StartupIpKey, GeneralSettingsSection);
+        }
+
+        public string GetSslCertificatePath()
+        {
+            return _iniFile.ReadValue(SslCertificatePathKey, SslCertificateSection);
+        }
+
+        public string GetSslCertificatePassword()
+        {
+            return _iniFile.ReadValue(SslCertificatePasswordKey, SslCertificateSection);
         }
     }
 }

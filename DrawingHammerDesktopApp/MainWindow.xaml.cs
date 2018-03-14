@@ -60,15 +60,20 @@ namespace DrawingHammerDesktopApp
         {
             switch (e.Packet)
             {
+                #region Autentication
                 case AuthenticationResultPacket p:
                     HandleAuthenticationPacket(p);
                     break;
                 case MatchDataPacket p:
                     HandleMatchDataPacket(p);
                     break;
+                #endregion
+
+                #region MatchHandling
                 case PlayerJoinedMatchPacket p:
                     HandleOnPlayerJoinedMatch(p);
                     break;
+                #endregion
 
                 #region TimerEvents
                 case MatchFinishedPacket _:
@@ -144,13 +149,10 @@ namespace DrawingHammerDesktopApp
         private void HandleOnMatchFinished()
         {
             InvokeGui(() =>
-            {
-                _viewModel.Players = new ObservableCollection<Player>(_viewModel.Players.OrderByDescending(player => player.Score));
-                //ToDo: Sort all players by Score
-                //Solution: https://stackoverflow.com/a/19113072/7518830
-
+            {                
+                _viewModel.Players = new ObservableCollection<Player>(_viewModel.Players.OrderByDescending(player => player.Score));                
+                //ToDo: Fix ranking -> 1,2,2,4... 
                 DialogHostMatchFinished.IsOpen = true;
-
             });
         }
 
