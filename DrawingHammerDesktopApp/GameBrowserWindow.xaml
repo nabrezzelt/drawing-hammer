@@ -67,6 +67,7 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+                        
                         <TextBlock Grid.Column="0" Foreground="{DynamicResource PrimaryHueMidBrush}">RUNNING</TextBlock>
                         <TextBlock Grid.Column="1" Margin="12,0">Main Faggot Match 1</TextBlock>
                         <TextBlock Grid.Column="2" Style="{DynamicResource MaterialDesignCaptionTextBlock}" Foreground="Gray">(12/12 Players)</TextBlock>

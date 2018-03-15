@@ -141,13 +141,16 @@ namespace DrawingHammerDesktopApp
 
         private void HandleOnPlayerLeftMatch(PlayerLeftMatchPacket packet)
         {
-            var playerToRemove = _viewModel.Players
-                .FirstOrDefault(player => player.Uid == packet.PlayerUid);
-
-            if (playerToRemove != null)
+            InvokeGui(() =>
             {
-                _viewModel.Players.Remove(playerToRemove);
-            }
+                var playerToRemove = _viewModel.Players
+                    .FirstOrDefault(player => player.Uid == packet.PlayerUid);
+
+                if (playerToRemove != null)
+                {
+                    _viewModel.Players.Remove(playerToRemove);
+                }
+            });            
         }
 
         private void DisableGuessingArea()
@@ -546,6 +549,8 @@ namespace DrawingHammerDesktopApp
             else //if(e.Parameter == "QuitMatch")
             {
                 //Quit-Match clicked
+                ProfileClipQuitMatch_OnClick(sender, e);
+
                 _viewModel.Reset();
 
                 var gameBrowser = new GameBrowserWindow(_client, this);
@@ -561,7 +566,7 @@ namespace DrawingHammerDesktopApp
             SendCurrentDrawingAreaContent();
         }
 
-        private void ProfileClipDisconnect_OnClick(object sender, RoutedEventArgs e)
+        private void ProfileClipQuitMatch_OnClick(object sender, RoutedEventArgs e)
         {
             _client.EnqueueDataForWrite(new LeaveMatchPacket(_viewModel.MatchUid, App.Uid, Router.ServerWildcard));
             _viewModel.Reset();

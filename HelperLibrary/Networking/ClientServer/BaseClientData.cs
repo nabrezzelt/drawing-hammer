@@ -4,33 +4,33 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using HelperLibrary.Logging;
-using HelperLibrary.Networking.ClientServer.Packets;
-
-namespace HelperLibrary.Networking.ClientServer
-{
-    public class BaseClientData
-    {
-        public string Uid;
-        public bool Authenticated;
-        public readonly TcpClient TcpClient;
-        public readonly Stream ClientStream;
-        private readonly Thread _clientThread;                
-        private Server _serverInstance;
-
-        private readonly ConcurrentQueue<byte[]> _pendingDataToWrite = new ConcurrentQueue<byte[]>();
-        private bool _sendingData;
-
-        protected BaseClientData(Server serverInstance, TcpClient client, Stream stream)
-        {
-            Uid = "";
-
-            _serverInstance = serverInstance;
-
-            TcpClient = client;
-            ClientStream = stream;
-
-            //Starte für jeden Client nach dem Verbinden einen seperaten Thread in dem auf neue eingehende Nachrichten gehört/gewartet wird.
-            _clientThread = new Thread(_serverInstance.DataIn);
+using HelperLibrary.Networking.ClientServer.Packets;                                                                                                    
+                                                                                                                                                        
+namespace HelperLibrary.Networking.ClientServer                                                                                                         
+{                                                                                                                                                       
+    public class BaseClientData                                                                                                                         
+    {                                                                                                                                                   
+        public string Uid;                                                                                                                              
+        public bool Authenticated;                                                                                                                      
+        public readonly TcpClient TcpClient;                                                                                                            
+        public readonly Stream ClientStream;                                                                                                            
+        private readonly Thread _clientThread;                                                                                                          
+        private Server _serverInstance;                                                                                                                 
+                                                                                                                                                        
+        private readonly ConcurrentQueue<byte[]> _pendingDataToWrite = new ConcurrentQueue<byte[]>();                                                   
+        private bool _sendingData;                                                                                                                      
+                                                                                                                                                        
+        protected BaseClientData(Server serverInstance, TcpClient client, Stream stream)                                                                
+        {                                                                                                                                               
+            Uid = "";                                                                                                                                   
+                                                                                                                                                        
+            _serverInstance = serverInstance;                                                                                                           
+                                                                                                                                                        
+            TcpClient = client;                                                                                                                         
+            ClientStream = stream;                                                                                                                      
+                                                                                                                                                        
+            //Starte für jeden Client nach dem Verbinden einen seperaten Thread in dem auf neue eingehende Nachrichten gehört/gewartet wird.            
+            _clientThread = new Thread(_serverInstance.DataIn);                                                                                         
             _clientThread.Start(this);
         }       
 
@@ -42,6 +42,8 @@ namespace HelperLibrary.Networking.ClientServer
 
         public void EnqueueDataForWrite(BasePacket packet)
         {
+            Log.Debug($"SENT: Send packet of type: {packet.GetType().Name}");
+
             byte[] packetBytes = BasePacket.Serialize(packet);
 
             var length = packetBytes.Length;

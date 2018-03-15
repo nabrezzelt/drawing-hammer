@@ -126,7 +126,7 @@ namespace DrawingHammerPacketLibrary
         /// </summary>
         public ObservableCollection<Word> RandomWordsToPick { get; set; }
 
-        /// <summary>
+        /// <summary> (
         /// Word that the current drawing player needs to draw
         /// </summary>
         public Word WordToDraw { get; set; }

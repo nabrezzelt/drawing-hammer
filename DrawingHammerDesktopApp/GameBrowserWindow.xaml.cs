@@ -74,18 +74,7 @@ namespace DrawingHammerDesktopApp
 
         private void HandleOnPlayerLeftMatch(PlayerLeftMatchPacket packet)
         {
-           InvokeGui(() =>
-           {
-               var match = _viewModel.GetMatch(packet.MatchUid);
-
-               var playerToRemove = match?.Players
-                   .FirstOrDefault(player => player.Uid == packet.PlayerUid);
-
-               if (playerToRemove != null)
-               {
-                   match.Players.Remove(playerToRemove);
-               }
-           });
+            RequestGameList();
         }
 
         private void HandleOnJoinMatchFailed(MatchJoinFailedPacket packet)

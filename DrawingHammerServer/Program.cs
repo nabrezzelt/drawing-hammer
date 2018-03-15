@@ -266,7 +266,7 @@ namespace DrawingHammerServer
         private static void OnPacketReceived(object sender, PacketReceivedEventArgs e)
         {
             var packet = e.Packet;
-            Log.Debug("Packet recived of type: " + e.Packet.GetType().Name);
+            Log.Debug("RECV: Packet recived of type: " + e.Packet.GetType().Name);
 
             switch (packet)
             {
@@ -316,7 +316,7 @@ namespace DrawingHammerServer
             var match = GetMatchByUid(packet.MatchUid);
 
             var playerToRemove =
-                match?.PlayedPlayers.FirstOrDefault(player => player.Uid == packet.SenderUid);
+                match?.Players.FirstOrDefault(player => player.Uid == packet.SenderUid);
 
             if (playerToRemove != null)
             {

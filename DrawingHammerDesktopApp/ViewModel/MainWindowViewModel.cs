@@ -72,8 +72,13 @@ namespace DrawingHammerDesktopApp.ViewModel
         public void Reset()
         {
             ResetTimer();
+            WordToDraw = null;
+            Rounds = 0;
+            CurrentRound = 0;
+            RemainingTime = 0;
             Players.Clear();
-            MatchUid = String.Empty;           
+            Guesses.Clear();
+            MatchUid = String.Empty;             
         }
     }
 }
