@@ -69,7 +69,21 @@ namespace DrawingHammerDesktopApp
                 case PlayerLeftMatchPacket p:
                     HandleOnPlayerLeftMatch(p);
                     break;
+                case MatchFinishedPacket p:
+                    HandleOnMatchFinished(p);
+                    break;             
             }
+        }
+
+        private void HandleOnMatchFinished(MatchFinishedPacket packet)
+        {
+            InvokeGui(() =>
+            {
+                var match = _viewModel.Matches.FirstOrDefault(m => m.MatchUid == packet.MatchUid);
+
+                if (match != null)
+                    match.IsFinished = true;
+            });
         }
 
         private void HandleOnPlayerLeftMatch(PlayerLeftMatchPacket packet)

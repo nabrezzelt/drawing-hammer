@@ -6,8 +6,11 @@ namespace DrawingHammerPacketLibrary
     [Serializable]
     public class MatchFinishedPacket : BasePacket
     {
-        public MatchFinishedPacket(string senderUid, string destinationUid) : base(senderUid, destinationUid)
+        public string MatchUid { get; }
+
+        public MatchFinishedPacket(string matchUid, string senderUid, string destinationUid) : base(senderUid, destinationUid)
         {
+            MatchUid = matchUid;
         }
     }
 }

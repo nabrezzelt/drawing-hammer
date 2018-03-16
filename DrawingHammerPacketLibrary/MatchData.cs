@@ -8,6 +8,10 @@ namespace DrawingHammerPacketLibrary
     {
         public string MatchUid { get; }
 
+        public bool IsFinished { get; set; }
+
+        public bool IsRunning => !IsFinished;
+
         public int CreatorId { get; }
 
         public string Title { get; }
@@ -29,6 +33,7 @@ namespace DrawingHammerPacketLibrary
         public MatchData(Match match)
         {
             MatchUid = match.MatchUid;
+            IsFinished = match.IsFinished;
             CreatorId = match.CreatorId;
 
             Title = match.Title;

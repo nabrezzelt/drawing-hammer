@@ -9,7 +9,6 @@ using HelperLibrary.Networking.ClientServer;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 
@@ -293,6 +292,7 @@ namespace DrawingHammerServer
                 case LeaveMatchPacket p:
                     HandleOnLeaveMatchPacket(p);
                     break;
+
                 case RequestMatchDataPacket p:
                     HandleOnRequestMatchDataPacket(p);
                     break;
@@ -315,19 +315,13 @@ namespace DrawingHammerServer
         {
             var match = GetMatchByUid(packet.MatchUid);
 
-            var playerToRemove =
-                match?.Players.FirstOrDefault(player => player.Uid == packet.SenderUid);
-
-            if (playerToRemove != null)
+            if (match != null)
             {
-                match.PlayedPlayers.Remove(playerToRemove);
-                match.Players.Remove(playerToRemove);
-
-                foreach (var client in _server.Clients)
+                if (match.RemovePlayer(packet.SenderUid))
                 {
-                    client.EnqueueDataForWrite(new PlayerLeftMatchPacket(match.MatchUid, playerToRemove.Uid, Router.ServerWildcard, client.Uid));
+                    _server.Router.DistributePacket(new PlayerLeftMatchPacket(match.MatchUid, packet.SenderUid, Router.ServerWildcard, Router.AllAuthenticatedWildCard));                 
                 }
-            }
+            }            
         }
 
         private static void HandleOnWordGuessPacket(WordGuessPacket packet)
@@ -347,7 +341,7 @@ namespace DrawingHammerServer
                 match.CalculateAndRaiseScore(packet.SenderUid);
 
                 //Check if all players (exept the drawing player) have guessed the word and stop this subround!
-                if (match.EveryPlayerGuessedTheWord())
+                if (match.HasEveryPlayerGuessedTheWord())
                 {
                     match.StopSubRoundTimer();
                 }
@@ -425,7 +419,11 @@ namespace DrawingHammerServer
             Match match = GetMatchByUid(packet.MatchUid);
             DrawingHammerClientData client = (DrawingHammerClientData)_server.GetClientByUid(packet.SenderUid);
 
-            if (match.Players.Count < match.MaxPlayers)
+            if (match.IsFinished)
+            {
+                client.EnqueueDataForWrite(new MatchJoinFailedPacket("Match is already finished!", packet.SenderUid, Router.ServerWildcard));
+            }
+            else if (match.Players.Count < match.MaxPlayers)
             {
                 Player player = new Player(client.User.Id, client.Uid, client.User.Username, 0);
                 match.Players.Add(player);
@@ -545,13 +543,16 @@ namespace DrawingHammerServer
                 _server.Router.DistributePacket(new SubRoundFinishedPacket(Router.ServerWildcard, player.Uid));
             }
 
-            foreach (var player in match.Players)
+            if (e.LastDrawingPlayer != null && e.LastWord != null)
             {
-                if (player.Uid != e.LastDrawingPlayer.Uid)
-                {
-                    _server.Router.DistributePacket(new WordSolutionPacket(e.LastWord, Router.ServerWildcard, player.Uid));
+                foreach (var player in match.Players)
+                {                
+                    if (player.Uid != e.LastDrawingPlayer.Uid)
+                    {
+                        _server.Router.DistributePacket(new WordSolutionPacket(e.LastWord, Router.ServerWildcard, player.Uid));
+                    }
                 }
-            }
+            }            
         }
 
         private static void Match_RoundFinished(object sender, EventArgs e)
@@ -568,7 +569,7 @@ namespace DrawingHammerServer
         {
             var match = (Match)sender;
 
-            if (match.WordToDraw == null)
+            if (match.WordToDraw == null && e.PreparingPlayer != null)
             {
                 var randomWord = match.GetRandomWordFromPreselectedWords();
                 match.PickedWords.Add(randomWord);
@@ -589,7 +590,7 @@ namespace DrawingHammerServer
 
             foreach (Player player in match.Players)
             {
-                _server.Router.DistributePacket(new MatchFinishedPacket(Router.ServerWildcard, player.Uid));                
+                _server.Router.DistributePacket(new MatchFinishedPacket(match.MatchUid, Router.ServerWildcard, player.Uid));                
             }
         }
 
@@ -656,24 +657,16 @@ namespace DrawingHammerServer
         }
 
         private static void OnClientDisconnected(object sender, ClientDisconnectedEventArgs e)
-        {
+        {            
             Console.WriteLine("Client disconnected with Uid: {0}", e.ClientUid);
 
             foreach (var match in _matches)
-            {                
-                var player = match.Players.FirstOrDefault(p => p.Uid == e.ClientUid);
-
-                match.PlayedPlayers.Remove(player);
-                match.Players.Remove(player);
-
-                if (player != null)
+            {                                
+                if (match.RemovePlayer(e.ClientUid))
                 {
-                    foreach (var client in _server.Clients)
-                    {
-                        client.EnqueueDataForWrite(new PlayerLeftMatchPacket(match.MatchUid, player.Uid, Router.ServerWildcard, client.Uid));
-                    }
+                    _server.Router.DistributePacket(new PlayerLeftMatchPacket(match.MatchUid, e.ClientUid, Router.ServerWildcard, Router.AllAuthenticatedWildCard));                    
                     return; //Player can be in only on match
-                }        
+                }                 
             }
         }
 

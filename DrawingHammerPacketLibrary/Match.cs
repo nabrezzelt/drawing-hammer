@@ -29,7 +29,12 @@ namespace DrawingHammerPacketLibrary
         /// <summary>
         /// Indicates whether a subround is currently running
         /// </summary>
-        public bool IsSubRoundRunning { get; private set; }        
+        public bool IsSubRoundRunning { get; private set; }
+
+        /// <summary>
+        /// Indicates if the match is finished
+        /// </summary>
+        public bool IsFinished { get; set; }
 
         /// <summary>
         /// Event, that is fired when the preparationtimer started
@@ -144,8 +149,8 @@ namespace DrawingHammerPacketLibrary
         /// <summary>
         /// Strokes of the InkCanvas as byte-array
         /// </summary>
-        public byte[] Strokes { get; set; }
-        
+        public byte[] Strokes { get; set; }        
+
         private readonly Timer _preparationTimer;
 
         private readonly Timer _subRoundTimer;
@@ -185,11 +190,15 @@ namespace DrawingHammerPacketLibrary
             ResetHasGuessed();
 
             var player = GetCurrentlyDrawingPlayer();
-            player.Status = PlayerStatus.Guessing;
 
-            PlayedPlayers.Add(player);
+            if (player != null)
+            {
+                player.Status = PlayerStatus.Guessing;
 
-            if (PlayedPlayers.Count == Players.Count)
+                PlayedPlayers.Add(player);
+            }            
+
+            if (PlayedPlayers.Count >= Players.Count)
             {
                 //Runde Beendet
                 PlayedPlayers.Clear();
@@ -198,6 +207,7 @@ namespace DrawingHammerPacketLibrary
                 if (CurrentRound == Rounds)
                 {
                     IsRunning = false;
+                    IsFinished = true;
                     MatchFinished?.Invoke(this, EventArgs.Empty);
                     return;
                 }
@@ -216,7 +226,11 @@ namespace DrawingHammerPacketLibrary
             _currentPreparationTime = PreparationTime;
 
             var player = GetCurrentlyPreparingPlayer();
-            player.Status = PlayerStatus.Drawing;
+
+            if (player != null)
+            {
+                player.Status = PlayerStatus.Drawing;
+            }            
 
             StartSubRound();
         }
@@ -378,7 +392,11 @@ namespace DrawingHammerPacketLibrary
             return null;
         }
 
-        public bool EveryPlayerGuessedTheWord()
+        /// <summary>
+        /// Checks if every player of the match has guesses the required word
+        /// </summary>
+        /// <returns>true if all (exepts the drawing player) has guessed the word, otherwise false</returns>
+        public bool HasEveryPlayerGuessedTheWord()
         {
             foreach (var player in Players)
             {
@@ -386,6 +404,58 @@ namespace DrawingHammerPacketLibrary
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Removes a player from this match and stops the required timers 
+        /// </summary>
+        /// <param name="playerUid">Unique uid of this player</param>
+        /// <returns>true if a player was removed, false if no player was removed</returns>
+        public bool RemovePlayer(string playerUid)
+        {
+            var player = Players.FirstOrDefault(p => p.Uid == playerUid);
+
+            if (player != null)
+            {                
+                Players.Remove(player);
+                PlayedPlayers.Remove(player);
+
+                if (Players.Count < 2)
+                {
+                    StopMatch();
+                }
+                else
+                {
+                    if (player.Status == PlayerStatus.Drawing)
+                    {
+                        StopSubRoundTimer();
+                    }
+                    else if (player.Status == PlayerStatus.Preparing)
+                    {
+                        StopPreparationTimer();
+                        StopSubRoundTimer();
+                    }
+                }                
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Stops this match.
+        /// </summary>
+        public void StopMatch()
+        {
+            _preparationTimer.Stop();
+            _subRoundTimer.Stop();
+
+            IsSubRoundRunning = false;
+            IsRunning = false;
+            IsFinished = true;
+
+            MatchFinished?.Invoke(this, EventArgs.Empty);
         }
     }
 }
