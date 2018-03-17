@@ -77,6 +77,7 @@
                              IsDeletable="True"
                              ToolTip="Profile"
                              DeleteToolTip="Leave current Match"
+                             DeleteClick="ProfileClipQuitMatch_OnClick"
                              Margin="5">
             <materialDesign:Chip.Icon>
                 <materialDesign:PackIcon Kind="Account" />
@@ -116,7 +117,7 @@
                 </ListView.ItemTemplate>
             </ListView>
             <Grid Grid.Column="1">
-                <materialDesign:DialogHost x:Name="DialogHostMatchFinished" DialogClosing="DialogHostMatchFinished_OnDialogClosing">
+                <materialDesign:DialogHost x:Name="DialogHostMatchFinished" DialogClosing="DialogHost_OnDialogClosing">
                     <materialDesign:DialogHost.DialogContent>
                         <Grid>
                             <Grid.RowDefinitions>
@@ -144,10 +145,10 @@
                             </ListView>
                             <Button Grid.Row="2" Content="Quit Match" Margin="6" 
                                     HorizontalAlignment="Center"
-                                    Command="materialDesign:DialogHost.CloseDialogCommand"/>
+                                    Command="materialDesign:DialogHost.CloseDialogCommand" CommandParameter="QuitMatch"/>
                         </Grid>
                     </materialDesign:DialogHost.DialogContent>
-                    <materialDesign:DialogHost x:Name="DialogHostPickWords" DialogClosing="DialogHostPickWords_OnDialogClosing">
+                    <materialDesign:DialogHost x:Name="DialogHostPickWords" DialogClosing="DialogHost_OnDialogClosing">
                         <materialDesign:DialogHost.DialogContent>
                             <Grid>
                                 <ListView ItemsSource="{Binding Words}">

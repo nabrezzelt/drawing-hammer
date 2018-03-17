@@ -1,4 +1,4 @@
-﻿using DrawingHammerPacketLibrary;
+﻿using DrawingHammerPackageLibrary;
 using HelperLibrary.Networking.ClientServer;
 using System;
 using System.ComponentModel;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-using DrawingHammerPacketLibrary.Enums;
+using DrawingHammerPackageLibrary.Enums;
 
 namespace DrawingHammerDesktopApp
 {
@@ -25,20 +25,20 @@ namespace DrawingHammerDesktopApp
             _client = client;
 
             _client.ConnectionLost += OnConnectionLost;            
-            _client.PacketReceived += OnPacketReceived;
+            _client.PackageReceived += OnPackageReceived;
         }
 
-        private void OnPacketReceived(object sender, PacketReceivedEventArgs e)
+        private void OnPackageReceived(object sender, PackageReceivedEventArgs e)
         {
-            switch (e.Packet)
+            switch (e.Package)
             {
-                case AuthenticationResultPacket p:
+                case AuthenticationResultPackage p:
                     HandleAuthenticationResult(p);
                     break;
             }
         }
 
-        private void HandleAuthenticationResult(AuthenticationResultPacket packet)
+        private void HandleAuthenticationResult(AuthenticationResultPackage package)
         {
             InvokeGui(() =>
             {
@@ -47,7 +47,7 @@ namespace DrawingHammerDesktopApp
             });
 
             
-            switch (packet.Result)
+            switch (package.Result)
             {
                 case AuthenticationResult.Ok:
                     LoggedIn = true;
@@ -101,13 +101,13 @@ namespace DrawingHammerDesktopApp
 
             await Task.Run(() =>
             {                
-                var loginPacket = new AuthenticationPacket(
+                var loginPackage = new AuthenticationPackage(
                     username, 
                     password, 
                     App.Uid, 
                     Router.ServerWildcard);
                 
-                _client.EnqueueDataForWrite(loginPacket);
+                _client.EnqueueDataForWrite(loginPackage);
             });
         }
 

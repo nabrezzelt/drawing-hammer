@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:converters="clr-namespace:DrawingHammerDesktopApp.Converters"
         mc:Ignorable="d"
         Title="drawing-hammer | Gamebrowser"
         Height="444.907"
@@ -19,6 +20,9 @@
         TextOptions.TextRenderingMode="Auto"        
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}">
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -45,7 +49,8 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Foreground="{DynamicResource PrimaryHueMidBrush}" Text="RUNNING" />
+                                <TextBlock Grid.Column="0" Foreground="{DynamicResource SecondaryAccentBrush}" Text="FINISHED" Visibility="{Binding IsFinished, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Collapsed}}" />
+                                <TextBlock Grid.Column="0" Foreground="{DynamicResource PrimaryHueMidBrush}" Text="RUNNING"  Visibility="{Binding IsRunning, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Collapsed}}" />
                                 <TextBlock Grid.Column="1" Margin="12,0" Text="{Binding Title}" />
                                 <TextBlock Grid.Column="2" Style="{DynamicResource MaterialDesignCaptionTextBlock}" Foreground="Gray">
                                     <StackPanel Orientation="Horizontal">
@@ -67,6 +72,7 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+                        
                         <TextBlock Grid.Column="0" Foreground="{DynamicResource PrimaryHueMidBrush}">RUNNING</TextBlock>
                         <TextBlock Grid.Column="1" Margin="12,0">Main Faggot Match 1</TextBlock>
                         <TextBlock Grid.Column="2" Style="{DynamicResource MaterialDesignCaptionTextBlock}" Foreground="Gray">(12/12 Players)</TextBlock>

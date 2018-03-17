@@ -1,4 +1,4 @@
-﻿using DrawingHammerPacketLibrary;
+﻿using DrawingHammerPackageLibrary;
 using HelperLibrary.Database;
 using System.Collections.Generic;
 
@@ -6,7 +6,7 @@ namespace DrawingHammerServer
 {
     internal class WordManager
     {
-        private static readonly MySQLDatabaseManager DbManager = MySQLDatabaseManager.GetInstance();
+        private static readonly MySqlDatabaseManager DbManager = MySqlDatabaseManager.GetInstance();
 
         public static List<Word> GetWord(IList<Word> pickedWords, int limit = 3)
         {

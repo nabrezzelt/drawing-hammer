@@ -73,10 +73,7 @@
                     x:Name="ButtonRegister"
                     IsEnabled="False" Click="Register">
                 <StackPanel Orientation="Horizontal">
-                    <fa:ImageAwesome Icon="UserPlus" 
-                                     Width="12"
-                                     Margin="0,0,5,0"
-                                     Foreground="White" />
+                    <materialDesign:PackIcon Kind="AccountPlus" Margin="0,0,2,0" />
                     <TextBlock>Register</TextBlock>
                 </StackPanel>
             </Button>

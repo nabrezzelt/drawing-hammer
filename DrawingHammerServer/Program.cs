@@ -1,5 +1,5 @@
-﻿using DrawingHammerPacketLibrary;
-using DrawingHammerPacketLibrary.Enums;
+﻿using DrawingHammerPackageLibrary;
+using DrawingHammerPackageLibrary.Enums;
 using DrawingHammerServer.Exceptions;
 using HelperLibrary.Database;
 using HelperLibrary.Database.Exceptions;
@@ -46,13 +46,13 @@ namespace DrawingHammerServer
             InitializeDatabaseConnection();
             Log.Info("");
 
-            string ip = _settingsManager.GetStartupIp() != "" ? _settingsManager.GetStartupIp() : NetworkUtilities.GetThisIPv4Adress();
+            string ip = !String.IsNullOrWhiteSpace(_settingsManager.GetStartupIp()) ? _settingsManager.GetStartupIp() : NetworkUtilities.GetThisIPv4Adress();
 
             _server = new DrawingHammerServer(new X509Certificate2(_settingsManager.GetSslCertificatePath(), _settingsManager.GetSslCertificatePassword()), ip, 9999);
 
             _server.ClientConnected += OnClientConnected;
             _server.ClientDisconnected += OnClientDisconnected;
-            _server.PacketReceived += OnPacketReceived;
+            _server.PackageReceived += OnPackageReceived;
             _server.Start();
 
             _authenticationManager = new AuthenticationManager();
@@ -75,11 +75,10 @@ namespace DrawingHammerServer
 
         private static void StartCommandLineHandler()
         {
+            string input = String.Empty;
+
             while (true)
-            {
-                Log.Info("");
-                Console.Write("DrawingHammer>");
-                var input = Console.ReadLine();
+            {                
                 string[] args = input?.Split(' ');
                 string username, password;
                 User user;
@@ -98,7 +97,7 @@ namespace DrawingHammerServer
                         Log.Info(filteredUsers.Count + " account(s) found.");
                         Log.Info("");
 
-                        filteredUsers.ForEach(u => Log.Info(u.Id + " " + u.Username + ", IsBanned:" + (u.IsBanned ? "True" : "False")));
+                        filteredUsers.ForEach(u => Log.Info(u.Id + " " + u.Username));
                         break;
                     #endregion
 
@@ -108,7 +107,7 @@ namespace DrawingHammerServer
                         Log.Info(users.Count + " account(s) found.");
                         Log.Info("");
 
-                        users.ForEach(u => Log.Info(u.Id + " " + u.Username + ", IsBanned:" + (u.IsBanned ? "True" : "False")));
+                        users.ForEach(u => Log.Info(u.Id + " " + u.Username));
                         break;
                     #endregion
 
@@ -235,12 +234,18 @@ namespace DrawingHammerServer
                         }
                         break;
                 }
+
+                Log.Info("");
+                Console.Write("DrawingHammer>");
+                input = Console.ReadLine();
             }
         }
 
         private static void InitializeDatabaseConnection()
         {
-            MySQLDatabaseManager dbManager = MySQLDatabaseManager.GetInstance();
+            MySqlDatabaseManager.CreateInstance();
+
+            MySqlDatabaseManager dbManager = MySqlDatabaseManager.GetInstance();
             dbManager.SetConnectionString(
                 _settingsManager.GetDatabaseHost(),
                 _settingsManager.GetDatabaseUser(),
@@ -262,69 +267,86 @@ namespace DrawingHammerServer
             Log.Info("Database connection successfully initialized!");
         }
 
-        private static void OnPacketReceived(object sender, PacketReceivedEventArgs e)
+        private static void OnPackageReceived(object sender, PackageReceivedEventArgs e)
         {
-            var packet = e.Packet;
-            Log.Debug("Packet recived of type: " + e.Packet.GetType().Name);
+            var package = e.Package;
+            Log.Debug("RECV: Package recived of type: " + e.Package.GetType().Name);
 
-            switch (packet)
+            switch (package)
             {
-                case AuthenticationPacket p:
-                    HandleOnAuthenticationPacket(p, e.SenderTcpClient);
+                case AuthenticationPackage p:
+                    HandleOnAuthenticationPackage(p, e.SenderTcpClient);
                     break;
 
-                case RegistrationPacket p:
-                    HandleOnRegistrationPacket(p, e.SenderTcpClient);
+                case RegistrationPackage p:
+                    HandleOnRegistrationPackage(p, e.SenderTcpClient);
                     break;
 
-                case RequestGamelistPacket p:
-                    HandleOnRequestGamelistPacket(p);
+                case RequestGamelistPackage p:
+                    HandleOnRequestGamelistPackage(p);
                     break;
 
-                case CreateMatchPacket p:
-                    HandleOnCreateMatchPacket(p);
+                case CreateMatchPackage p:
+                    HandleOnCreateMatchPackage(p);
                     break;
 
-                case JoinMatchPacket p:
-                    HandleOnJoinMatchPacket(p);
+                case JoinMatchPackage p:
+                    HandleOnJoinMatchPackage(p);
                     break;
 
-                case RequestMatchDataPacket p:
-                    HandleOnRequestMatchDataPacket(p);
+                case LeaveMatchPackage p:
+                    HandleOnLeaveMatchPackage(p);
                     break;
 
-                case PickedWordPacket p:
-                    HandleOnPickedWordPacket(p);
+                case RequestMatchDataPackage p:
+                    HandleOnRequestMatchDataPackage(p);
                     break;
 
-                case DrawingAreaChangedPacket p:
-                    HandleOnDrawingAreaChangedPacket(p);
+                case PickedWordPackage p:
+                    HandleOnPickedWordPackage(p);
                     break;
 
-                case WordGuessPacket p:
-                    HandleOnWordGuessPacket(p);
+                case DrawingAreaChangedPackage p:
+                    HandleOnDrawingAreaChangedPackage(p);
+                    break;
+
+                case WordGuessPackage p:
+                    HandleOnWordGuessPackage(p);
                     break;
             }
         }
 
-        private static void HandleOnWordGuessPacket(WordGuessPacket packet)
+        private static void HandleOnLeaveMatchPackage(LeaveMatchPackage package)
         {
-            var match = GetMatchByUid(packet.MatchUid);
+            var match = GetMatchByUid(package.MatchUid);
+
+            if (match != null)
+            {
+                if (match.RemovePlayer(package.SenderUid))
+                {
+                    _server.Router.DistributePackage(new PlayerLeftMatchPackage(match.MatchUid, package.SenderUid, Router.ServerWildcard, Router.AllAuthenticatedWildCard));                 
+                }
+            }            
+        }
+
+        private static void HandleOnWordGuessPackage(WordGuessPackage package)
+        {
+            var match = GetMatchByUid(package.MatchUid);
 
             if (match.WordToDraw == null)
                 return;
 
-            if (String.Equals(match.WordToDraw.Value, packet.GuessedWord, StringComparison.InvariantCultureIgnoreCase))
+            if (String.Equals(match.WordToDraw.Value, package.GuessedWord, StringComparison.InvariantCultureIgnoreCase))
             {
                 foreach (var matchPlayer in match.Players)
                 {
-                    _server.Router.DistributePacket(new WordGuessCorrectPacket(packet.SenderUid, Router.ServerWildcard, matchPlayer.Uid));
+                    _server.Router.DistributePackage(new WordGuessCorrectPackage(package.SenderUid, Router.ServerWildcard, matchPlayer.Uid));
                 }
 
-                match.CalculateAndRaiseScore(packet.SenderUid);
+                match.CalculateAndRaiseScore(package.SenderUid);
 
                 //Check if all players (exept the drawing player) have guessed the word and stop this subround!
-                if (match.EveryPlayerGuessedTheWord())
+                if (match.HasEveryPlayerGuessedTheWord())
                 {
                     match.StopSubRoundTimer();
                 }
@@ -333,33 +355,33 @@ namespace DrawingHammerServer
             {
                 foreach (var matchPlayer in match.Players)
                 {
-                    _server.Router.DistributePacket(new WordGuessPacket(packet.GuessedWord, match.MatchUid, packet.PlayerUid, Router.ServerWildcard, matchPlayer.Uid));
+                    _server.Router.DistributePackage(new WordGuessPackage(package.GuessedWord, match.MatchUid, package.PlayerUid, Router.ServerWildcard, matchPlayer.Uid));
                 }
             }
         }
 
-        private static void HandleOnDrawingAreaChangedPacket(DrawingAreaChangedPacket packet)
+        private static void HandleOnDrawingAreaChangedPackage(DrawingAreaChangedPackage package)
         {
-            var match = GetMatchByUid(packet.MatchUid);
+            var match = GetMatchByUid(package.MatchUid);
             var drawingPlayer = match.GetCurrentlyDrawingPlayer();
 
-            if (drawingPlayer != null && packet.SenderUid == drawingPlayer.Uid)
+            if (drawingPlayer != null && package.SenderUid == drawingPlayer.Uid)
             {
-                match.Strokes = packet.Strokes;
+                match.Strokes = package.Strokes;
 
                 foreach (var player in match.Players)
                 {
-                    if (player.Uid != packet.SenderUid)
+                    if (player.Uid != package.SenderUid)
                     {
-                        _server.Router.DistributePacket(new DrawingAreaChangedPacket(packet.Strokes, match.MatchUid, Router.ServerWildcard, player.Uid));
+                        _server.Router.DistributePackage(new DrawingAreaChangedPackage(package.Strokes, match.MatchUid, Router.ServerWildcard, player.Uid));
                     }
                 }
             }
         }
 
-        private static void HandleOnPickedWordPacket(PickedWordPacket packet)
+        private static void HandleOnPickedWordPackage(PickedWordPackage package)
         {
-            var match = GetMatchByUid(packet.MatchUid);
+            var match = GetMatchByUid(package.MatchUid);
             var preparingPlayer = match.GetCurrentlyPreparingPlayer();
 
             if (preparingPlayer != null)
@@ -368,9 +390,9 @@ namespace DrawingHammerServer
 
                 foreach (var randomWord in match.RandomWordsToPick)
                 {
-                    if (randomWord.Id == packet.PickedWord.Id)
+                    if (randomWord.Id == package.PickedWord.Id)
                     {
-                        word = packet.PickedWord;
+                        word = package.PickedWord;
                     }
                 }
 
@@ -382,32 +404,36 @@ namespace DrawingHammerServer
                 match.WordToDraw = word;
                 match.PickedWords.Add(word);
 
-                _server.Router.DistributePacket(new WordToDrawPacket(word, Router.ServerWildcard, preparingPlayer.Uid));
+                _server.Router.DistributePackage(new WordToDrawPackage(word, Router.ServerWildcard, preparingPlayer.Uid));
 
                 match.StopPreparationTimer();
                 Log.Debug("PreparationTimer should be stopped now!");
             }
         }
 
-        private static void HandleOnRequestMatchDataPacket(RequestMatchDataPacket packet)
+        private static void HandleOnRequestMatchDataPackage(RequestMatchDataPackage package)
         {
-            var match = GetMatchByUid(packet.MatchUid);
-            DrawingHammerClientData client = (DrawingHammerClientData)_server.GetClientByUid(packet.SenderUid);
+            var match = GetMatchByUid(package.MatchUid);
+            DrawingHammerClientData client = (DrawingHammerClientData)_server.GetClientFromClientList(package.SenderUid);
 
-            client.EnqueueDataForWrite(new MatchDataPacket(new MatchData(match), Router.ServerWildcard, client.Uid));
+            client.EnqueueDataForWrite(new MatchDataPackage(new MatchData(match), Router.ServerWildcard, client.Uid));
         }
 
-        private static void HandleOnJoinMatchPacket(JoinMatchPacket packet)
+        private static void HandleOnJoinMatchPackage(JoinMatchPackage package)
         {
-            Match match = GetMatchByUid(packet.MatchUid);
-            DrawingHammerClientData client = (DrawingHammerClientData)_server.GetClientByUid(packet.SenderUid);
+            Match match = GetMatchByUid(package.MatchUid);
+            DrawingHammerClientData client = (DrawingHammerClientData)_server.GetClientFromClientList(package.SenderUid);
 
-            if (match.Players.Count < match.MaxPlayers)
+            if (match.IsFinished)
+            {
+                client.EnqueueDataForWrite(new MatchJoinFailedPackage("Match is already finished!", package.SenderUid, Router.ServerWildcard));
+            }
+            else if (match.Players.Count < match.MaxPlayers)
             {
                 Player player = new Player(client.User.Id, client.Uid, client.User.Username, 0);
                 match.Players.Add(player);
 
-                _server.Router.DistributePacket(new PlayerJoinedMatchPacket(
+                _server.Router.DistributePackage(new PlayerJoinedMatchPackage(
                     match.MatchUid,
                     player,
                     Router.ServerWildcard,
@@ -417,7 +443,7 @@ namespace DrawingHammerServer
                 {
                     //Notify player that a round already started
                     Log.Debug("Match is currently running - send subround started again!");
-                    _server.Router.DistributePacket(new SubRoundStartedPacket(Router.ServerWildcard, packet.SenderUid));
+                    _server.Router.DistributePackage(new SubRoundStartedPackage(Router.ServerWildcard, package.SenderUid));
                 }
 
                 if (match.Players.Count > 1 && !match.IsRunning)
@@ -427,16 +453,16 @@ namespace DrawingHammerServer
             }
             else
             {
-                client.EnqueueDataForWrite(new MatchJoinFailedPacket("Maximum player count reached!", packet.SenderUid, Router.ServerWildcard));
+                client.EnqueueDataForWrite(new MatchJoinFailedPackage("Maximum player count reached!", package.SenderUid, Router.ServerWildcard));
             }
         }
 
-        private static void HandleOnCreateMatchPacket(CreateMatchPacket packet)
+        private static void HandleOnCreateMatchPackage(CreateMatchPackage package)
         {
-            var client = (DrawingHammerClientData)_server.GetClientByUid(packet.SenderUid);
+            var client = (DrawingHammerClientData)_server.GetClientFromClientList(package.SenderUid);
 
             Match match =
-                new Match(packet.MatchData.Title, packet.MatchData.Rounds, packet.MatchData.MaxPlayers, packet.MatchData.RoundLength)
+                new Match(package.MatchData.Title, package.MatchData.Rounds, package.MatchData.MaxPlayers, package.MatchData.RoundLength)
                 {
                     CreatorId = client.User.Id
                 };
@@ -454,11 +480,11 @@ namespace DrawingHammerServer
             _matches.Add(match);
             Log.Debug("Match created with title: " + match.Title);
 
-            _server.Router.DistributePacket(
-                new CreateMatchPacket(new MatchData(match), Router.ServerWildcard, Router.AllAuthenticatedWildCard));
+            _server.Router.DistributePackage(
+                new CreateMatchPackage(new MatchData(match), Router.ServerWildcard, Router.AllAuthenticatedWildCard));
             Log.Debug("All clients notified recording new match.");
 
-            client.EnqueueDataForWrite(new MatchCreatedPacket(Router.ServerWildcard, client.Uid));
+            client.EnqueueDataForWrite(new MatchCreatedPackage(Router.ServerWildcard, client.Uid));
         }
 
         private static void Match_ScoreChanged(object sender, ScoreChangedEventArgs e)
@@ -467,7 +493,7 @@ namespace DrawingHammerServer
 
             foreach (var matchPlayer in match.Players)
             {
-                _server.Router.DistributePacket(new ScoreChangedPacket(e.Player.Uid, e.RaisedScore, Router.ServerWildcard, matchPlayer.Uid));
+                _server.Router.DistributePackage(new ScoreChangedPackage(e.Player.Uid, e.RaisedScore, Router.ServerWildcard, matchPlayer.Uid));
             }
         }
 
@@ -477,7 +503,7 @@ namespace DrawingHammerServer
 
             foreach (Player player in match.Players)
             {
-                _server.Router.DistributePacket(new RoundStartedPacket(e.RoundNumber, Router.ServerWildcard, player.Uid));
+                _server.Router.DistributePackage(new RoundStartedPackage(e.RoundNumber, Router.ServerWildcard, player.Uid));
             }
         }
 
@@ -495,11 +521,11 @@ namespace DrawingHammerServer
             words = WordManager.GetWord(match.PickedWords);
             match.RandomWordsToPick = new ObservableCollection<Word>(words);
 
-            _server.Router.DistributePacket(new PickWordsPacket(words, Router.ServerWildcard, e.Player.Uid));
+            _server.Router.DistributePackage(new PickWordsPackage(words, Router.ServerWildcard, e.Player.Uid));
 
             foreach (Player player in match.Players)
             {
-                _server.Router.DistributePacket(new PreparationTimeStartedPacket(e.Player, Router.ServerWildcard, player.Uid));
+                _server.Router.DistributePackage(new PreparationTimeStartedPackage(e.Player, Router.ServerWildcard, player.Uid));
             }
         }
 
@@ -509,7 +535,7 @@ namespace DrawingHammerServer
 
             foreach (Player player in match.Players)
             {
-                _server.Router.DistributePacket(new SubRoundStartedPacket(Router.ServerWildcard, player.Uid));
+                _server.Router.DistributePackage(new SubRoundStartedPackage(Router.ServerWildcard, player.Uid));
             }
         }
 
@@ -519,16 +545,19 @@ namespace DrawingHammerServer
 
             foreach (Player player in match.Players)
             {
-                _server.Router.DistributePacket(new SubRoundFinishedPacket(Router.ServerWildcard, player.Uid));
+                _server.Router.DistributePackage(new SubRoundFinishedPackage(Router.ServerWildcard, player.Uid));
             }
 
-            foreach (var player in match.Players)
+            if (e.LastDrawingPlayer != null && e.LastWord != null)
             {
-                if (player.Uid != e.LastDrawingPlayer.Uid)
-                {
-                    _server.Router.DistributePacket(new WordSolutionPacket(e.LastWord, Router.ServerWildcard, player.Uid));
+                foreach (var player in match.Players)
+                {                
+                    if (player.Uid != e.LastDrawingPlayer.Uid)
+                    {
+                        _server.Router.DistributePackage(new WordSolutionPackage(e.LastWord, Router.ServerWildcard, player.Uid));
+                    }
                 }
-            }
+            }            
         }
 
         private static void Match_RoundFinished(object sender, EventArgs e)
@@ -537,7 +566,7 @@ namespace DrawingHammerServer
 
             foreach (Player player in match.Players)
             {
-                _server.Router.DistributePacket(new RoundFinishedPacket(Router.ServerWildcard, player.Uid));
+                _server.Router.DistributePackage(new RoundFinishedPackage(Router.ServerWildcard, player.Uid));
             }
         }
 
@@ -545,18 +574,18 @@ namespace DrawingHammerServer
         {
             var match = (Match)sender;
 
-            if (match.WordToDraw == null)
+            if (match.WordToDraw == null && e.PreparingPlayer != null)
             {
                 var randomWord = match.GetRandomWordFromPreselectedWords();
                 match.PickedWords.Add(randomWord);
                 match.WordToDraw = randomWord;
 
-                _server.Router.DistributePacket(new WordToDrawPacket(randomWord, Router.ServerWildcard, e.PreparingPlayer.Uid));
+                _server.Router.DistributePackage(new WordToDrawPackage(randomWord, Router.ServerWildcard, e.PreparingPlayer.Uid));
             }
 
             foreach (Player player in match.Players)
             {
-                _server.Router.DistributePacket(new PreparationTimeFinishedPacket(Router.ServerWildcard, player.Uid));
+                _server.Router.DistributePackage(new PreparationTimeFinishedPackage(Router.ServerWildcard, player.Uid));
             }
         }
 
@@ -566,13 +595,11 @@ namespace DrawingHammerServer
 
             foreach (Player player in match.Players)
             {
-                _server.Router.DistributePacket(new MatchFinishedPacket(Router.ServerWildcard, player.Uid));
-                //ToDo: Notifiy players and show score overview
-                Log.Debug("Notifiy players and show score overview");
+                _server.Router.DistributePackage(new MatchFinishedPackage(match.MatchUid, Router.ServerWildcard, player.Uid));                
             }
         }
 
-        private static void HandleOnRequestGamelistPacket(RequestGamelistPacket packet)
+        private static void HandleOnRequestGamelistPackage(RequestGamelistPackage package)
         {
             var matchDataList = new ObservableCollection<MatchData>();
             foreach (var match in _matches)
@@ -580,64 +607,72 @@ namespace DrawingHammerServer
                 matchDataList.Add(new MatchData(match));
             }
 
-            var client = _server.GetClientByUid(packet.SenderUid);
-            client.EnqueueDataForWrite(new GameListPacket(matchDataList, Router.ServerWildcard, client.Uid));
+            var client = _server.GetClientFromClientList(package.SenderUid);
+            client.EnqueueDataForWrite(new GameListPackage(matchDataList, Router.ServerWildcard, client.Uid));
         }
 
-        private static void HandleOnRegistrationPacket(RegistrationPacket packet, TcpClient senderTcpClient)
+        private static void HandleOnRegistrationPackage(RegistrationPackage package, TcpClient senderTcpClient)
         {
-            var client = _server.GetClientByTcpClient(senderTcpClient);
-            client.Uid = packet.SenderUid;
+            var client = _server.GetClientFromClientList(senderTcpClient);
+            client.Uid = package.SenderUid;
 
             try
             {
-                UserManager.CreateUser(packet.Username, packet.Password);
-                Log.Info("User successfull created with username: " + packet.Username);
+                UserManager.CreateUser(package.Username, package.Password);
+                Log.Info("User successfull created with username: " + package.Username);
 
-                client.EnqueueDataForWrite(new RegistrationResultPacket(RegistrationResult.Ok, Router.ServerWildcard, packet.SenderUid));
+                client.EnqueueDataForWrite(new RegistrationResultPackage(RegistrationResult.Ok, Router.ServerWildcard, package.SenderUid));
             }
             catch (UserAlreadyExitsException)
             {
-                Log.Info("Registration failed. User with username '" + packet.Username + "' already exitsts");
-                client.EnqueueDataForWrite(new RegistrationResultPacket(RegistrationResult.UsernameAlreadyExists, Router.ServerWildcard, packet.SenderUid));
+                Log.Info("Registration failed. User with username '" + package.Username + "' already exitsts");
+                client.EnqueueDataForWrite(new RegistrationResultPackage(RegistrationResult.UsernameAlreadyExists, Router.ServerWildcard, package.SenderUid));
             }
             catch (UsernameTooLongException)
             {
-                Log.Info("Registration failed. User '" + packet.Username + "' is too long.");
-                client.EnqueueDataForWrite(new RegistrationResultPacket(RegistrationResult.UsernameTooLong, Router.ServerWildcard, packet.SenderUid));
+                Log.Info("Registration failed. User '" + package.Username + "' is too long.");
+                client.EnqueueDataForWrite(new RegistrationResultPackage(RegistrationResult.UsernameTooLong, Router.ServerWildcard, package.SenderUid));
             }
             catch (UsernameTooShortException)
             {
-                Log.Info("Registration failed. User '" + packet.Username + "' is too short.");
-                client.EnqueueDataForWrite(new RegistrationResultPacket(RegistrationResult.UsernameTooShort, Router.ServerWildcard, packet.SenderUid));
+                Log.Info("Registration failed. User '" + package.Username + "' is too short.");
+                client.EnqueueDataForWrite(new RegistrationResultPackage(RegistrationResult.UsernameTooShort, Router.ServerWildcard, package.SenderUid));
             }
         }
 
-        private static void HandleOnAuthenticationPacket(AuthenticationPacket packet, TcpClient senderTcpClient)
+        private static void HandleOnAuthenticationPackage(AuthenticationPackage package, TcpClient senderTcpClient)
         {
-            var client = (DrawingHammerClientData)_server.GetClientByTcpClient(senderTcpClient);
-            client.Uid = packet.SenderUid;
+            var client = (DrawingHammerClientData)_server.GetClientFromClientList(senderTcpClient);
+            client.Uid = package.SenderUid;
 
-            var authResult = _authenticationManager.IsValid(packet.Username, packet.Password);
+            var authResult = _authenticationManager.IsValid(package.Username, package.Password);
 
             if (authResult.Result)
             {
-                Log.Info($"Authenticationcredentials for username '{packet.Username}' are valid!");
+                Log.Info($"Authenticationcredentials for username '{package.Username}' are valid!");
                 client.Authenticated = true;
                 client.User = authResult.User;
-                client.EnqueueDataForWrite(new AuthenticationResultPacket(AuthenticationResult.Ok, Router.ServerWildcard, packet.SenderUid));
+                client.EnqueueDataForWrite(new AuthenticationResultPackage(AuthenticationResult.Ok, Router.ServerWildcard, package.SenderUid));
             }
             else
             {
-                Log.Info($"Authenticationcredentials for username '{packet.Username}' are not valid!");
-                client.EnqueueDataForWrite(new AuthenticationResultPacket(AuthenticationResult.Failed, Router.ServerWildcard, packet.SenderUid));
+                Log.Info($"Authenticationcredentials for username '{package.Username}' are not valid!");
+                client.EnqueueDataForWrite(new AuthenticationResultPackage(AuthenticationResult.Failed, Router.ServerWildcard, package.SenderUid));
             }
         }
 
         private static void OnClientDisconnected(object sender, ClientDisconnectedEventArgs e)
-        {
+        {            
             Console.WriteLine("Client disconnected with Uid: {0}", e.ClientUid);
-            //ToDo: Von allen Matches usw. entfernen und an die anderen Clients syncen.
+
+            foreach (var match in _matches)
+            {                                
+                if (match.RemovePlayer(e.ClientUid))
+                {
+                    _server.Router.DistributePackage(new PlayerLeftMatchPackage(match.MatchUid, e.ClientUid, Router.ServerWildcard, Router.AllAuthenticatedWildCard));                    
+                    return; //Player can be in only on match
+                }                 
+            }
         }
 
         private static void OnClientConnected(object sender, ClientConnectedEventArgs e)

@@ -1,5 +1,5 @@
 ﻿using System;
-using DrawingHammerPacketLibrary;
+using DrawingHammerPackageLibrary;
 using System.Collections.ObjectModel;
 using System.Timers;
 using MaterialDesignThemes.Wpf;
@@ -8,12 +8,18 @@ namespace DrawingHammerDesktopApp.ViewModel
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        public string MyUsername { get; set; }        
+        public string MyUsername { get; set; }     
+        
         public string MatchUid {get; set;}
+
         public int CurrentRound { get; set; }
+
         public int Rounds { get; set; }
-        public int RemainingTime { get; set; }        
+
+        public int RemainingTime { get; set; }       
+        
         public int RoundLength { get; set;  }
+
         public ObservableCollection<Player> Players { get; set; }
 
         public bool CanDraw { get; set; }
@@ -61,6 +67,18 @@ namespace DrawingHammerDesktopApp.ViewModel
         public void StartTimer()
         {
             _roundTimer.Start();
-        }           
+        }
+
+        public void Reset()
+        {
+            ResetTimer();
+            WordToDraw = null;
+            Rounds = 0;
+            CurrentRound = 0;
+            RemainingTime = 0;
+            Players.Clear();
+            Guesses.Clear();
+            MatchUid = String.Empty;             
+        }
     }
 }
