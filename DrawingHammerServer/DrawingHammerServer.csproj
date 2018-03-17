@@ -70,9 +70,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DrawingHammerPacketLibrary\DrawingHammerPacketLibrary.csproj">
-      <Project>{10D12DC1-CB43-410C-96CF-0016297FEFB2}</Project>
-      <Name>DrawingHammerPacketLibrary</Name>
+    <ProjectReference Include="..\DrawingHammerPackageLibrary\DrawingHammerPackageLibrary.csproj">
+      <Project>{10d12dc1-cb43-410c-96cf-0016297fefb2}</Project>
+      <Name>DrawingHammerPackageLibrary</Name>
     </ProjectReference>
     <ProjectReference Include="..\HelperLibrary\HelperLibrary.csproj">
       <Project>{3922e085-3615-422b-b706-ef8addeae830}</Project>

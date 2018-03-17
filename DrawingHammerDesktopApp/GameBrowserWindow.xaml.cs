@@ -1,5 +1,5 @@
 ﻿using DrawingHammerDesktopApp.ViewModel;
-using DrawingHammerPacketLibrary;
+using DrawingHammerPackageLibrary;
 using HelperLibrary.Logging;
 using HelperLibrary.Networking.ClientServer;
 using System;
@@ -36,7 +36,7 @@ namespace DrawingHammerDesktopApp
             _client = client;
 
             _client.ConnectionLost += OnConnectionLost;
-            _client.PacketReceived += OnPacketReceived;
+            _client.PackageReceived += OnPackageReceived;
 
             RequestGameList();
         }
@@ -45,73 +45,73 @@ namespace DrawingHammerDesktopApp
         {
             await Task.Run(() =>
             {
-                _client.EnqueueDataForWrite(new RequestGamelistPacket(App.Uid, Router.ServerWildcard));
+                _client.EnqueueDataForWrite(new RequestGamelistPackage(App.Uid, Router.ServerWildcard));
                 Log.Debug("Matchlist requested.");
             });
         }
 
-        private void OnPacketReceived(object sender, PacketReceivedEventArgs e)
+        private void OnPackageReceived(object sender, PackageReceivedEventArgs e)
         {
-            switch (e.Packet)
+            switch (e.Package)
             {
-                case GameListPacket p:
+                case GameListPackage p:
                     HandleOnGameListReceived(p);
                     break;                
-                case CreateMatchPacket p:
+                case CreateMatchPackage p:
                     AddMatchToList(p.MatchData);
                     break;
-                case PlayerJoinedMatchPacket p:
+                case PlayerJoinedMatchPackage p:
                     HandleOnPlayerChangedMatch(p);
                     break;
-                case MatchJoinFailedPacket p:
+                case MatchJoinFailedPackage p:
                     HandleOnJoinMatchFailed(p);
                     break;
-                case PlayerLeftMatchPacket p:
+                case PlayerLeftMatchPackage p:
                     HandleOnPlayerLeftMatch(p);
                     break;
-                case MatchFinishedPacket p:
+                case MatchFinishedPackage p:
                     HandleOnMatchFinished(p);
                     break;             
             }
         }
 
-        private void HandleOnMatchFinished(MatchFinishedPacket packet)
+        private void HandleOnMatchFinished(MatchFinishedPackage package)
         {
             InvokeGui(() =>
             {
-                var match = _viewModel.Matches.FirstOrDefault(m => m.MatchUid == packet.MatchUid);
+                var match = _viewModel.Matches.FirstOrDefault(m => m.MatchUid == package.MatchUid);
 
                 if (match != null)
                     match.IsFinished = true;
             });
         }
 
-        private void HandleOnPlayerLeftMatch(PlayerLeftMatchPacket packet)
+        private void HandleOnPlayerLeftMatch(PlayerLeftMatchPackage package)
         {
             RequestGameList();
         }
 
-        private void HandleOnJoinMatchFailed(MatchJoinFailedPacket packet)
+        private void HandleOnJoinMatchFailed(MatchJoinFailedPackage package)
         {
             InvokeGui(() =>
             {
-                StatusSnackbar.MessageQueue.Enqueue($"Could not join this match (Reason: {packet.Reason})");
+                StatusSnackbar.MessageQueue.Enqueue($"Could not join this match (Reason: {package.Reason})");
             });
         }
 
-        private void HandleOnPlayerChangedMatch(PlayerJoinedMatchPacket packet)
+        private void HandleOnPlayerChangedMatch(PlayerJoinedMatchPackage package)
         {
             InvokeGui(() =>
             {                
-                if (packet.Player.Uid == App.Uid)
+                if (package.Player.Uid == App.Uid)
                 {
-                    _mainWindow.MatchJoined(packet.MatchUid);
+                    _mainWindow.MatchJoined(package.MatchUid);
                     _matchJoined = true;
                     Close();
                 }
 
-                var match = _viewModel.GetMatch(packet.MatchUid);
-                match.Players.Add(packet.Player);                                
+                var match = _viewModel.GetMatch(package.MatchUid);
+                match.Players.Add(package.Player);                                
             });            
         }
 
@@ -123,11 +123,11 @@ namespace DrawingHammerDesktopApp
             });
         }
 
-        private void HandleOnGameListReceived(GameListPacket packet)
+        private void HandleOnGameListReceived(GameListPackage package)
         {
             InvokeGui(() =>
             {
-                _viewModel.Matches = packet.Matches;
+                _viewModel.Matches = package.Matches;
             });          
         }
 
@@ -171,7 +171,7 @@ namespace DrawingHammerDesktopApp
                 MatchData selectedMatch = (MatchData) ListViewGamelist.SelectedItem;
                 await Task.Run(() =>
                 {
-                    _client.EnqueueDataForWrite(new JoinMatchPacket(selectedMatch.MatchUid, App.Uid, Router.ServerWildcard));
+                    _client.EnqueueDataForWrite(new JoinMatchPackage(selectedMatch.MatchUid, App.Uid, Router.ServerWildcard));
                 });
             });           
         }

@@ -1,4 +1,4 @@
-﻿using DrawingHammerPacketLibrary;
+﻿using DrawingHammerPackageLibrary;
 using HelperLibrary.Networking.ClientServer;
 using System;
 using System.Windows;
@@ -19,16 +19,16 @@ namespace DrawingHammerDesktopApp
             InitializeComponent();
             _client = client;
             _client.ConnectionLost += OnConnectionLost;
-            _client.PacketReceived += OnPacketReceived;
+            _client.PackageReceived += OnPackageReceived;
         }
 
-        private void OnPacketReceived(object sender, PacketReceivedEventArgs e)
+        private void OnPackageReceived(object sender, PackageReceivedEventArgs e)
         {
             InvokeGui(() =>
             {
-                switch (e.Packet)
+                switch (e.Package)
                 {
-                    case MatchCreatedPacket _:
+                    case MatchCreatedPackage _:
                         NotifyForCreatedMatch();
                         break;
                 }
@@ -61,7 +61,7 @@ namespace DrawingHammerDesktopApp
 
         private void SendCreateMassage(string matchTitle, int maxRounds, int maxPlayers, int roundLength)
         {
-            _client.EnqueueDataForWrite(new CreateMatchPacket(new MatchData(matchTitle, maxRounds, maxPlayers, roundLength), App.Uid, Router.ServerWildcard));
+            _client.EnqueueDataForWrite(new CreateMatchPackage(new MatchData(matchTitle, maxRounds, maxPlayers, roundLength), App.Uid, Router.ServerWildcard));
         }
 
         private void InvokeGui(Action action)

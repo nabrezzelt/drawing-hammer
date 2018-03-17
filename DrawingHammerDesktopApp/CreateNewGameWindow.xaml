@@ -10,7 +10,8 @@
         Width="367.227"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        
+        Icon="pack://siteoforigin:,,,/Resources/DrawingHammerIcon.png"
+
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"

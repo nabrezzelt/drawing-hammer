@@ -9,7 +9,7 @@
         Width="255"
         ResizeMode="NoResize"
         Closing="OnClosing"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="CenterScreen"       
 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"

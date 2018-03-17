@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingHammerServer", "DrawingHammerServer\DrawingHammerServer.csproj", "{DDF29ECC-AD6B-4BBC-A015-322339B71EE0}"
 EndProject
@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingHammerDesktopApp", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperLibrary", "HelperLibrary\HelperLibrary.csproj", "{3922E085-3615-422B-B706-EF8ADDEAE830}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingHammerPacketLibrary", "DrawingHammerPacketLibrary\DrawingHammerPacketLibrary.csproj", "{10D12DC1-CB43-410C-96CF-0016297FEFB2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingHammerPackageLibrary", "DrawingHammerPackageLibrary\DrawingHammerPackageLibrary.csproj", "{10D12DC1-CB43-410C-96CF-0016297FEFB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

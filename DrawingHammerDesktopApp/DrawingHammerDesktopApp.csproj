@@ -166,12 +166,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\DrawingHammerTestLogo.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DrawingHammerPacketLibrary\DrawingHammerPacketLibrary.csproj">
+    <ProjectReference Include="..\DrawingHammerPackageLibrary\DrawingHammerPackageLibrary.csproj">
       <Project>{10d12dc1-cb43-410c-96cf-0016297fefb2}</Project>
-      <Name>DrawingHammerPacketLibrary</Name>
+      <Name>DrawingHammerPackageLibrary</Name>
     </ProjectReference>
     <ProjectReference Include="..\HelperLibrary\HelperLibrary.csproj">
       <Project>{3922E085-3615-422B-B706-EF8ADDEAE830}</Project>

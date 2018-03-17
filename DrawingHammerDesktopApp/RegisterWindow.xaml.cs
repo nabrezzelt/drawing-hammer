@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-using DrawingHammerPacketLibrary;
-using DrawingHammerPacketLibrary.Enums;
+using DrawingHammerPackageLibrary;
+using DrawingHammerPackageLibrary.Enums;
 using HelperLibrary.Networking.ClientServer;
 
 namespace DrawingHammerDesktopApp
@@ -22,15 +22,15 @@ namespace DrawingHammerDesktopApp
             _client = client;
 
             _client.ConnectionLost += OnConnectionLost;            
-            _client.PacketReceived += OnPacketReceived;
+            _client.PackageReceived += OnPackageReceived;
         }
 
-        private void OnPacketReceived(object sender, PacketReceivedEventArgs e)
+        private void OnPackageReceived(object sender, PackageReceivedEventArgs e)
         {
-            switch (e.Packet)
+            switch (e.Package)
             {
-                case RegistrationResultPacket packet:
-                    HandleRegisterResult(packet);
+                case RegistrationResultPackage package:
+                    HandleRegisterResult(package);
                     break;
             }
         }
@@ -43,7 +43,7 @@ namespace DrawingHammerDesktopApp
             });
         }
 
-        private void HandleRegisterResult(RegistrationResultPacket packet)
+        private void HandleRegisterResult(RegistrationResultPackage package)
         {
             InvokeGui(() =>
             {
@@ -51,7 +51,7 @@ namespace DrawingHammerDesktopApp
                 ProgressBarRegistering.Visibility = Visibility.Collapsed;
             });
             
-            switch (packet.Result)
+            switch (package.Result)
             {
                 case RegistrationResult.Ok:
                     InvokeGui(async () =>
@@ -114,7 +114,7 @@ namespace DrawingHammerDesktopApp
         {            
             await Task.Run(() =>
             {
-                _client.EnqueueDataForWrite(new RegistrationPacket(
+                _client.EnqueueDataForWrite(new RegistrationPackage(
                     username,
                     password,
                     App.Uid,

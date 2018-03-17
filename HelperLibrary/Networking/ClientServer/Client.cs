@@ -1,11 +1,11 @@
 ﻿using HelperLibrary.Logging;
-using HelperLibrary.Networking.ClientServer.Packets;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using HelperLibrary.Networking.ClientServer.Packages;
 
 namespace HelperLibrary.Networking.ClientServer
 {
@@ -22,27 +22,39 @@ namespace HelperLibrary.Networking.ClientServer
         public event EventHandler ConnectionLost;  
         
         /// <summary>
-        /// Fired when client receives a packet.
+        /// Fired when client receives a package.
         /// </summary>
-        public event EventHandler<PacketReceivedEventArgs> PacketReceived;
+        public event EventHandler<PackageReceivedEventArgs> PackageReceived;
 
+        /// <summary>
+        /// Indicates if the client is connected to the server.
+        /// </summary>
         public bool IsConnected { get; set; }
 
+        /// <summary>
+        /// <see cref="IPAddress"/> which the <see cref="TcpClient"/> is listen on .
+        /// </summary>
         protected IPAddress ServerIp;
+
+        /// <summary>
+        /// Port which the <see cref="TcpClient"/> is listen on .
+        /// </summary>
         protected int Port;
-        protected TcpClient TcpClient;
+
+        protected TcpClient TcpClient;                
         protected Stream ClientStream;
 
-        private readonly ConcurrentQueue<byte[]> _pendingDataToWrite = new ConcurrentQueue<byte[]>();
-        private bool _sendingData;
+        protected readonly ConcurrentQueue<byte[]> PendingDataToWrite = new ConcurrentQueue<byte[]>();
+        protected bool SendingData;
+
         /// <summary>
         /// Initialize the connection to the server.
         /// </summary>
-        /// <param name="serverIP">Server IP</param>
+        /// <param name="serverIp">Server IP</param>
         /// <param name="port">Port to connect</param>
-        public void Connect(IPAddress serverIP, int port)
+        public void Connect(IPAddress serverIp, int port)
         {
-            ServerIp = serverIP;
+            ServerIp = serverIp;
             Port = port;
 
             ConnectToServer();
@@ -56,6 +68,9 @@ namespace HelperLibrary.Networking.ClientServer
             Connect(IPAddress.Parse(serverIp), port);
         }
 
+        /// <summary>
+        /// Opens the connection of the TcpClient.
+        /// </summary>
         protected virtual void ConnectToServer()
         {
             TcpClient = new TcpClient();
@@ -79,6 +94,9 @@ namespace HelperLibrary.Networking.ClientServer
             }
         }        
 
+        /// <summary>
+        /// Starts the thread to receive and handle incomming data
+        /// </summary>
         private void StartReceivingData()
         {
             Log.Info("Starting incomming data handler...");
@@ -87,6 +105,9 @@ namespace HelperLibrary.Networking.ClientServer
             Log.Info("Incomming data handler started.");
         }
 
+        /// <summary>
+        /// Reads the incomming data from the <see cref="NetworkStream"/>.
+        /// </summary>
         private void HandleIncommingData()
         {            
             try
@@ -112,9 +133,9 @@ namespace HelperLibrary.Networking.ClientServer
                     }
 
                     //Daten sind im Buffer-Array gespeichert
-                    PacketReceived?.Invoke(this,
-                        new PacketReceivedEventArgs(BasePacket.Deserialize(buffer), TcpClient));
-                }
+                    PackageReceived?.Invoke(this,
+                        new PackageReceivedEventArgs(BasePackage.Deserialize(buffer), TcpClient));
+                }                
             }
             catch (IOException ex)
             {
@@ -140,37 +161,37 @@ namespace HelperLibrary.Networking.ClientServer
         /// <summary>
         /// Send a package to the server.
         /// </summary>
-        /// <param name="packet">Packet to send</param>
+        /// <param name="package">Package to send</param>
         [Obsolete("Use EnqueueDataForWrite(BasePackage package) instead!")]
-        public void SendPacketToServer(BasePacket packet)
+        public void SendPackageToServer(BasePackage package)
         {
-            EnqueueDataForWrite(packet);
+            EnqueueDataForWrite(package);
         }
         /// <summary>
-        /// Enqueue the packet in the message queue to send this to the server.
+        /// Enqueue the package in the message queue to send this to the server.
         /// </summary>
-        /// <param name="packet">Package to send (must inherit <see cref="BasePacket"/>).</param>
-        public void EnqueueDataForWrite(BasePacket packet)
+        /// <param name="package">Package to send (must inherit <see cref="BasePackage"/>).</param>
+        public void EnqueueDataForWrite(BasePackage package)
         {
             if (!TcpClient.Connected)
                 throw new InvalidOperationException("You're not connected!");
 
-            var packetBytes = BasePacket.Serialize(packet);
+            var packageBytes = BasePackage.Serialize(package);
 
-            var length = packetBytes.Length;
+            var length = packageBytes.Length;
             var lengthBytes = BitConverter.GetBytes(length);
 
-            _pendingDataToWrite.Enqueue(lengthBytes);
-            _pendingDataToWrite.Enqueue(packetBytes);
+            PendingDataToWrite.Enqueue(lengthBytes);
+            PendingDataToWrite.Enqueue(packageBytes);
 
-            lock (_pendingDataToWrite)
+            lock (PendingDataToWrite)
             {
-                if (_sendingData)
+                if (SendingData)
                 {
                     return;
                 }
 
-                _sendingData = true;
+                SendingData = true;
             }
 
             WriteData();
@@ -182,24 +203,24 @@ namespace HelperLibrary.Networking.ClientServer
 
             try
             {
-                if (_pendingDataToWrite.Count > 0 && _pendingDataToWrite.TryDequeue(out buffer))
+                if (PendingDataToWrite.Count > 0 && PendingDataToWrite.TryDequeue(out buffer))
                 {
                     ClientStream.BeginWrite(buffer, 0, buffer.Length, WriteCallback, ClientStream);
                 }
                 else
                 {
-                    lock (_pendingDataToWrite)
+                    lock (PendingDataToWrite)
                     {
-                        _sendingData = false;
+                        SendingData = false;
                     }
                 }
             }
             catch (Exception ex)
-            {
+            {                
                 Log.Debug(ex.ToString());
-                lock (_pendingDataToWrite)
+                lock (PendingDataToWrite)
                 {
-                    _sendingData = false;
+                    SendingData = false;
                 }
             }
         }
@@ -211,7 +232,7 @@ namespace HelperLibrary.Networking.ClientServer
                 ClientStream.EndWrite(ar);
             }
             catch (Exception ex)
-            {
+            {             
                 Log.Debug(ex.ToString());
             }
 

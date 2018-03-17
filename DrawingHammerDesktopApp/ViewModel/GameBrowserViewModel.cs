@@ -1,4 +1,4 @@
-﻿using DrawingHammerPacketLibrary;
+﻿using DrawingHammerPackageLibrary;
 using System.Collections.ObjectModel;
 
 namespace DrawingHammerDesktopApp.ViewModel

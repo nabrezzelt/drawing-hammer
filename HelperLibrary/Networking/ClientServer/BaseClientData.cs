@@ -1,56 +1,72 @@
-﻿using System;
+﻿using HelperLibrary.Logging;
+using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
-using HelperLibrary.Logging;
-using HelperLibrary.Networking.ClientServer.Packets;                                                                                                    
-                                                                                                                                                        
-namespace HelperLibrary.Networking.ClientServer                                                                                                         
-{                                                                                                                                                       
-    public class BaseClientData                                                                                                                         
-    {                                                                                                                                                   
-        public string Uid;                                                                                                                              
-        public bool Authenticated;                                                                                                                      
-        public readonly TcpClient TcpClient;                                                                                                            
-        public readonly Stream ClientStream;                                                                                                            
-        private readonly Thread _clientThread;                                                                                                          
-        private Server _serverInstance;                                                                                                                 
-                                                                                                                                                        
-        private readonly ConcurrentQueue<byte[]> _pendingDataToWrite = new ConcurrentQueue<byte[]>();                                                   
-        private bool _sendingData;                                                                                                                      
-                                                                                                                                                        
-        protected BaseClientData(Server serverInstance, TcpClient client, Stream stream)                                                                
-        {                                                                                                                                               
-            Uid = "";                                                                                                                                   
-                                                                                                                                                        
-            _serverInstance = serverInstance;                                                                                                           
-                                                                                                                                                        
-            TcpClient = client;                                                                                                                         
-            ClientStream = stream;                                                                                                                      
-                                                                                                                                                        
-            //Starte für jeden Client nach dem Verbinden einen seperaten Thread in dem auf neue eingehende Nachrichten gehört/gewartet wird.            
-            _clientThread = new Thread(_serverInstance.DataIn);                                                                                         
-            _clientThread.Start(this);
-        }       
+using HelperLibrary.Networking.ClientServer.Packages;
 
-        [Obsolete("Use EnqueueDataForWrite(BasePacket packet) instead!")]
-        public void SendDataPacketToClient(BasePacket packet)
-        {                        
-            EnqueueDataForWrite(packet);            
+namespace HelperLibrary.Networking.ClientServer
+{
+    public class BaseClientData
+    {
+        public string Uid { get; set; }
+
+        public bool Authenticated { get; set; }
+
+        public TcpClient TcpClient { get; }
+
+        public Stream ClientStream { get; }
+
+        private readonly Thread _clientThread;                
+        private readonly Server _serverInstance;
+
+        private readonly ConcurrentQueue<byte[]> _pendingDataToWrite = new ConcurrentQueue<byte[]>();
+        private bool _sendingData;
+
+        /// <summary>
+        /// Creates a new Client, who handles reading and sending of packages.
+        /// </summary>
+        /// <param name="serverInstance">Serverinstance to handle incomming packages.</param>
+        /// <param name="client"><see cref="TcpClient"/> of the</param>
+        /// <param name="stream">Stream to read.</param>
+        public BaseClientData(Server serverInstance, TcpClient client, Stream stream)
+        {
+            Uid = "";
+
+            _serverInstance = serverInstance;
+
+            TcpClient = client;
+            ClientStream = stream;
+
+            //Starte für jeden Client nach dem Verbinden einen seperaten Thread in dem auf neue eingehende Nachrichten gehört/gewartet wird.
+            _clientThread = new Thread(_serverInstance.DataIn);
+            _clientThread.Start(this);
         }
 
-        public void EnqueueDataForWrite(BasePacket packet)
+        /// <summary>
+        /// Sends a package to this client.
+        /// </summary>
+        /// <param name="package">Package to send (must inherit <see cref="BasePackage"/>).</param>
+        [Obsolete("Use EnqueueDataForWrite(object package) instead!")]
+        public void SendDataPackageToClient(BasePackage package)
         {
-            Log.Debug($"SENT: Send packet of type: {packet.GetType().Name}");
+            EnqueueDataForWrite(package);
+        }
 
-            byte[] packetBytes = BasePacket.Serialize(packet);
+        /// <summary>
+        /// Enqueue the package in the message queue to send this to the client.
+        /// </summary>
+        /// <param name="package">Package to send (must inherit <see cref="BasePackage"/>).</param>
+        public void EnqueueDataForWrite(BasePackage package)
+        {
+            var packageBytes = BasePackage.Serialize(package);
 
-            var length = packetBytes.Length;
+            var length = packageBytes.Length;
             var lengthBytes = BitConverter.GetBytes(length);
 
             _pendingDataToWrite.Enqueue(lengthBytes);
-            _pendingDataToWrite.Enqueue(packetBytes);
+            _pendingDataToWrite.Enqueue(packageBytes);
 
             lock (_pendingDataToWrite)
             {
@@ -95,7 +111,7 @@ namespace HelperLibrary.Networking.ClientServer
         }
 
         private void WriteCallback(IAsyncResult ar)
-        {            
+        {
             try
             {
                 ClientStream.EndWrite(ar);
@@ -106,7 +122,7 @@ namespace HelperLibrary.Networking.ClientServer
                 Log.Debug(ex.ToString());
             }
 
-            WriteData(); 
+            WriteData();
         }
     }
 }

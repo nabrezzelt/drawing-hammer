@@ -1,4 +1,4 @@
-﻿using DrawingHammerPacketLibrary.Enums;
+﻿using DrawingHammerPackageLibrary.Enums;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.Globalization;

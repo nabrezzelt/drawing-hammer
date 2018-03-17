@@ -9,13 +9,13 @@ namespace DrawingHammerServer
     {
         public const int MaxUsernameLength = 64;
         public const int MinUsernameLength = 6;
-        private static readonly MySQLDatabaseManager DbManager = MySQLDatabaseManager.GetInstance();
+        private static readonly MySqlDatabaseManager DbManager = MySqlDatabaseManager.GetInstance();
         
-        public static User GetUser(int id)
+        public static User GetUser(int userId)
         {
             string query = "SELECT username, password " +
                            "FROM users " +
-                           "WHERE id = " + id;
+                          $"WHERE userID = {userId}";
 
             var reader = DbManager.Select(query);
 
@@ -32,7 +32,7 @@ namespace DrawingHammerServer
 
             reader.Close();
 
-            return new User(id, username, passwordHash);
+            return new User(userId, username, passwordHash);
         }
 
         public static User GetUser(string username)
@@ -87,11 +87,11 @@ namespace DrawingHammerServer
 
         }
 
-        public static string GetUserSalt(int id)
+        public static string GetUserSalt(int userId)
         {
             string query = "SELECT salt " +
                            "FROM user_salt " +
-                           "WHERE userID = " + id;
+                          $"WHERE userID = {userId}";
             var reader = DbManager.Select(query);
 
             reader.Read();
@@ -130,10 +130,10 @@ namespace DrawingHammerServer
             DbManager.BindValue("@password", passwordHash);
             DbManager.ExecutePreparedInsertUpdateDelete();
 
-            int userId = DbManager.GetLastID();
+            int userId = DbManager.GetLastId();
 
             query = "INSERT INTO user_salt (userID, salt) VALUES " +
-                    "(" + userId + ", '" + salt + "')";
+                   $"({userId}, '{salt}'";
             DbManager.InsertUpdateDelete(query);
 
             return userId;
@@ -145,14 +145,17 @@ namespace DrawingHammerServer
             string passwordHash = HashManager.HashSha256(password + salt);
 
             string query = "UPDATE users " +
-                           "SET password = '" + passwordHash + "' " +
-                           "WHERE id = " + userId;
+                          $"SET password = '{passwordHash}' " +
+                          $"WHERE id = {userId}";
             DbManager.InsertUpdateDelete(query);
         }
 
         public static void DeleteUser(int userId)
         {
-            string query = "DELETE FROM users WHERE id = " + userId;
+            string query = $"DELETE FROM user_salt WHERE userID = {userId}";
+            DbManager.InsertUpdateDelete(query);
+
+            query = $"DELETE FROM users WHERE id = {userId}";
             DbManager.InsertUpdateDelete(query);
         }
 

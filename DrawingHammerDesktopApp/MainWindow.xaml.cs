@@ -1,6 +1,6 @@
 ﻿using DrawingHammerDesktopApp.ViewModel;
-using DrawingHammerPacketLibrary;
-using DrawingHammerPacketLibrary.Enums;
+using DrawingHammerPackageLibrary;
+using DrawingHammerPackageLibrary.Enums;
 using HelperLibrary.Logging;
 using HelperLibrary.Networking.ClientServer;
 using MaterialDesignThemes.Wpf;
@@ -36,7 +36,7 @@ namespace DrawingHammerDesktopApp
 
             _client.ConnectionLost += OnConnectionLost;
             _client.ConnectionSucceed += OnConnectionSucceed;
-            _client.PacketReceived += OnPacketReceived;
+            _client.PackageReceived += OnPackageReceived;
 
             Connect();
 
@@ -56,41 +56,41 @@ namespace DrawingHammerDesktopApp
             });
         }
 
-        private void OnPacketReceived(object sender, PacketReceivedEventArgs e)
+        private void OnPackageReceived(object sender, PackageReceivedEventArgs e)
         {
-            switch (e.Packet)
+            switch (e.Package)
             {
                 #region Autentication
-                case AuthenticationResultPacket p:
-                    HandleAuthenticationPacket(p);
+                case AuthenticationResultPackage p:
+                    HandleAuthenticationPackage(p);
                     break;
-                case MatchDataPacket p:
-                    HandleMatchDataPacket(p);
+                case MatchDataPackage p:
+                    HandleMatchDataPackage(p);
                     break;
                 #endregion
 
                 #region MatchHandling
-                case PlayerJoinedMatchPacket p:
+                case PlayerJoinedMatchPackage p:
                     HandleOnPlayerJoinedMatch(p);
                     break;
-                case PlayerLeftMatchPacket p:
+                case PlayerLeftMatchPackage p:
                     HandleOnPlayerLeftMatch(p);
                     break;
                 #endregion
 
                 #region TimerEvents
-                case MatchFinishedPacket _:
+                case MatchFinishedPackage _:
                     SetDrawingPlayerToGuessing();
                     StopTimer();
                     ClearDrawingAreaAndWord();
                     ClearGuessList();
                     HandleOnMatchFinished();
                     break;
-                case SubRoundStartedPacket _:
+                case SubRoundStartedPackage _:
                     StartTimer();
                     EnableCorrectArea();
                     break;
-                case SubRoundFinishedPacket _:
+                case SubRoundFinishedPackage _:
                     StopTimer();
                     ClearDrawingAreaAndWord();
                     ResetCorrectGuessesInPlayerList();
@@ -98,53 +98,53 @@ namespace DrawingHammerDesktopApp
                     DisableDrawingArea();
                     DisableGuessingArea();
                     break;
-                case RoundStartedPacket p:
+                case RoundStartedPackage p:
                     ChangeRoundNumber(p.RoundNumber);
                     break;
-                case PreparationTimeFinishedPacket _:
+                case PreparationTimeFinishedPackage _:
                     SetPreparingPlayerToDrawing();
                     break;
-                case PreparationTimeStartedPacket p:
+                case PreparationTimeStartedPackage p:
                     SetDrawingPlayerToGuessing();
                     SetPlayerToPreparing(p.PreparingPlayer);
                     break;
                 #endregion
 
                 #region Wordhandling
-                case PickWordsPacket p:
+                case PickWordsPackage p:
                     HandlePickingWords(p);
                     break;
-                case WordToDrawPacket p:
+                case WordToDrawPackage p:
                     HandleOnWordPicked(p);
                     break;
-                case WordGuessPacket p:
+                case WordGuessPackage p:
                     HandleOnWordGuessedByOtherPlayer(p);
                     break;
-                case WordGuessCorrectPacket p:
+                case WordGuessCorrectPackage p:
                     HandleOnWordGuessCorrect(p);
                     break;
-                case ScoreChangedPacket p:
+                case ScoreChangedPackage p:
                     HandleOnScoreChanged(p);
                     break;
-                case WordSolutionPacket p:
+                case WordSolutionPackage p:
                     HandleOnWordSolution(p);
                     break;
                 #endregion
 
                 #region DrawingArea
-                case DrawingAreaChangedPacket p:
+                case DrawingAreaChangedPackage p:
                     HandleOnDrawingAreaChanged(p);
                     break;
                     #endregion
             }
         }
 
-        private void HandleOnPlayerLeftMatch(PlayerLeftMatchPacket packet)
+        private void HandleOnPlayerLeftMatch(PlayerLeftMatchPackage package)
         {
             InvokeGui(() =>
             {
                 var playerToRemove = _viewModel.Players
-                    .FirstOrDefault(player => player.Uid == packet.PlayerUid);
+                    .FirstOrDefault(player => player.Uid == package.PlayerUid);
 
                 if (playerToRemove != null)
                 {
@@ -172,11 +172,11 @@ namespace DrawingHammerDesktopApp
             });
         }
 
-        private void HandleOnWordSolution(WordSolutionPacket packet)
+        private void HandleOnWordSolution(WordSolutionPackage package)
         {
             InvokeGui(() =>
             {
-                _viewModel.MessageQueue.Enqueue($"The word to guess was: '{packet.Word.Value}'", "Ok", () => { });
+                _viewModel.MessageQueue.Enqueue($"The word to guess was: '{package.Word.Value}'", "Ok", () => { });
             });
         }
 
@@ -205,16 +205,16 @@ namespace DrawingHammerDesktopApp
             });
         }
 
-        private void HandleOnScoreChanged(ScoreChangedPacket packet)
+        private void HandleOnScoreChanged(ScoreChangedPackage package)
         {
             InvokeGui(() =>
             {
-                Log.Debug($"Score changed: {packet}");
-                var player = GetPlayerByUid(packet.PlayerUid);
+                Log.Debug($"Score changed: {package}");
+                var player = GetPlayerByUid(package.PlayerUid);
 
                 if (player != null)
                 {
-                    player.Score += packet.RaisedScore;
+                    player.Score += package.RaisedScore;
                 }
             });
         }
@@ -251,53 +251,53 @@ namespace DrawingHammerDesktopApp
             });
         }
 
-        private void HandleOnWordGuessCorrect(WordGuessCorrectPacket packet)
+        private void HandleOnWordGuessCorrect(WordGuessCorrectPackage package)
         {
             InvokeGui(() =>
             {
-                var player = GetPlayerByUid(packet.PlayerUid);
+                var player = GetPlayerByUid(package.PlayerUid);
 
                 if (player != null)
                 {
                     _viewModel.Guesses.Add(new Guess(player.Username, String.Empty, true));
-                    Log.Debug($"Guess correct - Packet: {packet} - Username-by-Match: {player.Username}");
+                    Log.Debug($"Guess correct - Package: {package} - Username-by-Match: {player.Username}");
                     player.HasGuessed = true;
 
                     ScrollGuessListToLastItem();
                 }
 
-                if (packet.PlayerUid == App.Uid)
+                if (package.PlayerUid == App.Uid)
                 {                    
                     _viewModel.CanGuess = false;
                 }
             });
         }
 
-        private void HandleOnWordGuessedByOtherPlayer(WordGuessPacket packet)
+        private void HandleOnWordGuessedByOtherPlayer(WordGuessPackage package)
         {
             InvokeGui(() =>
             {
-                var player = GetPlayerByUid(packet.PlayerUid);
+                var player = GetPlayerByUid(package.PlayerUid);
 
                 if (player != null)
                 {
-                    _viewModel.Guesses.Add(new Guess(player.Username, packet.GuessedWord, false));
-                    Log.Debug($"Other user guessed a word: {packet}");
+                    _viewModel.Guesses.Add(new Guess(player.Username, package.GuessedWord, false));
+                    Log.Debug($"Other user guessed a word: {package}");
 
                     ScrollGuessListToLastItem();
                 }
             });
         }
 
-        private void HandleOnDrawingAreaChanged(DrawingAreaChangedPacket packet)
+        private void HandleOnDrawingAreaChanged(DrawingAreaChangedPackage package)
         {
             InvokeGui(() =>
             {
-                DrawingArea.Strokes = new StrokeCollection(new MemoryStream(packet.Strokes));
+                DrawingArea.Strokes = new StrokeCollection(new MemoryStream(package.Strokes));
             });
         }
 
-        private void HandleOnWordPicked(WordToDrawPacket packet)
+        private void HandleOnWordPicked(WordToDrawPackage package)
         {
             InvokeGui(() =>
             {
@@ -306,15 +306,15 @@ namespace DrawingHammerDesktopApp
                     DialogHostPickWords.IsOpen = false;
                 }
 
-                _viewModel.WordToDraw = packet.WordToDraw;
+                _viewModel.WordToDraw = package.WordToDraw;
             });
         }
 
-        private void HandlePickingWords(PickWordsPacket packet)
+        private void HandlePickingWords(PickWordsPackage package)
         {
             InvokeGui(() =>
             {
-                _viewModel.Words = new ObservableCollection<Word>(packet.WordsToSelect);
+                _viewModel.Words = new ObservableCollection<Word>(package.WordsToSelect);
 
                 DialogHostPickWords.IsOpen = true;
             });
@@ -386,21 +386,21 @@ namespace DrawingHammerDesktopApp
             });
         }
 
-        private void HandleOnPlayerJoinedMatch(PlayerJoinedMatchPacket packet)
+        private void HandleOnPlayerJoinedMatch(PlayerJoinedMatchPackage package)
         {
             InvokeGui(() =>
             {
-                if (_viewModel.MatchUid == packet.MatchUid)
+                if (_viewModel.MatchUid == package.MatchUid)
                 {
-                    _viewModel.Players.Add(packet.Player);
-                    Log.Warn($"Player {packet.Player.Username} joind with status: {packet.Player.Status}");
+                    _viewModel.Players.Add(package.Player);
+                    Log.Warn($"Player {package.Player.Username} joind with status: {package.Player.Status}");
                 }
             });
         }
 
-        private void HandleAuthenticationPacket(AuthenticationResultPacket packet)
+        private void HandleAuthenticationPackage(AuthenticationResultPackage package)
         {
-            if (packet.Result == AuthenticationResult.Ok)
+            if (package.Result == AuthenticationResult.Ok)
             {
                 InvokeGui(() =>
                 {
@@ -409,18 +409,18 @@ namespace DrawingHammerDesktopApp
             }
         }
 
-        private void HandleMatchDataPacket(MatchDataPacket packet)
+        private void HandleMatchDataPackage(MatchDataPackage package)
         {
             InvokeGui(() =>
             {
-                _viewModel.Rounds = packet.MatchData.Rounds;
-                _viewModel.CurrentRound = packet.MatchData.CurrentRound;
-                _viewModel.RemainingTime = packet.MatchData.RemainingTime;
-                _viewModel.RoundLength = packet.MatchData.RoundLength;
-                _viewModel.Players = packet.MatchData.Players;
+                _viewModel.Rounds = package.MatchData.Rounds;
+                _viewModel.CurrentRound = package.MatchData.CurrentRound;
+                _viewModel.RemainingTime = package.MatchData.RemainingTime;
+                _viewModel.RoundLength = package.MatchData.RoundLength;
+                _viewModel.Players = package.MatchData.Players;
 
-                if (packet.MatchData.Strokes != null)
-                    DrawingArea.Strokes = new StrokeCollection(new MemoryStream(packet.MatchData.Strokes));
+                if (package.MatchData.Strokes != null)
+                    DrawingArea.Strokes = new StrokeCollection(new MemoryStream(package.MatchData.Strokes));
 
                 foreach (var player in _viewModel.Players)
                 {
@@ -471,7 +471,7 @@ namespace DrawingHammerDesktopApp
         public void MatchJoined(string matchUid)
         {
             _viewModel.MatchUid = matchUid;
-            _client.EnqueueDataForWrite(new RequestMatchDataPacket(matchUid, App.Uid, Router.ServerWildcard));
+            _client.EnqueueDataForWrite(new RequestMatchDataPackage(matchUid, App.Uid, Router.ServerWildcard));
         }       
 
         private void ButtonSetEraser_OnClick(object sender, RoutedEventArgs e)
@@ -510,7 +510,7 @@ namespace DrawingHammerDesktopApp
             var strokeMemoryStream = new MemoryStream();
             DrawingArea.Strokes.Save(strokeMemoryStream);
 
-            _client.EnqueueDataForWrite(new DrawingAreaChangedPacket(strokeMemoryStream.ToArray(), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
+            _client.EnqueueDataForWrite(new DrawingAreaChangedPackage(strokeMemoryStream.ToArray(), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
         }
 
         private void TextBoxGuess_OnKeyDown(object sender, KeyEventArgs e)
@@ -519,7 +519,7 @@ namespace DrawingHammerDesktopApp
             {
                 var guessedWord = TextBoxGuess.Text;
 
-                _client.EnqueueDataForWrite(new WordGuessPacket(guessedWord, _viewModel.MatchUid, App.Uid, App.Uid, Router.ServerWildcard));
+                _client.EnqueueDataForWrite(new WordGuessPackage(guessedWord, _viewModel.MatchUid, App.Uid, App.Uid, Router.ServerWildcard));
                 TextBoxGuess.Clear();
             }
         }
@@ -544,7 +544,7 @@ namespace DrawingHammerDesktopApp
 
                 var word = (Word)e.Parameter;
 
-                _client.EnqueueDataForWrite(new PickedWordPacket(new Word(word.Id, word.Value), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
+                _client.EnqueueDataForWrite(new PickedWordPackage(new Word(word.Id, word.Value), _viewModel.MatchUid, App.Uid, Router.ServerWildcard));
             }
             else //if(e.Parameter == "QuitMatch")
             {
@@ -568,7 +568,7 @@ namespace DrawingHammerDesktopApp
 
         private void ProfileClipQuitMatch_OnClick(object sender, RoutedEventArgs e)
         {
-            _client.EnqueueDataForWrite(new LeaveMatchPacket(_viewModel.MatchUid, App.Uid, Router.ServerWildcard));
+            _client.EnqueueDataForWrite(new LeaveMatchPackage(_viewModel.MatchUid, App.Uid, Router.ServerWildcard));
             _viewModel.Reset();
 
             var gameBrowser = new GameBrowserWindow(_client, this);
