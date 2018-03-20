@@ -81,6 +81,8 @@ namespace DrawingHammerPackageLibrary
         /// </summary>
         public event EventHandler<ScoreChangedEventArgs> ScoreChanged;
 
+        public event EventHandler<PlayerRemovedEventArgs> PlayerRemoved;
+
         /// <summary>
         /// Unique Id of this match
         /// </summary>
@@ -437,6 +439,7 @@ namespace DrawingHammerPackageLibrary
                     }
                 }                
 
+                PlayerRemoved?.Invoke(this, new PlayerRemovedEventArgs(playerUid));
                 return true;
             }
 

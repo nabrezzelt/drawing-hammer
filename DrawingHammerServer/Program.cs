@@ -475,6 +475,7 @@ namespace DrawingHammerServer
             match.RoundFinished += Match_RoundFinished;
             match.MatchFinished += Match_MatchFinished;
             match.ScoreChanged += Match_ScoreChanged;
+            match.PlayerRemoved += Match_PlayerRemoved;
 
 
             _matches.Add(match);
@@ -485,6 +486,23 @@ namespace DrawingHammerServer
             Log.Debug("All clients notified recording new match.");
 
             client.EnqueueDataForWrite(new MatchCreatedPackage(Router.ServerWildcard, client.Uid));
+        }
+
+        private static void Match_PlayerRemoved(object sender, PlayerRemovedEventArgs e)
+        {
+            var match = (Match) sender;
+
+            if (match.Players.Count < 1 && match.IsFinished)
+            {                
+                _server.Router.DistributePackage(new RemoveMatchPackage(match.MatchUid, Router.ServerWildcard, Router.AllAuthenticatedWildCard));
+
+                RemoveMatch(match);
+            }
+        }
+
+        private static void RemoveMatch(Match match)
+        {
+            _matches.Remove(match);
         }
 
         private static void Match_ScoreChanged(object sender, ScoreChangedEventArgs e)

@@ -71,8 +71,28 @@ namespace DrawingHammerDesktopApp
                     break;
                 case MatchFinishedPackage p:
                     HandleOnMatchFinished(p);
-                    break;             
+                    break;
+                case RemoveMatchPackage p:
+                    HandleOnRemoveMatch(p);
+                    break;
             }
+        }
+
+        private void HandleOnRemoveMatch(RemoveMatchPackage package)
+        {
+            InvokeGui(() =>
+            {
+                for (int i = _viewModel.Matches.Count - 1; i >= 0; i--)
+                {
+                    var match = _viewModel.Matches[i];
+
+                    if (match.MatchUid == package.MatchUid)
+                    {
+                        _viewModel.Matches.RemoveAt(i);
+                        return;
+                    }                    
+                }
+            });
         }
 
         private void HandleOnMatchFinished(MatchFinishedPackage package)

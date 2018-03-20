@@ -45,6 +45,8 @@
     <Compile Include="Guess.cs" />
     <Compile Include="LeaveMatchPackage.cs" />
     <Compile Include="PlayerLeftMatchPackage.cs" />
+    <Compile Include="PlayerRemovedEventArgs.cs" />
+    <Compile Include="RemoveMatchPackage.cs" />
     <Compile Include="SubroundFinishedEventArgs.cs" />
     <Compile Include="WordGuessPackage.cs" />
     <Compile Include="CreateMatchPackage.cs" />
