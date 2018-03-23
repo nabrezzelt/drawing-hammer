@@ -9,8 +9,7 @@
         Height="398.32"
         Width="367.227"
         ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen"
-        Icon="pack://siteoforigin:,,,/Resources/DrawingHammerIcon.png"
+        WindowStartupLocation="CenterScreen"        
 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
