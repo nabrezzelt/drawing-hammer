@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="HelperLibrary.Networking.ClientServer.SslServer">
+    <Position X="10.5" Y="8.25" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQABAEAAAAAA=</HashCode>
+      <FileName>Networking\ClientServer\SslServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Networking.ClientServer.BaseClientData">
+    <Position X="17.5" Y="0.75" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAgAAAIAABAQAAEAAAAgCAAgAACCAAAAEAA=</HashCode>
+      <FileName>Networking\ClientServer\BaseClientData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Networking.ClientServer.Client">
+    <Position X="2" Y="0.5" Width="4.25" />
+    <TypeIdentifier>
+      <HashCode>AQQAgAEAoAAAAABAAAAAAIBACAAoAAIAAACCAAAElAA=</HashCode>
+      <FileName>Networking\ClientServer\Client.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Networking.ClientServer.ClientConnectedEventArgs">
+    <Position X="24" Y="0.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Networking\ClientServer\ClientConnectedEventArgs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Networking.ClientServer.ClientDisconnectedEventArgs">
+    <Position X="24" Y="2.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Networking\ClientServer\ClientDisconnectedEventArgs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Networking.ClientServer.PackageReceivedEventArgs">
+    <Position X="24" Y="4.5" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Networking\ClientServer\PackageReceivedEventArgs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Networking.ClientServer.Router">
+    <Position X="16.5" Y="7.75" Width="6.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAABAAAAAAAEAMAAAAAgAAAAAAABAAA=</HashCode>
+      <FileName>Networking\ClientServer\Router.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Networking.ClientServer.Server">
+    <Position X="9.5" Y="0.5" Width="5.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAGCABAAAAGAAAAIASAUAAACIBABAIAAAoAA=</HashCode>
+      <FileName>Networking\ClientServer\Server.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Networking.ClientServer.SslClient">
+    <Position X="0.5" Y="8" Width="7.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAEAAAAEAAAAAAAAAABAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Networking\ClientServer\SslClient.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Networking.ClientServer.Packages.BasePackage">
+    <Position X="17.75" Y="5" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAACBAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>Networking\ClientServer\Packages\BasePackage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

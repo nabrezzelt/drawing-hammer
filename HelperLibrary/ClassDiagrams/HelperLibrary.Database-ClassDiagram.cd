@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="HelperLibrary.Database.Exceptions.CouldNotConnectException">
+    <Position X="6.75" Y="1" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Database\Exceptions\CouldNotConnectException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Database.Exceptions.InstanceAlreadyExistsException">
+    <Position X="12.75" Y="3" Width="5.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Database\Exceptions\InstanceAlreadyExistsException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Database.Exceptions.MissingConnectionStringException">
+    <Position X="6.75" Y="3" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Database\Exceptions\MissingConnectionStringException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Database.Exceptions.NotConnectedException">
+    <Position X="12.75" Y="5" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Database\Exceptions\NotConnectedException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Database.Exceptions.QueryNotPreparedException">
+    <Position X="12.75" Y="1" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Database\Exceptions\QueryNotPreparedException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Database.Exceptions.SqlQueryFailedException">
+    <Position X="6.75" Y="5" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Database\Exceptions\SqlQueryFailedException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Database.SqlQueryEventArgs">
+    <Position X="1.25" Y="7.75" Width="3.5" />
+    <NestedTypes>
+      <Enum Name="HelperLibrary.Database.SqlQueryEventArgs.QueryType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Database\SqlQueryEventArgs.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAQAAAAAAAAA=</HashCode>
+      <FileName>Database\SqlQueryEventArgs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Database.MySqlDatabaseManager">
+    <Position X="0.5" Y="0.5" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAACAAABABIAQAIBABSAQCAAQQAAAQAADTEQ=</HashCode>
+      <FileName>Database\MySqlDatabaseManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

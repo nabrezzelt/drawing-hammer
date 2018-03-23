@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="DrawingHammerDesktopApp.RegisterWindow" BaseTypeListCollapsed="true">
+    <Position X="12.75" Y="8.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>ACAACAAAYAAAAEAAAAACABAAAAADAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>RegisterWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DrawingHammerDesktopApp.MainWindow" BaseTypeListCollapsed="true">
+    <Position X="6.5" Y="2.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>ASABAAIhABxaVEAQEAAGQPAJBAAQAEgJIAAgAkQwAAA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DrawingHammerDesktopApp.LoginWindow" BaseTypeListCollapsed="true">
+    <Position X="14" Y="1.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AKAACAAAAAAAAEgAQBACgAAgAAAAAAAIAAQQAAAAAAA=</HashCode>
+      <FileName>LoginWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DrawingHammerDesktopApp.GameBrowserWindow" BaseTypeListCollapsed="true">
+    <Position X="9.75" Y="2.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AGAAAAIAACBABEAQAAADgEACAARAAAAMAAAAAAQAAAA=</HashCode>
+      <FileName>GameBrowserWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DrawingHammerDesktopApp.CreateNewGameWindow" BaseTypeListCollapsed="true">
+    <Position X="10" Y="8.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAACAAAAEAAAAACAAgAAAAAAEAIAAAAAAAAACA=</HashCode>
+      <FileName>CreateNewGameWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DrawingHammerDesktopApp.ConnectionSettingsWindow" BaseTypeListCollapsed="true">
+    <Position X="12.75" Y="6" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAQAIAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConnectionSettingsWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DrawingHammerDesktopApp.App">
+    <Position X="6.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAARAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawingHammerDesktopApp.ViewModel.ViewModelBase">
+    <Position X="2.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\ViewModelBase.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DrawingHammerDesktopApp.ViewModel.MainWindowViewModel">
+    <Position X="1.25" Y="2.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAABAQAAAAAABBIAABUAAAMAAEBoAAAAAAAAEgIgAAA=</HashCode>
+      <FileName>ViewModel\MainWindowViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawingHammerDesktopApp.ViewModel.GameBrowserViewModel">
+    <Position X="3.5" Y="2.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>ABAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\GameBrowserViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawingHammerDesktopApp.Converters.StatusToIconConverter" BaseTypeListCollapsed="true">
+    <Position X="8.75" Y="0.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Converters\StatusToIconConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DrawingHammerDesktopApp.Converters.IndexConverter" BaseTypeListCollapsed="true">
+    <Position X="15.75" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Converters\IndexConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DrawingHammerDesktopApp.Converters.ColorToBrushConverter" BaseTypeListCollapsed="true">
+    <Position X="15.25" Y="6.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Converters\ColorToBrushConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DrawingHammerDesktopApp.Converters.BoolToVisibilityConverter" BaseTypeListCollapsed="true">
+    <Position X="11.5" Y="0.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Converters\BoolToVisibilityConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

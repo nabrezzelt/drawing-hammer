@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Comment CommentText="SslServer &amp; Server sind im HelberLibrary-Assembly definiert">
+    <Position X="14.279" Y="3.74" Height="0.615" Width="1.7" />
+  </Comment>
+  <Comment CommentText="BaseClientData ist im HelberLibrary-Assembly definiert">
+    <Position X="13.872" Y="8.969" Height="0.615" Width="1.7" />
+  </Comment>
+  <Class Name="DrawingHammerServer.WordManager">
+    <Position X="4" Y="0.5" Width="4.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAAAEAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>WordManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawingHammerServer.UserManager">
+    <Position X="4.25" Y="2.75" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAgAQAIiAAEAAAIAAAAAAAAAAAAEAEAAAAAAAA=</HashCode>
+      <FileName>UserManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawingHammerServer.User">
+    <Position X="4.25" Y="6.75" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AACCAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawingHammerServer.SettingsManager">
+    <Position X="0.5" Y="2.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AEAASAEAAAEQAAAAAAAAAAFAQAAAAJAAAQABAFBEEQA=</HashCode>
+      <FileName>SettingsManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawingHammerServer.DrawingHammerServer">
+    <Position X="9.75" Y="0.5" Width="5.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DrawingHammerServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawingHammerServer.DrawingHammerClientData">
+    <Position X="9.75" Y="5.75" Width="5.75" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DrawingHammerClientData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawingHammerServer.AuthenticationManager">
+    <Position X="0.5" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AuthenticationManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HelperLibrary.Networking.ClientServer.SslServer" Collapsed="true">
+    <Position X="12" Y="3" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="HelperLibrary.Networking.ClientServer.Server" Collapsed="true">
+    <Position X="12" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="HelperLibrary.Networking.ClientServer.BaseClientData" Collapsed="true">
+    <Position X="11.75" Y="9" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="DrawingHammerServer.Exceptions.UserAlreadyExitsException">
+    <Position X="0.5" Y="11.75" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Exceptions\UserAlreadyExitsException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawingHammerServer.Exceptions.UsernameTooLongException">
+    <Position X="0.5" Y="9.75" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Exceptions\UsernameTooLongException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DrawingHammerServer.Exceptions.UsernameTooShortException">
+    <Position X="0.5" Y="13.75" Width="5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Exceptions\UsernameTooShortException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -80,6 +80,12 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="ClassDiagrams\HelperLibrary.Cryptography-ClassDiagram.cd" />
+    <None Include="ClassDiagrams\HelperLibrary.Database-ClassDiagram.cd" />
+    <None Include="ClassDiagrams\HelperLibrary.FileSystem-ClassDiagram.cd" />
+    <None Include="ClassDiagrams\HelperLibrary.Logging-ClassDiagram.cd" />
+    <None Include="ClassDiagrams\HelperLibrary.Networking-ClassDiagram.cd" />
+    <None Include="ClassDiagrams\HelperLibrary.Networking.ClientServer-ClassDiagram.cd" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
