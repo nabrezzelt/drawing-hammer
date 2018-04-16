@@ -133,7 +133,7 @@ namespace DrawingHammerServer
             int userId = DbManager.GetLastId();
 
             query = "INSERT INTO user_salt (userID, salt) VALUES " +
-                   $"({userId}, '{salt}'";
+                   $"({userId}, '{salt}')";
             DbManager.InsertUpdateDelete(query);
 
             return userId;
