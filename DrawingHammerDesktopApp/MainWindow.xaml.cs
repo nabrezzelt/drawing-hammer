@@ -45,7 +45,8 @@ namespace DrawingHammerDesktopApp
 
             InitializeComponent();
 
-            SetPenSize(5, 5);
+            DialogHostConnecting.IsOpen = true;
+            SetPenSize(5, 5);            
         }
 
         private async void Connect()
@@ -447,6 +448,7 @@ namespace DrawingHammerDesktopApp
                 gameBrowser.ShowDialog();
 
                 ProgressBarLoading.Visibility = Visibility.Collapsed;
+                DialogHostConnecting.IsOpen = false;
             });
         }
 
@@ -575,6 +577,14 @@ namespace DrawingHammerDesktopApp
             gameBrowser.ShowDialog();
 
             ProgressBarLoading.Visibility = Visibility.Visible;
-        }        
+        }
+
+        private void DialogHostConnecting_OnDialogClosing(object sender, DialogClosingEventArgs eventargs)
+        {
+            if (eventargs.Parameter.ToString() == "ExitApplication")
+            {
+                Environment.Exit(0);
+            }
+        }
     }
 }

@@ -21,57 +21,78 @@
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <converters:IndexConverter x:Key="IndexConverter" />
     </Window.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-        <ProgressBar Grid.Column="0"
+    <materialDesign:DialogHost DialogClosing="DialogHostConnecting_OnDialogClosing" x:Name="DialogHostConnecting">
+        <materialDesign:DialogHost.DialogContent>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Style="{DynamicResource MaterialDesignTitleTextBlock}"
+                                       Margin="6,10,6,5"
+                                       HorizontalAlignment="Center"
+                                       Text="Trying to connect..." />
+                <ProgressBar Grid.Row="1"                                                            
+                             Height="6"
+                             IsIndeterminate="True" Margin="10,0,10,10" />
+                <Button Grid.Row="2" Content="Abort and quit" Margin="6,6,6,10" 
+                        Style="{DynamicResource MaterialDesignRaisedAccentButton}"
+                        HorizontalAlignment="Center"
+                        Command="materialDesign:DialogHost.CloseDialogCommand" CommandParameter="ExitApplication"/>
+            </Grid>
+        </materialDesign:DialogHost.DialogContent>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ProgressBar Grid.Column="0"
                      Grid.Row="0"  
                      x:Name="ProgressBarLoading"
                      Grid.ColumnSpan="3"
                      Height="6"
                      IsIndeterminate="True" />
-        <StackPanel Grid.Row="1"
+            <StackPanel Grid.Row="1"
                     Grid.Column="0"
                     HorizontalAlignment="Left"
                     Orientation="Horizontal">
-            <Image Source="Resources/DrawingHammerLogoTradeamark.png" Width="70" Margin="5" />
-            <Grid Margin="12,0,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">Round:</TextBlock>
-                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" Margin="16,0,0,0" Text="{Binding CurrentRound}" FontWeight="Bold" />
-                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="2" Margin="5,0,0,0">of</TextBlock>
-                <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="3" Margin="5,0,0,0" Text="{Binding Rounds}" FontWeight="Bold" />
+                <Image Source="Resources/DrawingHammerLogoTradeamark.png" Width="70" Margin="5" />
+                <Grid Margin="12,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">Round:</TextBlock>
+                    <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" Margin="16,0,0,0" Text="{Binding CurrentRound}" FontWeight="Bold" />
+                    <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="2" Margin="5,0,0,0">of</TextBlock>
+                    <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="3" Margin="5,0,0,0" Text="{Binding Rounds}" FontWeight="Bold" />
 
-                <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="0">Remainig Time:</TextBlock>
-                <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="-1,0,0,0" Text="{Binding RemainingTime}" FontWeight="Bold" />
-                <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="3">Seconds</TextBlock>
-            </Grid>
-        </StackPanel>
-        <TextBlock Grid.Column="1" 
+                    <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="0">Remainig Time:</TextBlock>
+                    <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="-1,0,0,0" Text="{Binding RemainingTime}" FontWeight="Bold" />
+                    <TextBlock VerticalAlignment="Center" Grid.Row="1" Grid.Column="3">Seconds</TextBlock>
+                </Grid>
+            </StackPanel>
+            <TextBlock Grid.Column="1" 
                    Grid.Row="1" 
                    Margin="5" 
                    Text="{Binding WordToDraw.Value}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    Style="{DynamicResource MaterialDesignTitleTextBlock}"/>
-        <materialDesign:Chip Grid.Column="2"
+            <materialDesign:Chip Grid.Column="2"
                              Grid.Row="1"                             
                              Content="{Binding MyUsername}"
                              IsDeletable="True"
@@ -79,220 +100,177 @@
                              DeleteToolTip="Leave current Match"
                              DeleteClick="ProfileClipQuitMatch_OnClick"
                              Margin="5">
-            <materialDesign:Chip.Icon>
-                <materialDesign:PackIcon Kind="Account" />
-            </materialDesign:Chip.Icon>
-        </materialDesign:Chip>
-        <Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="220" />
-            </Grid.ColumnDefinitions>
-            <ListView Grid.Column="0" ItemsSource="{Binding Players}">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Width="184">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <materialDesign:Chip Grid.Column="0"
+                <materialDesign:Chip.Icon>
+                    <materialDesign:PackIcon Kind="Account" />
+                </materialDesign:Chip.Icon>
+            </materialDesign:Chip>
+            <Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="220" />
+                </Grid.ColumnDefinitions>
+                <ListView Grid.Column="0" ItemsSource="{Binding Players}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Width="184">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <materialDesign:Chip Grid.Column="0"
                                                  Content="{Binding Username}">
-                                <materialDesign:Chip.Icon>
-                                    <materialDesign:PackIcon Kind="Account" />
-                                </materialDesign:Chip.Icon>
-                            </materialDesign:Chip>
-                            <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="{Binding Status, Converter={StaticResource StatusToIconConverter}}" VerticalAlignment="Center" />
-                                <TextBlock 
+                                    <materialDesign:Chip.Icon>
+                                        <materialDesign:PackIcon Kind="Account" />
+                                    </materialDesign:Chip.Icon>
+                                </materialDesign:Chip>
+                                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="{Binding Status, Converter={StaticResource StatusToIconConverter}}" VerticalAlignment="Center" />
+                                    <TextBlock 
                                        Text="{Binding Score}"
                                        VerticalAlignment="Center" 
                                        HorizontalAlignment="Center" Margin="6,0,6,0" />
-                                <materialDesign:PackIcon Kind="Check" Foreground="{DynamicResource PrimaryHueMidBrush}" Visibility="{Binding HasGuessed, Converter={StaticResource BoolToVisibilityConverter}}" VerticalAlignment="Center" Margin="5,0,0,0" />
-                            </StackPanel>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-            <Grid Grid.Column="1">
-                <materialDesign:DialogHost x:Name="DialogHostMatchFinished" DialogClosing="DialogHost_OnDialogClosing">
-                    <materialDesign:DialogHost.DialogContent>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Style="{DynamicResource MaterialDesignTitleTextBlock}"
-                                       Margin="6,5"
-                                       HorizontalAlignment="Center"
-                                       Text="Match finished!" />
-                            <ListView Grid.Row="1" Margin="6" ItemsSource="{Binding Players}">
-                                <ListView.View>
-                                    <GridView>
-                                        <GridView.Columns>
-                                            <GridViewColumn Header="Rank"
-                                                            DisplayMemberBinding="{Binding RelativeSource={RelativeSource FindAncestor, 
-                                                                AncestorType={x:Type ListViewItem}}, 
-                                                                Converter={StaticResource IndexConverter}}"/>
-                                            <GridViewColumn Header="Player" DisplayMemberBinding="{Binding Username}" />
-                                            <GridViewColumn Header="Score" DisplayMemberBinding="{Binding Score}" />
-                                        </GridView.Columns>
-                                    </GridView>
-                                </ListView.View>
-                            </ListView>
-                            <Button Grid.Row="2" Content="Quit Match" Margin="6" 
-                                    HorizontalAlignment="Center"
-                                    Command="materialDesign:DialogHost.CloseDialogCommand" CommandParameter="QuitMatch"/>
-                        </Grid>
-                    </materialDesign:DialogHost.DialogContent>
-                    <materialDesign:DialogHost x:Name="DialogHostPickWords" DialogClosing="DialogHost_OnDialogClosing">
-                        <materialDesign:DialogHost.DialogContent>
-                            <Grid>
-                                <ListView ItemsSource="{Binding Words}">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate>
-                                            <Button Content="{Binding Value}" Command="materialDesign:DialogHost.CloseDialogCommand" CommandParameter="{Binding .}" />
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
+                                    <materialDesign:PackIcon Kind="Check" Foreground="{DynamicResource PrimaryHueMidBrush}" Visibility="{Binding HasGuessed, Converter={StaticResource BoolToVisibilityConverter}}" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                </StackPanel>
                             </Grid>
-                        </materialDesign:DialogHost.DialogContent>
-                        <Grid IsEnabled="{Binding CanDraw}">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <InkCanvas Margin="10" x:Name="DrawingArea"
-                                   StrokeCollected="DrawingArea_OnChanged"
-                                   StrokeErased="DrawingArea_OnChanged" />
-                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,6">
-                                <Button Background="#e91e63" BorderBrush="#e91e63" Click="ButtonSetColor_OnClick" Tag="#e91e63" Margin="2" />
-                                <Button Background="#9c27b0" BorderBrush="#9c27b0" Click="ButtonSetColor_OnClick" Tag="#9c27b0" Margin="2" />
-                                <Button Background="#673ab7" BorderBrush="#673ab7" Click="ButtonSetColor_OnClick" Tag="#673ab7" Margin="2" />
-                                <Button Background="#3f51b5" BorderBrush="#3f51b5" Click="ButtonSetColor_OnClick" Tag="#3f51b5" Margin="2" />
-                                <Button Background="#2196f3" BorderBrush="#2196f3" Click="ButtonSetColor_OnClick" Tag="#2196f3" Margin="2" />
-                                <Button Background="#03a9f4" BorderBrush="#03a9f4" Click="ButtonSetColor_OnClick" Tag="#03a9f4" Margin="2" />
-                                <Button Background="#00bcd4" BorderBrush="#00bcd4" Click="ButtonSetColor_OnClick" Tag="#00bcd4" Margin="2" />
-                                <Button Background="#009688" BorderBrush="#009688" Click="ButtonSetColor_OnClick" Tag="#009688" Margin="2" />
-                                <Button Background="#4caf50" BorderBrush="#4caf50" Click="ButtonSetColor_OnClick" Tag="#4caf50" Margin="2" />
-                                <Button Background="#8bc34a" BorderBrush="#8bc34a" Click="ButtonSetColor_OnClick" Tag="#8bc34a" Margin="2" />
-                                <Button Background="#cddc39" BorderBrush="#cddc39" Click="ButtonSetColor_OnClick" Tag="#cddc39" Margin="2" />
-                                <Button Background="#ffeb3b" BorderBrush="#ffeb3b" Click="ButtonSetColor_OnClick" Tag="#ffeb3b" Margin="2" />
-                                <Button Background="#ffc107" BorderBrush="#ffc107" Click="ButtonSetColor_OnClick" Tag="#ffc107" Margin="2" />
-                                <Button Background="#ff9800" BorderBrush="#ff9800" Click="ButtonSetColor_OnClick" Tag="#ff9800" Margin="2" />
-                                <Button Background="#ff5722" BorderBrush="#ff5722" Click="ButtonSetColor_OnClick" Tag="#ff5722" Margin="2" />
-                                <Button Background="#795548" BorderBrush="#795548" Click="ButtonSetColor_OnClick" Tag="#795548" Margin="2" />
-                                <Button Background="#9e9e9e" BorderBrush="#9e9e9e" Click="ButtonSetColor_OnClick" Tag="#9e9e9e" Margin="2" />
-                                <Button Background="#607d8b" BorderBrush="#607d8b" Click="ButtonSetColor_OnClick" Tag="#607d8b" Margin="2" />
-                                <Button Background="#000000" BorderBrush="#000000" Click="ButtonSetColor_OnClick" Tag="#000000" Margin="2" />
-                                <Button Background="#ffffff" BorderBrush="#ffffff" Click="ButtonSetEraser_OnClick" Margin="2" Content="{materialDesign:PackIcon Kind=Eraser, Size=16}" Padding="8" ToolTip="Eraser" />
-                                <Button Background="#ffffff" BorderBrush="#ffffff" Click="ButtonResetDrawingAreaContent_OnClick" Margin="2" Content="{materialDesign:PackIcon Kind=Delete, Size=16}" Padding="8" />
-                            </StackPanel>
-                        </Grid>
-                    </materialDesign:DialogHost>
-                </materialDesign:DialogHost>
-
-                <materialDesign:Snackbar MessageQueue="{Binding MessageQueue}"                                         
-                                         Margin="5,0" />
-            </Grid>
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <ListView ItemsSource="{Binding Guesses}" x:Name="ListViewGuesses">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <TextBlock FontWeight="Bold" Text="{Binding PlayerName}" />
-                                <TextBlock Foreground="{DynamicResource PrimaryHueLightBrush}"
-                                           Text="{Binding PlayerName, StringFormat=' {0} has guessed the word!'}">
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsCorrect}" Value="True">
-                                                    <Setter Property="TextBlock.Visibility" Value="Visible" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsCorrect}" Value="False">
-                                                    <Setter Property="TextBlock.Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                                <TextBlock Text="{Binding GuessMessage}" Margin="4,0,0,0">
-                                    <TextBlock.Style>
-                                        <Style>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsCorrect}" Value="False">
-                                                    <Setter Property="TextBlock.Visibility" Value="Visible" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsCorrect}" Value="True">
-                                                    <Setter Property="TextBlock.Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <TextBox Grid.Row="1"
+                <Grid Grid.Column="1">
+                    <materialDesign:DialogHost x:Name="DialogHostMatchFinished" DialogClosing="DialogHost_OnDialogClosing">
+                        <materialDesign:DialogHost.DialogContent>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Style="{DynamicResource MaterialDesignTitleTextBlock}"
+                                       Margin="6,5"
+                                       HorizontalAlignment="Center"
+                                       Text="Match finished!" />
+                                <ListView Grid.Row="1" Margin="6" ItemsSource="{Binding Players}">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridView.Columns>
+                                                <GridViewColumn Header="Rank"
+                                                            DisplayMemberBinding="{Binding RelativeSource={RelativeSource FindAncestor, 
+                                                                AncestorType={x:Type ListViewItem}}, 
+                                                                Converter={StaticResource IndexConverter}}"/>
+                                                <GridViewColumn Header="Player" DisplayMemberBinding="{Binding Username}" />
+                                                <GridViewColumn Header="Score" DisplayMemberBinding="{Binding Score}" />
+                                            </GridView.Columns>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <Button Grid.Row="2" Content="Quit Match" Margin="6" 
+                                    HorizontalAlignment="Center"
+                                    Command="materialDesign:DialogHost.CloseDialogCommand" CommandParameter="QuitMatch"/>
+                            </Grid>
+                        </materialDesign:DialogHost.DialogContent>
+                        <materialDesign:DialogHost x:Name="DialogHostPickWords" DialogClosing="DialogHost_OnDialogClosing">
+                            <materialDesign:DialogHost.DialogContent>
+                                <Grid>
+                                    <ListView ItemsSource="{Binding Words}">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Content="{Binding Value}" Command="materialDesign:DialogHost.CloseDialogCommand" CommandParameter="{Binding .}" />
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </Grid>
+                            </materialDesign:DialogHost.DialogContent>
+                            <Grid IsEnabled="{Binding CanDraw}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <InkCanvas Margin="10" x:Name="DrawingArea"
+                                   StrokeCollected="DrawingArea_OnChanged"
+                                   StrokeErased="DrawingArea_OnChanged" />
+                                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,6">
+                                    <Button Background="#e91e63" BorderBrush="#e91e63" Click="ButtonSetColor_OnClick" Tag="#e91e63" Margin="2" />
+                                    <Button Background="#9c27b0" BorderBrush="#9c27b0" Click="ButtonSetColor_OnClick" Tag="#9c27b0" Margin="2" />
+                                    <Button Background="#673ab7" BorderBrush="#673ab7" Click="ButtonSetColor_OnClick" Tag="#673ab7" Margin="2" />
+                                    <Button Background="#3f51b5" BorderBrush="#3f51b5" Click="ButtonSetColor_OnClick" Tag="#3f51b5" Margin="2" />
+                                    <Button Background="#2196f3" BorderBrush="#2196f3" Click="ButtonSetColor_OnClick" Tag="#2196f3" Margin="2" />
+                                    <Button Background="#03a9f4" BorderBrush="#03a9f4" Click="ButtonSetColor_OnClick" Tag="#03a9f4" Margin="2" />
+                                    <Button Background="#00bcd4" BorderBrush="#00bcd4" Click="ButtonSetColor_OnClick" Tag="#00bcd4" Margin="2" />
+                                    <Button Background="#009688" BorderBrush="#009688" Click="ButtonSetColor_OnClick" Tag="#009688" Margin="2" />
+                                    <Button Background="#4caf50" BorderBrush="#4caf50" Click="ButtonSetColor_OnClick" Tag="#4caf50" Margin="2" />
+                                    <Button Background="#8bc34a" BorderBrush="#8bc34a" Click="ButtonSetColor_OnClick" Tag="#8bc34a" Margin="2" />
+                                    <Button Background="#cddc39" BorderBrush="#cddc39" Click="ButtonSetColor_OnClick" Tag="#cddc39" Margin="2" />
+                                    <Button Background="#ffeb3b" BorderBrush="#ffeb3b" Click="ButtonSetColor_OnClick" Tag="#ffeb3b" Margin="2" />
+                                    <Button Background="#ffc107" BorderBrush="#ffc107" Click="ButtonSetColor_OnClick" Tag="#ffc107" Margin="2" />
+                                    <Button Background="#ff9800" BorderBrush="#ff9800" Click="ButtonSetColor_OnClick" Tag="#ff9800" Margin="2" />
+                                    <Button Background="#ff5722" BorderBrush="#ff5722" Click="ButtonSetColor_OnClick" Tag="#ff5722" Margin="2" />
+                                    <Button Background="#795548" BorderBrush="#795548" Click="ButtonSetColor_OnClick" Tag="#795548" Margin="2" />
+                                    <Button Background="#9e9e9e" BorderBrush="#9e9e9e" Click="ButtonSetColor_OnClick" Tag="#9e9e9e" Margin="2" />
+                                    <Button Background="#607d8b" BorderBrush="#607d8b" Click="ButtonSetColor_OnClick" Tag="#607d8b" Margin="2" />
+                                    <Button Background="#000000" BorderBrush="#000000" Click="ButtonSetColor_OnClick" Tag="#000000" Margin="2" />
+                                    <Button Background="#ffffff" BorderBrush="#ffffff" Click="ButtonSetEraser_OnClick" Margin="2" Content="{materialDesign:PackIcon Kind=Eraser, Size=16}" Padding="8" ToolTip="Eraser" />
+                                    <Button Background="#ffffff" BorderBrush="#ffffff" Click="ButtonResetDrawingAreaContent_OnClick" Margin="2" Content="{materialDesign:PackIcon Kind=Delete, Size=16}" Padding="8" />
+                                </StackPanel>
+                            </Grid>
+                        </materialDesign:DialogHost>
+                    </materialDesign:DialogHost>
+
+                    <materialDesign:Snackbar MessageQueue="{Binding MessageQueue}"                                         
+                                         Margin="5,0" />
+                </Grid>
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ListView ItemsSource="{Binding Guesses}" x:Name="ListViewGuesses">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="{Binding PlayerName}" />
+                                    <TextBlock Foreground="{DynamicResource PrimaryHueLightBrush}"
+                                           Text="{Binding PlayerName, StringFormat=' {0} has guessed the word!'}">
+                                        <TextBlock.Style>
+                                            <Style>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCorrect}" Value="True">
+                                                        <Setter Property="TextBlock.Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsCorrect}" Value="False">
+                                                        <Setter Property="TextBlock.Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding GuessMessage}" Margin="4,0,0,0">
+                                        <TextBlock.Style>
+                                            <Style>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCorrect}" Value="False">
+                                                        <Setter Property="TextBlock.Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsCorrect}" Value="True">
+                                                        <Setter Property="TextBlock.Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <TextBox Grid.Row="1"
                          Margin="5"
                          IsEnabled="{Binding CanGuess}"
                          x:Name="TextBoxGuess"
                          materialDesign:HintAssist.Hint="Your Guess"
                          KeyDown="TextBoxGuess_OnKeyDown"/>
+                </Grid>
             </Grid>
         </Grid>
-    </Grid>
-
-
-    <!--<Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <ProgressBar IsIndeterminate="True"  Height="3" x:Name="pbLoading"/>
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <Label Content="Verbleibende Zeit: " />
-            <Label Content="17" FontWeight="Bold"/>
-            <Label Content=" Sekunden"/>
-        </StackPanel>
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="180" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="180" />
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Label Content="Mitspieler:" />
-                <ListView Grid.Row="1">
-
-                </ListView>
-            </Grid>
-            <InkCanvas Grid.Column="1">
-
-            </InkCanvas>
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <ListView>
-
-                </ListView>
-                <TextBox Grid.Row="1" Margin="5"></TextBox>
-            </Grid>
-        </Grid>
-    </Grid>-->
+    </materialDesign:DialogHost>
+    
 </Window>

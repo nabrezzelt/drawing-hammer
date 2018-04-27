@@ -31,12 +31,14 @@ namespace DrawingHammerServer
 
             InitializeSettingsFile();
 
-            if (String.IsNullOrWhiteSpace(_settingsManager.GetSslCertificatePath()))
+            if (String.IsNullOrWhiteSpace(_settingsManager.GetSslCertificatePath()) )
             {
-                Log.Fatal($"No Ssl-Certificate path specified. Please set the path to the Ssl-Certificate in {SettingsPath}");
-                Log.Info("Press any key to exit...");
-                Console.ReadLine();
-                Environment.Exit(1);
+                FatalExit($"No Ssl-Certificate path specified. Please set the path to the Ssl-Certificate in {SettingsPath}");                
+            }
+
+            if (!File.Exists(_settingsManager.GetSslCertificatePath()))
+            {
+                FatalExit("Ssl-Certificate not found! Please check the path you specified in your Settings-File.");
             }
 
             Log.DisplaySelfCertDetails(new X509Certificate2(
@@ -48,7 +50,7 @@ namespace DrawingHammerServer
 
             string ip = !String.IsNullOrWhiteSpace(_settingsManager.GetStartupIp()) ? _settingsManager.GetStartupIp() : NetworkUtilities.GetThisIPv4Adress();
 
-            _server = new DrawingHammerServer(new X509Certificate2(_settingsManager.GetSslCertificatePath(), _settingsManager.GetSslCertificatePassword()), ip, 9999);
+            _server = new DrawingHammerServer(new X509Certificate2(_settingsManager.GetSslCertificatePath(), _settingsManager.GetSslCertificatePassword()), ip, _settingsManager.GetStartupPort());
 
             _server.ClientConnected += OnClientConnected;
             _server.ClientDisconnected += OnClientDisconnected;
@@ -68,13 +70,19 @@ namespace DrawingHammerServer
                 return;
 
             _settingsManager.InitializeSettingsFile();
+
+            Log.Info("Generating .ini-File...");
             Log.Warn(".ini-File generated. Please setup your settings!");
+            Log.Info("Press any key to exit...");
             Console.ReadLine();
             Environment.Exit(0);
         }
 
         private static void StartCommandLineHandler()
         {
+            var maxUsernameLength = _settingsManager.GetMaxUsernameLength();
+            var minUsernameLength = _settingsManager.GetMinUsernameLength();
+
             string input = String.Empty;
 
             while (true)
@@ -149,7 +157,7 @@ namespace DrawingHammerServer
 
                         try
                         {
-                            UserManager.CreateUser(username, password);
+                            UserManager.CreateUser(username, password, minUsernameLength, maxUsernameLength);
                             Log.Info("Account '" + username.ToLower() + "' created!");
                         }
                         catch (UserAlreadyExitsException)
@@ -158,11 +166,11 @@ namespace DrawingHammerServer
                         }
                         catch (UsernameTooLongException)
                         {
-                            Log.Info("Username is too long. The maxium length is " + UserManager.MaxUsernameLength);
+                            Log.Info("Username is too long. The maxium length is " + maxUsernameLength);
                         }
                         catch (UsernameTooShortException)
                         {
-                            Log.Info("Username is too short. The minimum length is " + UserManager.MinUsernameLength);
+                            Log.Info("Username is too short. The minimum length is " + minUsernameLength);
                         }
                         break;
                     #endregion
@@ -258,10 +266,7 @@ namespace DrawingHammerServer
             }
             catch (CouldNotConnectException e)
             {
-                Log.Fatal(e.InnerException?.Message);
-                Log.Info("Press any key to exit...");
-                Console.ReadLine();
-                Environment.Exit(1);
+                FatalExit(e.InnerException?.Message);                
             }
 
             Log.Info("Database connection successfully initialized!");
@@ -636,7 +641,7 @@ namespace DrawingHammerServer
 
             try
             {
-                UserManager.CreateUser(package.Username, package.Password);
+                UserManager.CreateUser(package.Username, package.Password, _settingsManager.GetMinUsernameLength(), _settingsManager.GetMaxUsernameLength());
                 Log.Info("User successfull created with username: " + package.Username);
 
                 client.EnqueueDataForWrite(new RegistrationResultPackage(RegistrationResult.Ok, Router.ServerWildcard, package.SenderUid));
@@ -648,12 +653,12 @@ namespace DrawingHammerServer
             }
             catch (UsernameTooLongException)
             {
-                Log.Info("Registration failed. User '" + package.Username + "' is too long.");
+                Log.Info("Registration failed. Username '" + package.Username + "' is too long.");
                 client.EnqueueDataForWrite(new RegistrationResultPackage(RegistrationResult.UsernameTooLong, Router.ServerWildcard, package.SenderUid));
             }
             catch (UsernameTooShortException)
             {
-                Log.Info("Registration failed. User '" + package.Username + "' is too short.");
+                Log.Info("Registration failed. Username '" + package.Username + "' is too short.");
                 client.EnqueueDataForWrite(new RegistrationResultPackage(RegistrationResult.UsernameTooShort, Router.ServerWildcard, package.SenderUid));
             }
         }
@@ -707,6 +712,14 @@ namespace DrawingHammerServer
             }
 
             return null;
+        }
+
+        private static void FatalExit(string message)
+        {
+            Log.Fatal(message);
+            Log.Info("Press any key to exit...");
+            Console.ReadLine();
+            Environment.Exit(1);
         }
     }
 }

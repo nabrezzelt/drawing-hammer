@@ -1,4 +1,5 @@
-﻿using HelperLibrary.FileSystem;
+﻿using System;
+using HelperLibrary.FileSystem;
 
 namespace DrawingHammerServer
 {
@@ -7,6 +8,7 @@ namespace DrawingHammerServer
         private readonly IniFile _iniFile;
 
         private const string DatabaseSettingsSection = "Database Settings",
+            StartupSettingsSection = "Startup Settings",
             GeneralSettingsSection = "General Settings",
             SslCertificateSection = "Certificate Settings";
 
@@ -15,9 +17,16 @@ namespace DrawingHammerServer
             DatabaseUserKey = "DatabaseUser",
             DatabasePasswordKey = "DatabasePassword",
             DatabasenameKey = "Databasename",
+
             StartupIpKey = "StartupIp",
+            StartupPortKey = "StartupPort",
+
             SslCertificatePathKey = "SslCertificatePath",
-            SslCertificatePasswordKey = "SslCertificatePassword";
+            SslCertificatePasswordKey = "SslCertificatePassword",
+
+            MinUsernameLengthKey = "MinUsernameLength",
+            MaxUsernameLengthKey = "MaxUsernameLength";
+
 
         public SettingsManager(string iniFilePath)
         {
@@ -26,13 +35,23 @@ namespace DrawingHammerServer
 
         public void InitializeSettingsFile()
         {
+            //Database
             _iniFile.WriteValue(DatabaseHostKey, "", DatabaseSettingsSection);
             _iniFile.WriteValue(DatabaseUserKey, "", DatabaseSettingsSection);
             _iniFile.WriteValue(DatabasePasswordKey, "", DatabaseSettingsSection);
             _iniFile.WriteValue(DatabasenameKey, "", DatabaseSettingsSection);
-            _iniFile.WriteValue(StartupIpKey, "", GeneralSettingsSection);
+
+            //Startup
+            _iniFile.WriteValue(StartupIpKey, "", StartupSettingsSection);
+            _iniFile.WriteValue(StartupPortKey, "9999", StartupSettingsSection);
+
+            //Certificate
             _iniFile.WriteValue(SslCertificatePathKey, "", SslCertificateSection);
             _iniFile.WriteValue(SslCertificatePasswordKey, "", SslCertificateSection);
+
+            //General
+            _iniFile.WriteValue(MinUsernameLengthKey, "6", GeneralSettingsSection);
+            _iniFile.WriteValue(MaxUsernameLengthKey, "24", GeneralSettingsSection);
         }
 
         public string GetDatabaseHost()
@@ -57,8 +76,18 @@ namespace DrawingHammerServer
 
         public string GetStartupIp()
         {
-            return _iniFile.ReadValue(StartupIpKey, GeneralSettingsSection);
+            return _iniFile.ReadValue(StartupIpKey, StartupSettingsSection);
         }
+
+        public int GetStartupPort()
+        {
+            if (!int.TryParse(_iniFile.ReadValue(StartupPortKey, StartupSettingsSection), out int port) && port > 0)
+            {
+                throw new FormatException("The Port-Key in your Settings-File must be a int and larger than zero!");
+            }
+
+            return port;
+        }        
 
         public string GetSslCertificatePath()
         {
@@ -68,6 +97,26 @@ namespace DrawingHammerServer
         public string GetSslCertificatePassword()
         {
             return _iniFile.ReadValue(SslCertificatePasswordKey, SslCertificateSection);
+        }
+
+        public int GetMinUsernameLength()
+        {
+            if (!int.TryParse(_iniFile.ReadValue(MinUsernameLengthKey, GeneralSettingsSection), out int minLength) && minLength > 0)
+            {
+                throw new FormatException("The MinUsernameLength-Key in your Settings-File must be a int and larger or equal to 1!");
+            }
+
+            return minLength;
+        }
+
+        public int GetMaxUsernameLength()
+        {
+            if (!int.TryParse(_iniFile.ReadValue(MaxUsernameLengthKey, GeneralSettingsSection), out int maxLength) && maxLength <= 64)
+            {
+                throw new FormatException("The MaxUsernameLength-Key in your Settings-File must be a int and smaller or equal to 64!");
+            }
+
+            return maxLength;            
         }
     }
 }

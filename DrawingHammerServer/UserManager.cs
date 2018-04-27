@@ -6,9 +6,7 @@ using System.Collections.Generic;
 namespace DrawingHammerServer
 {
     internal class UserManager
-    {
-        public const int MaxUsernameLength = 64;
-        public const int MinUsernameLength = 6;
+    {        
         private static readonly MySqlDatabaseManager DbManager = MySqlDatabaseManager.GetInstance();
         
         public static User GetUser(int userId)
@@ -109,15 +107,15 @@ namespace DrawingHammerServer
             return salt;
         }
 
-        public static int CreateUser(string username, string password)
+        public static int CreateUser(string username, string password, int minUsernameLength, int maxUsernameLength)
         {
             if (GetUser(username) != null)
                 throw new UserAlreadyExitsException();
 
-            if(username.Length < MinUsernameLength)
+            if(username.Length < minUsernameLength)
                 throw new UsernameTooShortException();
 
-            if (username.Length > MaxUsernameLength)
+            if (username.Length > maxUsernameLength)
                 throw new UsernameTooLongException();
 
             string salt = HashManager.GenerateSecureRandomToken();
